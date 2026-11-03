@@ -1,0 +1,9 @@
+{
+  // Cloudflare Worker-ийн нэр. Dashboard дээрх нэртэй яг адил байх ёстой.
+  "name": "naimanand-xxk",
+  "compatibility_date": "2026-10-01",
+  // Сайтын файлууд public/ хавтсанд байна. Нүүр хуудас: public/index.html
+  "assets": {
+    "directory": "./public/"
+  }
+}
