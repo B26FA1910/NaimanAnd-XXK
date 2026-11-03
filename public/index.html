@@ -289,6 +289,26 @@ body.modal-open{overflow:hidden}
 .cust-sum{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:16px}
 .mini-title{margin:6px 0 10px}
 
+.side-link{background:none;border:0;padding:0;color:#C3CCD5;text-decoration:underline;text-underline-offset:3px;cursor:pointer;font-size:12.5px}
+.side-link:hover{color:#fff}
+.sync{display:flex;align-items:center;flex-wrap:wrap;gap:2px 7px;margin-bottom:8px;color:#C3CCD5}
+.sync .side-link{flex-basis:100%;text-align:left;margin-left:15px}
+.sync::before{content:"";width:8px;height:8px;border-radius:50%;background:#4CB37A;flex:none}
+.sync.busy::before{background:var(--brass-light)}
+.sync.err{color:#F3A59C}
+.sync.err::before{background:#E5534B}
+.sync-chip{display:none}
+.gate{position:fixed;inset:0;z-index:90;background:var(--paper);display:grid;place-items:center;padding:20px;overflow-y:auto}
+.gate[hidden]{display:none}
+.gate-box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:32px;width:100%;max-width:440px;display:flex;flex-direction:column;gap:14px}
+.gate-box h1{font-size:24px}
+.gate-box ol{margin:0;padding-left:20px;display:grid;gap:6px;color:var(--ink-2)}
+.gate-box code{background:#F1F3F5;border-radius:4px;padding:1px 5px;font-size:13.5px}
+.gate-err{color:var(--red);font-size:14px}
+.gate-box .btn{align-self:flex-start}
+.spin{width:22px;height:22px;border-radius:50%;border:2.5px solid var(--line);border-top-color:var(--brass);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
 /* toast */
 .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:10px;font-size:14.5px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:80;max-width:calc(100vw - 32px);box-shadow:0 10px 30px rgba(15,23,32,.25)}
 .toast.show{opacity:1;transform:translate(-50%,0)}
@@ -379,6 +399,9 @@ body.modal-open{overflow:hidden}
   .figs{grid-template-columns:repeat(2,minmax(0,1fr))}
   .welcome{padding:26px 20px;margin-top:0}
   .toast{bottom:92px}
+  .sync-chip{position:fixed;top:10px;right:10px;z-index:45;display:none;align-items:center;gap:7px;background:var(--vault);color:#fff;font-size:12.5px;padding:6px 11px;border-radius:99px;border:0}
+  .sync-chip.busy,.sync-chip.err{display:inline-flex}
+  .sync-chip.err{background:var(--red)}
 }
 @media (max-width:560px){
   .grid2,.grid3{grid-template-columns:1fr}
@@ -390,6 +413,7 @@ body.modal-open{overflow:hidden}
   .tl li::before{left:91px}
 }
 @media (prefers-reduced-motion:reduce){
+  .spin{animation-duration:2.4s}
   .modal{animation:none}
   .toast{transition:none}
 }
@@ -410,7 +434,7 @@ body.modal-open{overflow:hidden}
       <a href="#settings" data-nav="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>Тохиргоо</a>
     </nav>
     <button class="btn btn-brass" data-act="new-loan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Шинэ зээл бичих</button>
-    <div class="side-foot" id="side-foot"></div>
+    <div class="side-foot"><div id="sync-state" class="sync">Ачаалж байна</div><div id="side-info"></div></div>
   </aside>
   <main id="view" tabindex="-1"></main>
 </div>
@@ -423,6 +447,8 @@ body.modal-open{overflow:hidden}
   <a href="#settings" data-nav="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>Тохиргоо</a>
 </nav>
 
+<button id="sync-chip" class="sync-chip" data-act="retry-sync"></button>
+<div id="gate" class="gate" hidden></div>
 <div id="modal-root"></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <div id="print-area"></div>
@@ -464,7 +490,7 @@ const ICON = {
 };
 function ic(n){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON[n]+'</svg>'; }
 
-/* ================= Хадгалалт ================= */
+/* ================= Хадгалалт: Cloudflare D1 сервер ================= */
 function defaultDB(){
   return { version:1,
     settings:{ shopName:'Миний ломбард', phone:'', address:'', defaultRate:3, defaultTerm:30, nextTicket:1, lastBackup:null, terms:DEFAULT_TERMS },
@@ -485,17 +511,190 @@ function normalize(d){
   d.version = 1;
   return d;
 }
-const storageOK = (()=>{ try{ const k='__lombard_t'; localStorage.setItem(k,'1'); localStorage.removeItem(k); return true; }catch(e){ return false; } })();
-function load(){
-  try{ const raw = localStorage.getItem(KEY); if(raw) return normalize(JSON.parse(raw)); }catch(e){}
-  return defaultDB();
+const PASS_KEY = 'lombard-pass';            // энэ төхөөрөмж дээр хадгалсан нууц үг
+let db = defaultDB();
+let pass = ''; try{ pass = localStorage.getItem(PASS_KEY) || ''; }catch(e){}
+let loaded = false, everLoaded = false, syncing = false, syncAgain = false, knownRev = null, retryTimer = null;
+const synced = { customers:new Map(), loans:new Map(), settings:'' };
+
+async function api(path, opts){
+  opts = opts || {};
+  const headers = { 'authorization':'Bearer '+encodeURIComponent(pass) };
+  if(opts.body!==undefined) headers['content-type'] = 'application/json';
+  let res, data = null;
+  try{ res = await fetch(path, { method:opts.method||'GET', headers, body:opts.body!==undefined?JSON.stringify(opts.body):undefined, cache:'no-store' }); }
+  catch(e){ const err=new Error('network'); err.status=0; err.code='network'; throw err; }
+  try{ data = await res.json(); }catch(e){}
+  if(!res.ok || !data){ const err=new Error((data&&data.message)||('HTTP '+res.status)); err.status=res.status; err.code=(data&&data.error)||'http'; throw err; }
+  return data;
 }
-let db = load();
-function save(){
-  try{ localStorage.setItem(KEY, JSON.stringify(db)); }
-  catch(e){ toast('Хөтөчид хадгалж чадсангүй. Тохиргоо хэсгээс нөөц файл татаж авна уу.','err',6000); }
+function settingsJSON(){ const s=Object.assign({}, db.settings); delete s.nextTicket; return JSON.stringify(s); }
+function markSynced(){
+  synced.customers = new Map(db.customers.map(c=>[c.id, JSON.stringify(c)]));
+  synced.loans = new Map(db.loans.map(l=>[l.id, JSON.stringify(l)]));
+  synced.settings = settingsJSON();
 }
-try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
+function applyServer(data){
+  db = normalize({ settings:Object.assign({}, data.settings||{}, {nextTicket:data.nextTicket||1}), customers:data.customers||[], loans:data.loans||[] });
+  knownRev = data.rev; markSynced();
+}
+// Сүүлд серверт илгээснээс хойш өөрчлөгдсөн зүйлсийг олно
+function computeDiff(){
+  const up={customers:[],loans:[]}, del={customers:[],loans:[]}, sent={customers:new Map(),loans:new Map()};
+  let count = 0;
+  for(const k of ['customers','loans']){
+    const seen = new Set();
+    for(const o of db[k]){ const j=JSON.stringify(o); seen.add(o.id); if(synced[k].get(o.id)!==j){ up[k].push(o); sent[k].set(o.id,j); count++; } }
+    for(const id of synced[k].keys()) if(!seen.has(id)){ del[k].push(id); count++; }
+  }
+  const sj = settingsJSON(), settings = sj!==synced.settings ? JSON.parse(sj) : null;
+  if(settings) count++;
+  return {up, del, sent, settings, sj, count};
+}
+function save(){ if(loaded) pushSync(); }
+async function pushSync(){
+  if(!loaded) return;
+  if(syncing){ syncAgain = true; return; }
+  const d = computeDiff();
+  if(!d.count){ setSync('ok'); return; }
+  syncing = true; setSync('busy'); clearTimeout(retryTimer);
+  let failed = null;
+  try{
+    const cu = d.up.customers.slice(), lu = d.up.loans.slice();
+    let first = true;
+    while(first || cu.length || lu.length){   // том өөрчлөлтийг хэсэгчлэн илгээнэ
+      const part = { upsert:{ customers:cu.splice(0,300), loans:lu.splice(0,300) } };
+      if(first){ part.delete = d.del; part.settings = d.settings; }
+      await api('/api/sync', {method:'POST', body:part});
+      part.upsert.customers.forEach(c=>synced.customers.set(c.id, d.sent.customers.get(c.id)));
+      part.upsert.loans.forEach(l=>synced.loans.set(l.id, d.sent.loans.get(l.id)));
+      if(first){ d.del.customers.forEach(id=>synced.customers.delete(id)); d.del.loans.forEach(id=>synced.loans.delete(id)); if(d.settings) synced.settings = d.sj; }
+      first = false;
+    }
+  }catch(e){ failed = e; }
+  syncing = false;
+  if(failed){
+    setSync('err'); handleApiError(failed, true);
+    if(loaded) retryTimer = setTimeout(pushSync, 15000);
+    return;
+  }
+  if(syncAgain){ syncAgain = false; return pushSync(); }
+  setSync('ok');
+}
+function setSync(st){
+  const el = document.getElementById('sync-state'), chip = document.getElementById('sync-chip');
+  const txt = {ok:'Серверт хадгалагдсан', busy:'Хадгалж байна…', err:'Хадгалж чадсангүй'}[st];
+  if(el){ el.className = 'sync '+(st==='ok'?'':st); el.innerHTML = esc(txt) + (st==='err'?' <button class="side-link" data-act="retry-sync">Дахин оролдох</button>':''); }
+  if(chip){ chip.className = 'sync-chip '+(st==='ok'?'':st); chip.textContent = st==='err' ? 'Хадгалж чадсангүй. Дарж дахин оролдоно уу' : txt; }
+}
+function handleApiError(e, background){
+  if(e.status===401){ loaded=false; showGate('login', 'Нууц үг өөрчлөгдсөн эсвэл буруу байна. Дахин нэвтэрнэ үү.'); return; }
+  if(e.status===503){ loaded=false; showGate('setup'); return; }
+  if(background) toast('Сервертэй холбогдож чадсангүй. Интернэтээ шалгана уу, өөрчлөлтийг дахин илгээх болно.','err',5000);
+}
+async function runImport(data){
+  const d = normalize(JSON.parse(JSON.stringify(data)));
+  const settings = Object.assign({}, d.settings); delete settings.nextTicket;
+  syncing = true; setSync('busy');
+  try{
+    const cu = d.customers.slice(), lu = d.loans.slice();
+    let first = true;
+    while(first || cu.length || lu.length){
+      const part = { upsert:{ customers:cu.splice(0,300), loans:lu.splice(0,300) } };
+      if(first){ part.reset = true; part.settings = settings; }
+      await api('/api/sync', {method:'POST', body:part});
+      first = false;
+    }
+    await api('/api/ticket', {method:'PUT', body:{ next:+d.settings.nextTicket||1 }});
+    applyServer(await api('/api/data'));
+  } finally { syncing = false; syncAgain = false; }
+  render(); refreshModals(); setSync('ok');
+}
+async function refreshFromServer(){
+  if(!loaded || syncing || modalStack.length || document.hidden) return;
+  if(computeDiff().count){ pushSync(); return; }
+  try{
+    const r = await api('/api/rev');
+    if(r.rev === knownRev) return;
+    const data = await api('/api/data');
+    if(!loaded || syncing || modalStack.length || computeDiff().count) return;
+    applyServer(data); render();
+  }catch(e){ if(e.status===401 || e.status===503) handleApiError(e, true); }
+}
+setInterval(refreshFromServer, 45000);
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) refreshFromServer(); });
+window.addEventListener('beforeunload', e=>{ if(loaded && (syncing || computeDiff().count)){ e.preventDefault(); e.returnValue=''; } });
+
+const LOGO = '<svg width="46" height="46" viewBox="0 0 34 34" aria-hidden="true"><path d="M5 3.5h24" stroke="#A57E22" stroke-width="2.2" stroke-linecap="round"/><path d="M17 3.5v5M10 3.5l0 14M24 3.5v14" stroke="#A57E22" stroke-width="1.4"/><circle cx="17" cy="12.5" r="5" fill="#A57E22"/><circle cx="10" cy="23.5" r="5" fill="#A57E22"/><circle cx="24" cy="23.5" r="5" fill="#A57E22"/></svg>';
+function showGate(kind, msg){
+  closeAllModals();
+  const g = document.getElementById('gate'); g.hidden = false;
+  let h = LOGO;
+  if(kind==='loading') h += '<div class="spin" role="status" aria-label="Ачаалж байна"></div><p class="lead">Бүртгэлийг серверээс ачаалж байна…</p>';
+  else if(kind==='login') h += '<h1>Ломбардын бүртгэл</h1><p class="lead">Нэвтрэхийн тулд нууц үгээ оруулна уу.</p>'+
+    '<form id="gate-form" class="form" novalidate><div class="field"><label for="gate-pass">Нууц үг</label><input type="password" id="gate-pass" autocomplete="current-password"></div>'+
+    (msg?'<p class="gate-err" role="alert">'+esc(msg)+'</p>':'')+'<button class="btn btn-primary" type="submit">Нэвтрэх</button></form>';
+  else if(kind==='setup') h += '<h1>Нууц үг тохируулаагүй байна</h1><p class="lead">Бүртгэлийг хамгаалах нууц үгийг Cloudflare дээр нэг удаа тохируулна:</p>'+
+    '<ol><li>Cloudflare → Workers &amp; Pages → энэ сайтын Worker-ийг нээнэ</li><li><b>Settings</b> → <b>Variables and Secrets</b> → <b>Add</b></li><li>Type: <b>Secret</b>, Variable name: <code>APP_PASSWORD</code>, Value: өөрийн нууц үг</li><li><b>Deploy</b> дарна</li></ol>'+
+    '<button class="btn btn-primary" id="gate-retry">Дахин шалгах</button>';
+  else h += '<h1>Сервертэй холбогдож чадсангүй</h1><p class="lead">'+esc(msg||'Интернэт холболтоо шалгаад дахин оролдоно уу.')+'</p>'+(location.protocol==='file:'?'':'<button class="btn btn-primary" id="gate-retry">Дахин оролдох</button>');
+  g.innerHTML = '<div class="gate-box">'+h+'</div>';
+  const form = document.getElementById('gate-form');
+  if(form){
+    const inp = document.getElementById('gate-pass'); setTimeout(()=>inp.focus(), 30);
+    form.addEventListener('submit', e=>{ e.preventDefault(); const v=inp.value; if(!v){ inp.focus(); return; } form.querySelector('button').disabled=true; login(v); });
+  }
+  const retry = document.getElementById('gate-retry');
+  if(retry) retry.addEventListener('click', ()=>{ showGate('loading'); login(pass); });
+}
+function hideGate(){ const g=document.getElementById('gate'); g.hidden=true; g.innerHTML=''; }
+async function login(p){
+  pass = p || '';
+  if(!pass){ showGate('login'); return; }
+  try{
+    if(everLoaded && computeDiff().count){
+      await api('/api/rev');                       // нууц үгийг шалгана
+      try{ localStorage.setItem(PASS_KEY, pass); }catch(e){}
+      loaded = true; hideGate(); render(); pushSync(); return;
+    }
+    const data = await api('/api/data');
+    try{ localStorage.setItem(PASS_KEY, pass); }catch(e){}
+    applyServer(data); loaded = true; everLoaded = true;
+    hideGate(); render(); setSync('ok'); offerMigration();
+  }catch(e){
+    if(e.status===401) showGate('login', 'Нууц үг буруу байна.');
+    else if(e.status===503) showGate('setup');
+    else if(e.status===0) showGate('offline');
+    else showGate('offline', 'Серверт алдаа гарлаа ('+e.message+'). Хэсэг хүлээгээд дахин оролдоно уу.');
+  }
+}
+function logout(){
+  const go = ()=>{ try{ localStorage.removeItem(PASS_KEY); }catch(e){} pass=''; loaded=false; location.hash=''; location.reload(); };
+  if(syncing || computeDiff().count){
+    confirmBox({title:'Хадгалагдаагүй өөрчлөлт байна', text:'Серверт хараахан хадгалагдаагүй өөрчлөлт байна. Одоо гарвал тэдгээр нь алга болно.', ok:'Гарах', danger:true, onOk:go});
+  } else go();
+}
+// Өмнөх хувилбарт энэ хөтөч дээр бичсэн бүртгэлийг серверт шилжүүлэх санал
+function offerMigration(){
+  if(db.loans.length || db.customers.length) return;
+  let raw = null; try{ raw = localStorage.getItem(KEY); }catch(e){}
+  if(!raw) return;
+  let old; try{ old = normalize(JSON.parse(raw)); }catch(e){ return; }
+  if(!old.loans.length && !old.customers.length) return;
+  confirmBox({ title:'Энэ хөтөчид хадгалсан бүртгэл олдлоо',
+    text:'Өмнөх хувилбарт энэ хөтөч дээр '+old.customers.length+' харилцагч, '+old.loans.length+' зээл бичсэн байна. Тэдгээрийг серверт шилжүүлбэл бүх төхөөрөмжөөс харагдаж, найдвартай хадгалагдана.',
+    ok:'Серверт шилжүүлэх',
+    onOk: async ()=>{
+      try{ await runImport(old); try{ localStorage.setItem(KEY+'-migrated', raw); localStorage.removeItem(KEY); }catch(e){} toast('Бүртгэлийг серверт шилжүүллээ'); }
+      catch(e){ handleApiError(e,false); toast('Шилжүүлж чадсангүй. Хуудсыг дахин ачаалаад оролдоно уу.','err',5000); }
+    } });
+}
+async function boot(){
+  if(location.protocol==='file:'){ showGate('offline', 'Энэ хувилбар бүртгэлээ серверт хадгалдаг тул файлыг компьютер дээрээс шууд нээвэл ажиллахгүй. Сайтын хаягаар нь нээнэ үү.'); return; }
+  if(!pass){ showGate('login'); return; }
+  showGate('loading');
+  await login(pass);
+}
 
 /* ================= Туслах функцууд ================= */
 const $ = (s,r=document)=>r.querySelector(s);
@@ -692,11 +891,10 @@ function ticketHTML(l, x, c){
     '</span></button>';
 }
 function backupNotice(){
-  if(!storageOK) return '<div class="notice err"><span>Энэ хөтөч өгөгдөл хадгалахыг хориглосон байна. Хуудсыг хаахад бүртгэл устна, тиймээс нөөц файлаа тогтмол татаж аваарай.</span><button class="btn sm" data-act="backup">'+ic('download')+'Нөөц татах</button></div>';
   if(!db.loans.length) return '';
   const lb = db.settings.lastBackup;
-  if(lb && diffDays(lb.slice(0,10), todayISO()) < 7) return '';
-  return '<div class="notice"><span>Бүртгэл зөвхөн энэ хөтөчид хадгалагдаж байна. '+(lb?'Сүүлд '+fmtDate(lb.slice(0,10))+'-нд нөөцөлсөн.':'Одоогоор нөөц файл татаагүй байна.')+'</span><button class="btn sm" data-act="backup">'+ic('download')+'Нөөц татах</button></div>';
+  if(lb && diffDays(lb.slice(0,10), todayISO()) < 30) return '';
+  return '<div class="notice"><span>Бүртгэл серверт хадгалагдаж байгаа ч нэмэлт хамгаалалт болгож сард нэг удаа нөөц файл татаж аваарай. '+(lb?'Сүүлд '+fmtDate(lb.slice(0,10))+'-нд татсан.':'Одоогоор нөөц файл татаагүй байна.')+'</span><button class="btn sm" data-act="backup">'+ic('download')+'Нөөц татах</button></div>';
 }
 function viewWelcome(){
   return '<div class="welcome">'+
@@ -869,14 +1067,17 @@ function viewSettings(){
     '<div><button class="btn btn-primary" type="submit">Тохиргоог хадгалах</button></div>'+
   '</form></section>'+
   '<section class="panel pad"><div><h2>Нөөцлөлт</h2><p class="sub">Сүүлд нөөцөлсөн: '+(s.lastBackup?fmtDate(s.lastBackup.slice(0,10)):'хараахан нөөцлөөгүй')+'</p></div>'+
-    '<p>Бүх бүртгэл зөвхөн энэ төхөөрөмжийн хөтөчид хадгалагдана. Хөтчийн түүх цэвэрлэх, өөр компьютер ашиглахад алга болж болох тул долоо хоногт нэгээс доошгүй удаа нөөц файл татаж, өөр газар хадгалаарай. Өөр компьютер руу шилжүүлэхдээ тэр файлаа "Нөөцөөс сэргээх"-ээр оруулна.</p>'+
+    '<p>Бүх бүртгэл Cloudflare-ийн D1 серверт хадгалагдаж, нууц үгээр нэвтэрсэн бүх төхөөрөмжөөс нэг дор харагдана. Нэмэлт хамгаалалт болгож сард нэг удаа нөөц файл татаж, өөр газар хадгалаарай. "Нөөцөөс сэргээх" нь сервер дээрх бүртгэлийг файлынхаар солино.</p>'+
     '<div class="row-btns"><button class="btn btn-primary" data-act="backup">'+ic('download')+'Нөөц файл татах</button><button class="btn" data-act="import">Нөөцөөс сэргээх</button><button class="btn" data-act="csv">Зээлийн жагсаалт татах (Excel)</button></div></section>'+
+  '<section class="panel pad"><div><h2>Нэвтрэлт</h2><p class="sub">Нууц үгийг Cloudflare дээрх APP_PASSWORD тохиргооноос солино.</p></div>'+
+    '<p>Энэ төхөөрөмж нууц үгийг санаж байгаа. Олон хүн ашигладаг компьютер дээр ажлаа дуусгаад гарч байгаарай.</p>'+
+    '<div><button class="btn" data-act="logout">Энэ төхөөрөмжөөс гарах</button></div></section>'+
   '<section class="panel pad"><div><h2>Бүх өгөгдлийг устгах</h2><p class="sub">Харилцагч, зээл, төлөлтийн бүх бүртгэл буцаагдахгүйгээр устна.</p></div>'+
     '<div><button class="btn btn-danger" data-act="wipe">'+ic('trash')+'Бүгдийг устгах</button></div></section></div>';
 }
 function bindSettings(){
   const f = $('#set-form'); if(!f) return;
-  f.addEventListener('submit', e=>{
+  f.addEventListener('submit', async e=>{
     e.preventDefault();
     const name=$('#s-name').value.trim(), rate=parseRate($('#s-rate').value), term=parseInt($('#s-term').value,10), next=parseInt($('#s-next').value,10);
     if(!name) return fieldErr($('#s-name'),'Ломбардын нэрийг оруулна уу');
@@ -885,7 +1086,13 @@ function bindSettings(){
     if(!(next>=1)) return fieldErr($('#s-next'),'Тасалбарын дугаар 1-ээс их байна');
     const maxNo = db.loans.reduce((m,l)=>Math.max(m,l.ticketNo||0),0);
     if(next<=maxNo) return fieldErr($('#s-next'),'№'+String(maxNo).padStart(4,'0')+' тасалбар бичигдсэн тул '+(maxNo+1)+'-ээс эхлүүлнэ үү');
-    Object.assign(db.settings, {shopName:name, phone:$('#s-phone').value.trim(), address:$('#s-addr').value.trim(), defaultRate:rate, defaultTerm:term, nextTicket:next, terms:$('#s-terms').value.trim()});
+    const vals = {shopName:name, phone:$('#s-phone').value.trim(), address:$('#s-addr').value.trim(), defaultRate:rate, defaultTerm:term, terms:$('#s-terms').value.trim()};
+    if(next !== +db.settings.nextTicket){
+      const btn = f.querySelector('button[type=submit]'); btn.disabled = true;
+      try{ const r = await api('/api/ticket', {method:'PUT', body:{next}}); vals.nextTicket = r.nextTicket; }
+      catch(err){ btn.disabled = false; handleApiError(err,false); toast('Тасалбарын дугаарыг серверт хадгалж чадсангүй. Дахин оролдоно уу.','err'); return; }
+    }
+    Object.assign(db.settings, vals);
     changed(); toast('Тохиргоог хадгаллаа');
   });
 }
@@ -897,7 +1104,7 @@ function render(){
   $$('[data-nav]').forEach(a=>{ const on=a.dataset.nav===r; a.classList.toggle('on',on); if(on) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
   $('#brand-name').textContent = db.settings.shopName || 'Ломбард';
   const lb = db.settings.lastBackup;
-  $('#side-foot').innerHTML = storageOK ? 'Бүртгэл энэ хөтөчид хадгалагдана.<br>Сүүлийн нөөц: <b>'+(lb?fmtDate(lb.slice(0,10)):'алга')+'</b>' : '<b>Хадгалах боломжгүй хөтөч</b>';
+  $('#side-info').innerHTML = 'Сүүлийн нөөц файл: <b>'+(lb?fmtDate(lb.slice(0,10)):'алга')+'</b><br><button class="side-link" data-act="logout">Гарах</button>';
   const v = $('#view');
   const sy = window.scrollY;
   if(r==='loans'){ v.innerHTML = viewLoans(); renderLoanList(); }
@@ -1050,8 +1257,9 @@ function openLoanForm(opts){
   upd();
   setTimeout(()=>{ (sel.value ? $('#lf-name',f) : (db.customers.length? cq : $('#lf-newc',f))).focus(); }, 30);
 
-  $('#loan-form',f).addEventListener('submit', e=>{
+  $('#loan-form',f).addEventListener('submit', async e=>{
     e.preventDefault();
+    if(f.dataset.busy) return;
     const cid=sel.value, name=$('#lf-name',f).value.trim(), P=parseMoney($('#lf-amt',f).value), R=parseRate($('#lf-rate',f).value), N=parseInt($('#lf-term',f).value,10), S=$('#lf-start',f).value;
     if(!cid) return fieldErr(sel,'Харилцагч сонгоно уу');
     if(!name) return fieldErr($('#lf-name',f),'Барьцаа хөрөнгийн нэрийг бичнэ үү');
@@ -1067,8 +1275,11 @@ function openLoanForm(opts){
       const iss = editing.events.find(e=>e.type==='issue'); if(iss) iss.date = S;
       closeModal(m); changed(); toast('Өөрчлөлтийг хадгаллаа');
     } else {
-      const maxNo = db.loans.reduce((mx,x)=>Math.max(mx,x.ticketNo||0),0);
-      const no = Math.max(+db.settings.nextTicket||1, maxNo+1);
+      // Тасалбарын дугаарыг сервер олгоно, ингэснээр хоёр компьютер нэг дугаар өгөхгүй
+      const btn = f.querySelector('.m-foot .btn-primary'); f.dataset.busy = '1'; btn.disabled = true;
+      let no;
+      try{ no = (await api('/api/ticket', {method:'POST'})).ticketNo; }
+      catch(err){ delete f.dataset.busy; btn.disabled = false; handleApiError(err,false); if(err.status!==401 && err.status!==503) toast('Тасалбарын дугаар авч чадсангүй. Интернэтээ шалгаад дахин оролдоно уу.','err',5000); return; }
       const loan = { id:uid(), ticketNo:no, customerId:cid, item, principal:P, rate:R, termDays:N, startDate:S, status:'active', closedDate:null, note,
         createdAt:new Date().toISOString(), events:[{id:uid(), type:'issue', date:S, at:stamp()}] };
       db.loans.push(loan); db.settings.nextTicket = no+1;
@@ -1336,8 +1547,8 @@ $('#import-file').addEventListener('change', e=>{
     try{ data = JSON.parse(rd.result); }catch(err){ toast('Файл уншигдсангүй. Энэ хуудаснаас татсан .json нөөц файл сонгоно уу.','err',5000); return; }
     if(!data || !Array.isArray(data.loans) || !Array.isArray(data.customers)){ toast('Энэ файл ломбардын нөөц биш байна','err',5000); return; }
     confirmBox({ title:'Нөөцөөс сэргээх үү?', danger:true, ok:'Сэргээх',
-      text:'Файлд '+data.customers.length+' харилцагч, '+data.loans.length+' зээл байна. Одоогийн бүх бүртгэл ('+db.customers.length+' харилцагч, '+db.loans.length+' зээл) файлынхаар солигдоно.',
-      onOk:()=>{ db = normalize(data); changed(); toast('Нөөцөөс сэргээлээ'); } });
+      text:'Файлд '+data.customers.length+' харилцагч, '+data.loans.length+' зээл байна. Сервер дээрх одоогийн бүх бүртгэл ('+db.customers.length+' харилцагч, '+db.loans.length+' зээл) файлынхаар солигдож, бүх төхөөрөмжид шинэчлэгдэнэ.',
+      onOk: async ()=>{ try{ await runImport(data); toast('Нөөцөөс сэргээлээ'); }catch(err){ handleApiError(err,false); toast('Сэргээж чадсангүй. Дахин оролдоно уу.','err',5000); } } });
   };
   rd.onerror = ()=>toast('Файл уншигдсангүй','err');
   rd.readAsText(file);
@@ -1417,12 +1628,19 @@ document.addEventListener('click', e=>{
     case 'import': $('#import-file').click(); break;
     case 'wipe':
       confirmBox({title:'Бүх өгөгдлийг устгах уу?', text:'Харилцагч, зээл, төлөлтийн бүх бүртгэл устна. Үүнийг буцаах боломжгүй.', ok:'Бүгдийг устгах', danger:true, typed:'УСТГАХ',
-        onOk:()=>{ const keep=Object.assign({}, db.settings, {nextTicket:1}); db=defaultDB(); db.settings=Object.assign(db.settings, keep); changed(); toast('Бүх бүртгэл устлаа'); }});
+        onOk: async ()=>{
+          syncing = true;
+          try{ await api('/api/wipe', {method:'POST'}); applyServer(await api('/api/data')); syncing = false; render(); setSync('ok'); toast('Бүх бүртгэл устлаа'); }
+          catch(err){ syncing = false; handleApiError(err,false); toast('Устгаж чадсангүй. Дахин оролдоно уу.','err'); }
+        }});
       break;
+    case 'logout': logout(); break;
+    case 'retry-sync': pushSync(); break;
   }
 });
 
 render();
+boot();
 })();
 </script>
 </body>

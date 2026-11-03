@@ -2,8 +2,21 @@
   // Cloudflare Worker-ийн нэр. Dashboard дээрх нэртэй яг адил байх ёстой.
   "name": "naimanand-xxk",
   "compatibility_date": "2026-10-01",
+  // /api/ хүсэлтүүдийг боловсруулах серверийн код
+  "main": "src/index.js",
   // Сайтын файлууд public/ хавтсанд байна. Нүүр хуудас: public/index.html
   "assets": {
-    "directory": "./public/"
-  }
+    "directory": "./public/",
+    "binding": "ASSETS"
+  },
+  // Зээл, харилцагчийн бүртгэл хадгалагдах D1 өгөгдлийн сан
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "lombard-db",
+      "database_id": "1744e395-7fad-439a-aecb-06885ecff979"
+    }
+  ]
+  // Нэвтрэх нууц үгийг энд бичихгүй. Cloudflare dashboard дээр
+  // Settings > Variables and Secrets хэсэгт APP_PASSWORD нэртэй Secret болгон нэмнэ.
 }
