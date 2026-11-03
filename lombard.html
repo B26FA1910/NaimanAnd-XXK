@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ломбард: зээлийн бүртгэл</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ECEFF2; --surface:#FFFFFF; --ink:#17212B; --ink-2:#44505D; --muted:#687482;
+  --line:#D3D9E0; --line-2:#E5E9ED; --hover:#F6F7F9;
+  --vault:#17212B;
+  --brass:#A57E22; --brass-ink:#7A5B10; --brass-light:#C9A04A; --brass-tint:#F5EDDA;
+  --red:#B42318; --red-tint:#FCEAE7;
+  --amber:#A3560A; --amber-tint:#FDF0DE;
+  --green:#2C7A4B; --green-tint:#E2F2E8;
+  --slate:#5C6371; --slate-tint:#ECEEF1;
+  --notch:var(--paper);
+  --font:'Golos Text', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --stamp:'Oswald', 'Arial Narrow', 'Roboto Condensed', sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font:15px/1.5 var(--font);color:var(--ink);background:var(--paper)}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{margin:0;line-height:1.25}
+h1{font-size:28px;font-weight:600;letter-spacing:-.01em}
+h2{font-size:18px;font-weight:600}
+h3{font-size:16px;font-weight:600}
+p{margin:0}
+.num{font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.red{color:var(--red)}
+.muted{color:var(--muted)}
+
+/* ---------- shell ---------- */
+.app{display:grid;grid-template-columns:236px minmax(0,1fr);min-height:100vh;background:linear-gradient(to right,var(--vault) 236px,transparent 236px)}
+.side{background:var(--vault);color:#C3CCD5;padding:22px 14px 18px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:26px}
+.brand{display:flex;align-items:center;gap:11px;padding:0 6px}
+.brand svg{flex:none}
+.brand-name{font-family:var(--stamp);font-size:20px;font-weight:500;color:#fff;line-height:1.15;word-break:break-word}
+.brand-sub{font-size:12.5px;color:#8D98A5;margin-top:2px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;color:#B3BDC8;text-decoration:none;font-weight:500;position:relative}
+.nav a:hover{background:rgba(255,255,255,.05);color:#fff}
+.nav a.on{background:rgba(201,160,74,.13);color:#fff}
+.nav a.on::before{content:"";position:absolute;left:-14px;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:var(--brass-light)}
+.nav svg{width:20px;height:20px;flex:none}
+.side .btn-brass{width:100%;height:44px}
+.side-foot{margin-top:auto;font-size:12.5px;line-height:1.45;color:#8D98A5;padding:0 6px}
+.side-foot b{color:#C3CCD5;font-weight:500}
+main{padding:32px 40px 64px;min-width:0}
+.wrap{max-width:1180px;margin:0 auto}
+.wrap.narrow{max-width:760px}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+.page-head .sub{margin-top:4px}
+.sub{color:var(--muted)}
+.head-btns{display:flex;gap:8px;flex-wrap:wrap}
+.tabbar{display:none}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-weight:500;cursor:pointer;white-space:nowrap;text-decoration:none;color:var(--ink)}
+.btn:hover{border-color:#B6C0CB;background:var(--hover)}
+.btn svg{width:18px;height:18px;flex:none}
+.btn-primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn-primary:hover{background:#27333F;border-color:#27333F}
+.btn-brass{background:var(--brass-light);border-color:var(--brass-light);color:var(--ink);font-weight:600}
+.btn-brass:hover{background:#D4AE5C;border-color:#D4AE5C}
+.btn-danger{background:var(--red);border-color:var(--red);color:#fff}
+.btn-danger:hover{background:#9A1D13;border-color:#9A1D13}
+.btn-ghost{background:transparent;border-color:transparent}
+.btn-ghost:hover{background:rgba(23,33,43,.06);border-color:transparent}
+.btn-ghost.danger{color:var(--red)}
+.btn.sm{height:34px;padding:0 12px;font-size:14px}
+.icon-btn{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--ink-2)}
+.icon-btn:hover{background:rgba(23,33,43,.07);color:var(--ink)}
+.icon-btn svg{width:20px;height:20px}
+.icon-btn.sm{width:30px;height:30px}
+.icon-btn.sm svg{width:16px;height:16px}
+.link{background:none;border:0;padding:0;color:inherit;text-decoration:underline;text-decoration-color:rgba(23,33,43,.3);text-underline-offset:3px;cursor:pointer;font-weight:600}
+.link:hover{text-decoration-color:currentColor}
+
+/* ---------- notices ---------- */
+.notice{display:flex;gap:14px;align-items:center;justify-content:space-between;background:var(--amber-tint);border:1px solid #EFD2A6;border-radius:10px;padding:12px 16px;margin-bottom:22px;font-size:14px;flex-wrap:wrap}
+.notice.err{background:var(--red-tint);border-color:#F3C4BD}
+
+/* ---------- ledger strip ---------- */
+.ledger{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:0 0 30px}
+.ledger>div{padding:16px 20px;box-shadow:1px 0 0 var(--line-2),0 1px 0 var(--line-2)}
+.ledger dt{font-size:13px;color:var(--muted)}
+.ledger dd{margin:4px 0 0;font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap}
+.ledger .alert dd{color:var(--red)}
+.ledger dd small{font-size:14px;font-weight:500;color:var(--muted);margin-left:4px}
+
+.dash{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:30px;align-items:start}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px}
+.sec-head .sub{font-size:14px}
+
+/* ---------- pawn ticket ---------- */
+.ticket{display:grid;grid-template-columns:120px minmax(0,1fr);width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;padding:0;cursor:pointer;position:relative;color:var(--ink)}
+button.ticket:hover{border-color:#B2BCC7}
+.ticket+.ticket{margin-top:12px}
+.stub{position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:12px;padding:14px 14px 14px 16px;background:var(--brass-tint);border-right:2px dashed rgba(23,33,43,.2)}
+.stub::before,.stub::after{content:"";position:absolute;right:-10px;width:18px;height:18px;border-radius:50%;background:var(--notch);border:1px solid var(--line)}
+.stub::before{top:-10px}
+.stub::after{bottom:-10px}
+.tno{font-family:var(--stamp);font-weight:600;font-size:28px;line-height:1;color:var(--brass-ink);letter-spacing:.01em}
+.stub-due{font-size:12.5px;color:var(--ink-2);line-height:1.35}
+.stub-due b{display:block;font-size:14px;color:var(--ink);font-variant-numeric:tabular-nums}
+.st-overdue .stub{background:var(--red-tint)} .st-overdue .tno{color:var(--red)}
+.st-soon .stub{background:var(--amber-tint)} .st-soon .tno{color:var(--amber)}
+.st-redeemed .stub{background:var(--green-tint)} .st-redeemed .tno{color:var(--green)}
+.st-forfeited .stub{background:var(--slate-tint)} .st-forfeited .tno{color:var(--slate)}
+.tbody{padding:14px 18px 16px;display:flex;flex-direction:column;gap:5px;min-width:0}
+.t-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.t-name{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t-item{color:var(--ink-2);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t-money{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:4px 0 6px}
+.t-money span{font-size:13px;color:var(--muted)}
+.t-money b{font-size:18px;font-variant-numeric:tabular-nums}
+
+.ticket.big{cursor:default;grid-template-columns:150px minmax(0,1fr)}
+.ticket.big .tno{font-size:38px}
+.ticket.big .tbody{gap:8px;padding:18px 22px}
+.who{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;flex:1 1 240px;min-width:0}
+.who span{white-space:nowrap}
+.ticket.big .t-top{flex-wrap:wrap;align-items:flex-start}
+.who .link{font-size:17px}
+.who span{font-size:14px;color:var(--muted)}
+.what{font-size:15px}
+.what .cat{display:block;font-size:13px;color:var(--muted)}
+.owed-line{display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-top:1px dashed var(--line);padding-top:10px;margin-top:4px;flex-wrap:wrap}
+.owed-line span{color:var(--ink-2);font-size:14px}
+.owed-line b{font-size:24px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+
+/* ---------- bars & badges ---------- */
+.bar{display:block;height:6px;border-radius:99px;background:var(--line-2);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:inherit;background:var(--brass)}
+.st-overdue .bar i,.bar.st-overdue i{background:var(--red)}
+.st-soon .bar i,.bar.st-soon i{background:var(--amber)}
+.bar.st-redeemed i{background:var(--green)}
+.bar.st-forfeited i{background:var(--slate)}
+.badge{display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:99px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.b-active{background:var(--brass-tint);color:var(--brass-ink)}
+.b-soon{background:var(--amber-tint);color:var(--amber)}
+.b-overdue{background:var(--red-tint);color:var(--red)}
+.b-redeemed{background:var(--green-tint);color:var(--green)}
+.b-forfeited{background:var(--slate-tint);color:var(--slate)}
+
+/* ---------- panels & lists ---------- */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.panel.pad{padding:22px 24px;display:flex;flex-direction:column;gap:14px}
+.panel+.panel{margin-top:18px}
+.lrow,.crow,.mrow{display:grid;gap:14px;align-items:center;padding:13px 18px;border:0;border-top:1px solid var(--line-2);width:100%;background:none;text-align:left;cursor:pointer;color:var(--ink)}
+.lrow{grid-template-columns:82px minmax(0,1.2fr) minmax(0,1.4fr) minmax(0,.95fr) minmax(0,1fr) minmax(0,1.3fr) 132px}
+.crow{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr) 70px 90px minmax(0,1fr)}
+.mrow{grid-template-columns:74px minmax(0,1fr) auto auto}
+.lrow:hover,.crow:hover,.mrow:hover{background:var(--hover)}
+.lhead{cursor:default;font-size:13px;color:var(--muted);border-top:0;background:#F7F8FA;padding-top:11px;padding-bottom:11px}
+.lhead:hover{background:#F7F8FA}
+.r{text-align:right}
+.cell-sub{display:block;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ell{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tno-s{font-family:var(--stamp);font-weight:500;font-size:18px;color:var(--brass-ink)}
+.due-line{display:block;font-size:13.5px;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-due .cell-sub{margin-top:5px;font-variant-numeric:tabular-nums}
+.empty{padding:36px 24px;text-align:center;color:var(--ink-2);display:flex;flex-direction:column;align-items:center;gap:14px}
+.panel .empty{border-top:1px solid var(--line-2)}
+.panel>.empty:first-child{border-top:0}
+
+.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.search{position:relative;flex:1 1 260px;max-width:400px}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted);pointer-events:none}
+.search input[type=search]{padding-left:40px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{height:34px;padding:0 12px;border-radius:99px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:500;font-size:14px;display:inline-flex;gap:7px;align-items:center;color:var(--ink)}
+.chip:hover{border-color:#B6C0CB}
+.chip .c{color:var(--muted);font-variant-numeric:tabular-nums}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip.on .c{color:#A9B4C0}
+
+/* feed */
+.feed{list-style:none;margin:0;padding:0}
+.feed li+li{border-top:1px solid var(--line-2)}
+.feed button{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:12px;align-items:start;width:100%;padding:12px 16px;border:0;background:none;text-align:left;cursor:pointer;color:var(--ink)}
+.feed button:hover{background:var(--hover)}
+.feed .dot{width:8px;height:8px;border-radius:50%;margin-top:7px;background:var(--ink-2)}
+.feed .k-payment .dot{background:var(--green)}
+.feed .k-extend .dot{background:var(--amber)}
+.feed .k-redeem .dot{background:var(--green)}
+.feed .k-forfeit .dot{background:var(--slate)}
+.feed .k-issue .dot{background:var(--brass)}
+.feed .t{font-weight:500}
+.feed .s{display:block;font-size:13px;color:var(--muted)}
+.feed .d{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* welcome */
+.welcome{max-width:680px;margin:6vh auto 0;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:36px 36px 32px}
+.welcome h1{margin:18px 0 8px}
+.welcome .lead{color:var(--ink-2);font-size:16px}
+.steps{list-style:none;margin:24px 0 26px;padding:0;display:grid;gap:12px;counter-reset:s}
+.steps li{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start;counter-increment:s}
+.steps li::before{content:counter(s);font-family:var(--stamp);font-size:20px;font-weight:600;color:var(--brass-ink);background:var(--brass-tint);width:34px;height:34px;border-radius:50%;display:grid;place-items:center;line-height:1}
+.steps b{display:block}
+.steps span{color:var(--muted);font-size:14px}
+.welcome .btns{display:flex;gap:10px;flex-wrap:wrap}
+
+/* ---------- forms ---------- */
+.form{display:flex;flex-direction:column;gap:16px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field>label,.field>.lbl{font-size:13.5px;font-weight:500;color:var(--ink-2)}
+.req::after{content:" *";color:var(--red)}
+.hint{font-size:12.5px;color:var(--muted)}
+input[type=text],input[type=search],input[type=date],input[type=number],input[type=tel],select,textarea{height:42px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:#fff;width:100%;min-width:0;appearance:none;-webkit-appearance:none}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23687482' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:18px;padding-right:36px}
+textarea{height:auto;min-height:76px;padding:10px 12px;resize:vertical;line-height:1.45}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brass);box-shadow:0 0 0 3px rgba(165,126,34,.2)}
+input.bad,select.bad{border-color:var(--red);box-shadow:0 0 0 3px rgba(180,35,24,.15)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.fs-title{font-size:14.5px;font-weight:600;padding-top:6px;border-top:1px solid var(--line-2);margin-top:2px;padding-top:16px}
+.fs-title:first-child{border-top:0;padding-top:0;margin-top:0}
+.pick{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:8px}
+.quick{display:flex;gap:6px;flex-wrap:wrap}
+.quick button{height:30px;padding:0 10px;border-radius:99px;border:1px solid var(--line);background:#fff;font-size:13px;cursor:pointer;font-variant-numeric:tabular-nums}
+.quick button:hover{border-color:var(--brass);color:var(--brass-ink)}
+.calc{background:var(--brass-tint);border-radius:10px;padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:8px 22px}
+.calc div{display:flex;justify-content:space-between;gap:10px;font-size:14px}
+.calc span{color:var(--ink-2)}
+.calc b{font-variant-numeric:tabular-nums;font-weight:600}
+.calc .total{grid-column:1/-1;border-top:1px solid rgba(122,91,16,.22);padding-top:9px;font-size:16px}
+.calc.plain{background:#F5F7F9}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;cursor:pointer}
+.check input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--ink);flex:none}
+.row-btns{display:flex;gap:10px;flex-wrap:wrap}
+
+/* ---------- modal ---------- */
+.modal-layer{position:fixed;inset:0;background:rgba(23,33,43,.5);display:flex;align-items:flex-start;justify-content:center;padding:5vh 16px;overflow-y:auto;z-index:50}
+.modal{--notch:var(--surface);background:var(--surface);border-radius:14px;width:100%;max-width:580px;box-shadow:0 24px 60px rgba(15,23,32,.3);animation:pop .16s ease-out;outline:none}
+.modal.wide{max-width:820px}
+.m-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 16px 4px 24px}
+.m-head h2{font-size:20px}
+.m-body{padding:12px 24px 24px}
+.m-foot{display:flex;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--line-2);flex-wrap:wrap}
+.lead{color:var(--ink-2)}
+@keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+body.modal-open{overflow:hidden}
+
+/* detail */
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.actions-2{display:flex;flex-wrap:wrap;gap:2px;margin:0 0 4px -10px}
+.pgs{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:22px 0}
+.pg-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14px;margin-bottom:8px}
+.pg-head span{color:var(--muted)}
+.pg-head b{font-variant-numeric:tabular-nums}
+.track{display:block;height:10px;border-radius:99px;background:var(--line-2);overflow:hidden}
+.track i{display:block;height:100%;border-radius:inherit;background:var(--brass)}
+.track.st-overdue i{background:var(--red)}
+.track.st-soon i{background:var(--amber)}
+.track.st-redeemed i,.track.pay i{background:var(--green)}
+.track.st-forfeited i{background:var(--slate)}
+.pg-scale{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--muted);margin-top:6px;font-variant-numeric:tabular-nums}
+.figs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line-2);border-radius:10px;overflow:hidden;margin:0 0 24px}
+.figs>div{padding:10px 14px;box-shadow:1px 0 0 var(--line-2),0 1px 0 var(--line-2)}
+.figs dt{font-size:12.5px;color:var(--muted)}
+.figs dd{margin:2px 0 0;font-weight:600;font-variant-numeric:tabular-nums;word-break:break-word}
+.figs dd small{font-weight:400;color:var(--muted)}
+.note-box{background:#F5F7F9;border-radius:8px;padding:10px 14px;font-size:14px;color:var(--ink-2);margin:-8px 0 22px;white-space:pre-wrap}
+
+.tl{list-style:none;margin:10px 0 0;padding:0}
+.tl li{display:grid;grid-template-columns:86px 18px minmax(0,1fr) 30px;gap:10px;align-items:start;padding:7px 0;position:relative}
+.tl li::before{content:"";position:absolute;left:105px;top:0;bottom:0;width:2px;background:var(--line-2)}
+.tl li:first-child::before{top:14px}
+.tl li:last-child::before{bottom:calc(100% - 14px)}
+.tl .d{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;padding-top:2px}
+.tl .dot{width:12px;height:12px;border-radius:50%;background:var(--ink-2);margin-top:6px;justify-self:center;position:relative;z-index:1;box-shadow:0 0 0 3px var(--surface)}
+.tl .ev-issue .dot{background:var(--brass)}
+.tl .ev-payment .dot,.tl .ev-redeem .dot{background:var(--green)}
+.tl .ev-extend .dot{background:var(--amber)}
+.tl .ev-forfeit .dot{background:var(--slate)}
+.tl .ev-pending .dot{background:var(--surface);border:2.5px solid var(--brass)}
+.tl .ev-pending.overdue .dot{border-color:var(--red)}
+.tl .what b{display:block;font-weight:500}
+.tl .what span{display:block;font-size:13.5px;color:var(--muted)}
+.tl .what .note{color:var(--ink-2);font-style:italic}
+
+.cust-sum{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.mini-title{margin:6px 0 10px}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:10px;font-size:14.5px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:80;max-width:calc(100vw - 32px);box-shadow:0 10px 30px rgba(15,23,32,.25)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.err{background:var(--red)}
+
+/* ---------- print ---------- */
+#print-area{display:none}
+.pt{border:1.2px solid #000;padding:7mm 8mm;font-size:10.5pt;color:#000;line-height:1.4;break-inside:avoid}
+.pt-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10mm;border-bottom:1px solid #000;padding-bottom:3mm;margin-bottom:3mm}
+.pt-head strong{font-size:13pt;display:block}
+.pt-head span{font-size:9pt}
+.pt-no{font-family:var(--stamp);font-size:22pt;font-weight:600;white-space:nowrap;text-align:right;line-height:1}
+.pt-no small{display:block;font-family:var(--font);font-size:8.5pt;font-weight:400}
+.pt-grid{display:grid;grid-template-columns:1fr 1fr;gap:1mm 8mm}
+.pt-grid div{display:flex;justify-content:space-between;gap:4mm;border-bottom:.5px dotted #888;padding:.6mm 0}
+.pt-grid div.full{grid-column:1/-1}
+.pt-grid span{color:#333}
+.pt-grid b{text-align:right}
+.pt-terms{font-size:8.5pt;margin:3mm 0 0;color:#222}
+.pt-sign{display:flex;justify-content:space-between;gap:10mm;margin-top:7mm;font-size:10pt}
+.pt-copy{text-align:right;font-size:8.5pt;margin-top:2mm;color:#333}
+.pt-cut{border-top:1px dashed #000;margin:7mm 0;text-align:center;font-size:8pt;line-height:0}
+.pt-cut span{background:#fff;padding:0 3mm}
+@media print{
+  @page{size:A4;margin:12mm}
+  body{background:#fff}
+  .app,.tabbar,#modal-root,#toast{display:none!important}
+  #print-area{display:block}
+}
+
+/* ---------- responsive ---------- */
+@media (max-width:1100px){
+  .lrow{grid-template-columns:76px minmax(0,1.2fr) minmax(0,1.4fr) minmax(0,1fr) minmax(0,1.3fr) 128px}
+  .lrow .c-prin{display:none}
+  .ledger{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:860px){
+  .app{grid-template-columns:1fr;background:none}
+  .side{display:none}
+  main{padding:20px 16px 100px}
+  h1{font-size:24px}
+  .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--vault);padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:40;justify-content:space-around;align-items:center}
+  .tabbar a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;color:#9AA5B1;text-decoration:none;font-size:11.5px;padding:5px 0;border-radius:8px;min-width:0}
+  .tabbar a svg{width:22px;height:22px}
+  .tabbar a.on{color:#fff}
+  .tabbar a.on svg{color:var(--brass-light)}
+  .tabbar .tb-new{flex:none;width:52px;height:52px;border-radius:50%;background:var(--brass-light);color:var(--ink);display:grid;place-items:center;border:0;margin:0 4px;cursor:pointer}
+  .tabbar .tb-new svg{width:26px;height:26px}
+  .ledger{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ledger>div{padding:12px 14px}
+  .ledger dd{font-size:18px}
+  .ledger>div:last-child:nth-child(odd){grid-column:1/-1}
+  .dash{grid-template-columns:1fr}
+  .sec-head .sub{display:none}
+  .lhead{display:none}
+  .lrow{grid-template-columns:62px minmax(0,1fr) auto;grid-template-areas:"no who st" "no item item" "no owed owed" "due due due";gap:3px 12px;padding:14px 16px}
+  .lrow .c-no{grid-area:no;align-self:start}
+  .lrow .c-who{grid-area:who}
+  .lrow .c-item{grid-area:item}
+  .lrow .c-owed{grid-area:owed;text-align:left}
+  .lrow .c-owed .cell-sub{display:inline;margin-left:8px}
+  .lrow .c-due{grid-area:due;margin-top:8px;display:grid;grid-template-columns:1fr auto;column-gap:10px;align-items:center}
+  .lrow .c-due .due-line{grid-column:2;grid-row:1;margin:0}
+  .lrow .c-due .cell-sub{grid-column:1;grid-row:1;margin:0}
+  .lrow .c-due .bar{grid-column:1/-1;grid-row:2;margin-top:6px}
+  .lrow .c-st{grid-area:st;align-self:start}
+  .lrow .c-who .cell-sub{display:none}
+  .crow{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"name owed" "sub act";gap:2px 12px;padding:13px 16px}
+  .crow .c-name{grid-area:name}
+  .crow .c-reg{grid-area:sub}
+  .crow .c-phone,.crow .c-n{display:none}
+  .crow .c-reg{font-size:13px;color:var(--muted)}
+  .crow .c-act{grid-area:act;text-align:right}
+  .crow .c-owed{grid-area:owed}
+  .modal-layer{padding:0;align-items:flex-end}
+  .modal,.modal.wide{border-radius:16px 16px 0 0;max-height:94vh;overflow-y:auto;max-width:none}
+  .m-head{position:sticky;top:0;background:var(--surface);z-index:2}
+  .m-body{padding:10px 18px 22px}
+  .m-head{padding-left:18px}
+  .m-foot{position:sticky;bottom:0;background:var(--surface);padding:12px 18px calc(12px + env(safe-area-inset-bottom))}
+  .ticket{grid-template-columns:96px minmax(0,1fr)}
+  .ticket.big{grid-template-columns:104px minmax(0,1fr)}
+  .tno{font-size:23px}
+  .ticket.big .tno{font-size:27px}
+  .ticket.big .tbody{padding:14px 16px}
+  .owed-line b{font-size:20px}
+  .pgs{grid-template-columns:1fr;gap:18px}
+  .figs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .welcome{padding:26px 20px;margin-top:0}
+  .toast{bottom:92px}
+}
+@media (max-width:560px){
+  .grid2,.grid3{grid-template-columns:1fr}
+  .grid2.keep{grid-template-columns:1fr 1fr}
+  .pick{grid-template-columns:1fr}
+  .calc{grid-template-columns:1fr}
+  .page-head .head-btns .btn-ghost{display:none}
+  .tl li{grid-template-columns:72px 18px minmax(0,1fr) 30px}
+  .tl li::before{left:91px}
+}
+@media (prefers-reduced-motion:reduce){
+  .modal{animation:none}
+  .toast{transition:none}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="side" aria-label="Цэс">
+    <div class="brand">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><path d="M5 3.5h24" stroke="#C9A04A" stroke-width="2.2" stroke-linecap="round"/><path d="M17 3.5v5M10 3.5l0 14M24 3.5v14" stroke="#C9A04A" stroke-width="1.4"/><circle cx="17" cy="12.5" r="5" fill="#C9A04A"/><circle cx="10" cy="23.5" r="5" fill="#C9A04A"/><circle cx="24" cy="23.5" r="5" fill="#C9A04A"/></svg>
+      <div><div class="brand-name" id="brand-name">Ломбард</div><div class="brand-sub">Барьцаат зээлийн бүртгэл</div></div>
+    </div>
+    <nav class="nav">
+      <a href="#dashboard" data-nav="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5h4v5"/></svg>Самбар</a>
+      <a href="#loans" data-nav="loans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2.5a2.5 2.5 0 0 0 0 5V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2.5a2.5 2.5 0 0 0 0-5z"/><path d="M15 5v2M15 11v2M15 17v2"/></svg>Зээлүүд</a>
+      <a href="#customers" data-nav="customers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c1.8.7 3 2.4 3.5 5.2"/></svg>Харилцагчид</a>
+      <a href="#settings" data-nav="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>Тохиргоо</a>
+    </nav>
+    <button class="btn btn-brass" data-act="new-loan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Шинэ зээл бичих</button>
+    <div class="side-foot" id="side-foot"></div>
+  </aside>
+  <main id="view" tabindex="-1"></main>
+</div>
+
+<nav class="tabbar" aria-label="Цэс">
+  <a href="#dashboard" data-nav="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5h4v5"/></svg>Самбар</a>
+  <a href="#loans" data-nav="loans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2.5a2.5 2.5 0 0 0 0 5V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2.5a2.5 2.5 0 0 0 0-5z"/><path d="M15 5v2M15 11v2M15 17v2"/></svg>Зээлүүд</a>
+  <button class="tb-new" data-act="new-loan" aria-label="Шинэ зээл бичих"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+  <a href="#customers" data-nav="customers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c1.8.7 3 2.4 3.5 5.2"/></svg>Харилцагч</a>
+  <a href="#settings" data-nav="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>Тохиргоо</a>
+</nav>
+
+<div id="modal-root"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="print-area"></div>
+<input type="file" id="import-file" accept=".json,application/json" hidden>
+
+<noscript><p style="padding:20px">Энэ хуудсыг ашиглахын тулд хөтчийн JavaScript-ийг асаана уу.</p></noscript>
+
+<script>
+(function(){
+'use strict';
+
+/* ================= Тогтмол утгууд ================= */
+const KEY = 'lombard-data-v1';
+const CATS = [
+  {id:'gold', name:'Алт, мөнгөн эдлэл', metal:true},
+  {id:'phone', name:'Гар утас'},
+  {id:'computer', name:'Компьютер, таблет'},
+  {id:'electronics', name:'Цахилгаан бараа'},
+  {id:'watch', name:'Цаг'},
+  {id:'car', name:'Автомашин'},
+  {id:'other', name:'Бусад'}
+];
+const DEFAULT_TERMS = 'Зээлдэгч зээлийг дуусах хугацаанд нь хүүгийн хамт төлж барьцаа хөрөнгөө буцаан авна. Хугацаа хэтэрсэн хоног бүрт хүү үргэлжлэн бодогдоно. Хугацаа хэтэрч, төлбөр төлөгдөөгүй тохиолдолд ломбард барьцаа хөрөнгийг худалдан борлуулах эрхтэй.';
+const WD = ['Ням','Даваа','Мягмар','Лхагва','Пүрэв','Баасан','Бямба'];
+
+const ICON = {
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  x:'<path d="M6 6l12 12M18 6 6 18"/>',
+  search:'<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>',
+  print:'<path d="M7 9V4h10v5"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v6H7z"/>',
+  edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
+  trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+  cash:'<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/>',
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  lock:'<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/>',
+  undo:'<path d="M9 7 4.5 11.5 9 16"/><path d="M5 11.5h9a5.5 5.5 0 0 1 0 11h-2"/>',
+  download:'<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 20h14"/>'
+};
+function ic(n){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON[n]+'</svg>'; }
+
+/* ================= Хадгалалт ================= */
+function defaultDB(){
+  return { version:1,
+    settings:{ shopName:'Миний ломбард', phone:'', address:'', defaultRate:3, defaultTerm:30, nextTicket:1, lastBackup:null, terms:DEFAULT_TERMS },
+    customers:[], loans:[] };
+}
+function normalize(d){
+  const b = defaultDB();
+  if(!d || typeof d!=='object') return b;
+  d.settings = Object.assign(b.settings, d.settings||{});
+  d.customers = Array.isArray(d.customers) ? d.customers : [];
+  d.loans = Array.isArray(d.loans) ? d.loans : [];
+  d.loans.forEach(l=>{
+    l.events = Array.isArray(l.events) ? l.events : [];
+    l.item = l.item || {};
+    l.principal = +l.principal||0; l.rate = +l.rate||0; l.termDays = +l.termDays||0;
+    l.status = l.status || 'active';
+  });
+  d.version = 1;
+  return d;
+}
+const storageOK = (()=>{ try{ const k='__lombard_t'; localStorage.setItem(k,'1'); localStorage.removeItem(k); return true; }catch(e){ return false; } })();
+function load(){
+  try{ const raw = localStorage.getItem(KEY); if(raw) return normalize(JSON.parse(raw)); }catch(e){}
+  return defaultDB();
+}
+let db = load();
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(db)); }
+  catch(e){ toast('Хөтөчид хадгалж чадсангүй. Тохиргоо хэсгээс нөөц файл татаж авна уу.','err',6000); }
+}
+try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
+
+/* ================= Туслах функцууд ================= */
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
+const pad = n=>String(n).padStart(2,'0');
+const uid = ()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+let _seq = 0; const stamp = ()=>Date.now()*1000 + (_seq++ % 1000);
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function num(n){ return Math.round(+n||0).toLocaleString('en-US'); }
+function money(n){ n = Math.round(+n||0); return (n<0?'−':'') + Math.abs(n).toLocaleString('en-US') + '₮'; }
+function parseMoney(s){ const v = String(s==null?'':s).replace(/[^\d]/g,''); return v ? Number(v) : 0; }
+function parseRate(s){ const v = parseFloat(String(s==null?'':s).replace(',','.')); return isFinite(v) ? v : NaN; }
+function fmtRate(r){ return String(Math.round((+r||0)*100)/100); }
+function todayISO(){ const d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function isISO(s){ return /^\d{4}-\d{2}-\d{2}$/.test(s||''); }
+function toUTC(iso){ const p = iso.split('-').map(Number); return Date.UTC(p[0],p[1]-1,p[2]); }
+function addDays(iso,n){ const x=new Date(toUTC(iso)+n*864e5); return x.getUTCFullYear()+'-'+pad(x.getUTCMonth()+1)+'-'+pad(x.getUTCDate()); }
+function diffDays(a,b){ return Math.round((toUTC(b)-toUTC(a))/864e5); }
+function fmtDate(iso){ return iso ? iso.replace(/-/g,'.') : ''; }
+function fmtLong(iso){ const p=iso.split('-').map(Number); const wd=new Date(toUTC(iso)).getUTCDay(); return p[0]+' оны '+p[1]+'-р сарын '+p[2]+', '+WD[wd]+' гараг'; }
+
+let toastTimer;
+function toast(msg, kind, ms){
+  const t = $('#toast'); t.textContent = msg; t.className = 'toast show ' + (kind||'');
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>{ t.className='toast'; }, ms||2800);
+}
+function download(name, text, type){
+  try{
+    const blob = new Blob([text], {type:type});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 800);
+    return true;
+  }catch(e){ toast('Файл татаж чадсангүй','err'); return false; }
+}
+
+/* ================= Тооцоолол ================= */
+const custById = id=>db.customers.find(c=>c.id===id);
+const loanById = id=>db.loans.find(l=>l.id===id);
+function fullName(c){ return c ? [c.lastName,c.firstName].filter(Boolean).join(' ') : 'Устгагдсан харилцагч'; }
+function shortName(c){ if(!c) return 'Устгагдсан харилцагч'; return c.lastName ? c.lastName.trim().charAt(0)+'. '+c.firstName : c.firstName; }
+function tno(l){ return '№'+String(l.ticketNo).padStart(4,'0'); }
+function catOf(id){ return CATS.find(c=>c.id===id) || CATS[CATS.length-1]; }
+function itemLine(l){ const it=l.item||{}; const p=[it.name]; if(it.weight) p.push(it.weight+' гр'); if(it.purity) p.push(it.purity+' сорьц'); return p.filter(Boolean).join(', '); }
+function extDays(l){ return l.events.filter(e=>e.type==='extend').reduce((s,e)=>s+(+e.days||0),0); }
+function dueOf(l){ return addDays(l.startDate, (+l.termDays||0) + extDays(l)); }
+function sortEvents(evts){ return evts.slice().sort((a,b)=> a.date<b.date?-1 : a.date>b.date?1 : (a.at||0)-(b.at||0)); }
+
+/* Хүүг үлдэгдэл дээр хоног тутам бодно (сарын хүү / 30).
+   Төлбөр эхлээд хуримтлагдсан хүүнд, дараа нь үндсэн зээлд орно. */
+function calc(l, asOf){
+  asOf = asOf || todayISO();
+  const r = (+l.rate||0)/100/30;
+  const end = l.status==='active' ? asOf : (l.closedDate || asOf);
+  let bal = +l.principal||0, acc = 0, last = l.startDate, intPaid = 0, prinPaid = 0, over = 0;
+  const alloc = {};
+  for(const p of sortEvents(l.events.filter(e=>e.type==='payment'))){
+    const d = Math.max(0, diffDays(last, p.date));
+    acc = Math.round(acc + bal*r*d);
+    if(p.date > last) last = p.date;
+    let a = +p.amount||0;
+    const ti = Math.min(a, acc); acc -= ti; a -= ti;
+    const tp = Math.min(a, bal); bal -= tp; a -= tp;
+    intPaid += ti; prinPaid += tp; over += a;
+    alloc[p.id] = {i:ti, p:tp, o:a};
+  }
+  const d = Math.max(0, diffDays(last, end));
+  acc = Math.round(acc + bal*r*d);
+  const due = dueOf(l);
+  const term = (+l.termDays||0) + extDays(l);
+  const ref = l.status==='active' ? asOf : (l.closedDate||asOf);
+  const elapsed = diffDays(l.startDate, ref);
+  const daysLeft = diffDays(asOf, due);
+  let state;
+  if(l.status==='redeemed') state='redeemed';
+  else if(l.status==='forfeited') state='forfeited';
+  else if(daysLeft<0) state='overdue';
+  else if(daysLeft<=3) state='soon';
+  else state='active';
+  return { bal, acc, owed:bal+acc, intPaid, prinPaid, over, paid:intPaid+prinPaid+over, alloc,
+    due, term, elapsed, daysLeft, state, daily:bal*r,
+    timePct: l.status!=='active' ? 1 : (term>0 ? Math.min(1, Math.max(0, elapsed/term)) : 1),
+    payPct: l.principal>0 ? Math.min(1, prinPaid/l.principal) : 0 };
+}
+const STATE = {
+  active:['Идэвхтэй','b-active'], soon:['Дуусах дөхсөн','b-soon'], overdue:['Хугацаа хэтэрсэн','b-overdue'],
+  redeemed:['Хаагдсан','b-redeemed'], forfeited:['Хураагдсан','b-forfeited']
+};
+function badge(s){ const v=STATE[s]; return '<span class="badge '+v[1]+'">'+v[0]+'</span>'; }
+function dueText(x){
+  if(x.state==='redeemed') return 'Төлж хаасан';
+  if(x.state==='forfeited') return 'Барьцаа хураасан';
+  if(x.daysLeft<0) return (-x.daysLeft)+' хоног хэтэрсэн';
+  if(x.daysLeft===0) return 'Өнөөдөр дуусна';
+  if(x.daysLeft===1) return 'Маргааш дуусна';
+  return x.daysLeft+' хоног үлдсэн';
+}
+
+/* ---- Үйлдлүүд (өгөгдөл өөрчлөх) ---- */
+function opPay(l, date, amount, note){ l.events.push({id:uid(), type:'payment', date, amount:Math.round(amount), note:note||'', at:stamp()}); }
+function opExtend(l, date, days, note){
+  const cur = dueOf(l); const base = date>cur ? date : cur; const newDue = addDays(base, days);
+  l.events.push({id:uid(), type:'extend', date, days:diffDays(cur,newDue), req:days, newDue, note:note||'', at:stamp()});
+}
+function opClose(l, date, kind, note){
+  l.status = kind==='redeem' ? 'redeemed' : 'forfeited';
+  l.closedDate = date;
+  const x = calc(l, date);
+  l.events.push({id:uid(), type:kind, date, note:note||'', remaining:x.owed, at:stamp()});
+}
+function opReopen(l){
+  const evs = sortEvents(l.events);
+  for(let i=evs.length-1;i>=0;i--){ if(evs[i].type==='redeem'||evs[i].type==='forfeit'){ l.events = l.events.filter(e=>e.id!==evs[i].id); break; } }
+  l.status = 'active'; l.closedDate = null;
+}
+
+/* ================= Модаль цонх ================= */
+const modalStack = [];
+function openModal(o){
+  const layer = document.createElement('div');
+  layer.className = 'modal-layer';
+  layer.innerHTML = '<div class="modal'+(o.wide?' wide':'')+'" role="dialog" aria-modal="true" tabindex="-1">'+
+    '<header class="m-head"><h2></h2><button class="icon-btn" data-dismiss aria-label="Хаах">'+ic('x')+'</button></header>'+
+    '<div class="m-body">'+o.body+'</div>'+(o.foot?'<footer class="m-foot">'+o.foot+'</footer>':'')+'</div>';
+  layer.querySelector('h2').textContent = o.title;
+  layer.querySelector('.modal').setAttribute('aria-label', o.title);
+  $('#modal-root').appendChild(layer);
+  const m = { layer, el:layer.querySelector('.modal'), prevFocus:document.activeElement };
+  modalStack.push(m);
+  layer.addEventListener('click', e=>{ if(e.target.closest('[data-dismiss]')) closeModal(m); });
+  if(o.dismissOutside) layer.addEventListener('mousedown', e=>{ if(e.target===layer) closeModal(m); });
+  document.body.classList.add('modal-open');
+  setTimeout(()=>{
+    const f = m.el.querySelector('[autofocus]') || (o.focusFirst ? m.el.querySelector('input:not([type=hidden]),select,textarea') : null) || m.el;
+    try{ f.focus(); }catch(e){}
+  }, 20);
+  return m;
+}
+function closeModal(m){
+  m = m || modalStack[modalStack.length-1];
+  const i = modalStack.indexOf(m); if(i<0) return;
+  modalStack.splice(i,1); m.layer.remove();
+  if(!modalStack.length) document.body.classList.remove('modal-open');
+  try{ if(m.prevFocus && document.contains(m.prevFocus)) m.prevFocus.focus(); }catch(e){}
+}
+function refreshModals(){
+  for(let i=modalStack.length-1;i>=0;i--){
+    const m = modalStack[i];
+    if(m.refresh && m.refresh()===false){ m.layer.remove(); modalStack.splice(i,1); }
+  }
+  if(!modalStack.length) document.body.classList.remove('modal-open');
+}
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape' && modalStack.length){ e.preventDefault(); closeModal(); }
+});
+function changed(){ save(); render(); refreshModals(); }
+
+function confirmBox(o){
+  const m = openModal({ title:o.title,
+    body:'<p class="lead">'+o.text+'</p>'+(o.typed?'<div class="field" style="margin-top:14px"><label for="cf-typed">Баталгаажуулахын тулд <b>'+esc(o.typed)+'</b> гэж бичнэ үү</label><input type="text" id="cf-typed" autocomplete="off" autofocus></div>':''),
+    foot:'<button class="btn" data-dismiss>Болих</button><button class="btn '+(o.danger?'btn-danger':'btn-primary')+'" data-ok'+(o.typed?'':' autofocus')+'>'+esc(o.ok||'Тийм')+'</button>' });
+  m.el.querySelector('[data-ok]').addEventListener('click', ()=>{
+    if(o.typed && $('#cf-typed', m.el).value.trim()!==o.typed){ toast('"'+o.typed+'" гэж бичнэ үү','err'); return; }
+    closeModal(m); o.onOk && o.onOk();
+  });
+}
+
+function bindMoney(root){
+  $$('input.money', root).forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      const pos = inp.selectionStart || 0;
+      const before = inp.value.slice(0,pos).replace(/[^\d]/g,'').length;
+      const v = parseMoney(inp.value);
+      inp.value = v ? num(v) : '';
+      let i=0, c=0; while(i<inp.value.length && c<before){ if(/\d/.test(inp.value[i])) c++; i++; }
+      try{ inp.setSelectionRange(i,i); }catch(e){}
+    });
+  });
+}
+function fieldErr(el, msg){ el.classList.add('bad'); el.focus(); toast(msg,'err'); el.addEventListener('input', ()=>el.classList.remove('bad'), {once:true}); el.addEventListener('change', ()=>el.classList.remove('bad'), {once:true}); return false; }
+
+/* ================= Харагдац: Самбар ================= */
+const ui = { loanF:'active', loanQ:'', custQ:'' };
+
+function ticketHTML(l, x, c){
+  return '<button class="ticket st-'+x.state+'" data-act="open-loan" data-id="'+l.id+'">'+
+    '<span class="stub"><span class="tno">'+tno(l)+'</span><span class="stub-due">Дуусах<b>'+fmtDate(x.due)+'</b></span></span>'+
+    '<span class="tbody">'+
+      '<span class="t-top"><span class="t-name">'+esc(shortName(c))+'</span>'+badge(x.state)+'</span>'+
+      '<span class="t-item">'+esc(itemLine(l))+'</span>'+
+      '<span class="t-money"><span>'+esc(dueText(x))+', өнөөдөр төлөх</span><b>'+money(x.owed)+'</b></span>'+
+      '<span class="bar"><i style="width:'+(x.timePct*100).toFixed(1)+'%"></i></span>'+
+    '</span></button>';
+}
+function backupNotice(){
+  if(!storageOK) return '<div class="notice err"><span>Энэ хөтөч өгөгдөл хадгалахыг хориглосон байна. Хуудсыг хаахад бүртгэл устна, тиймээс нөөц файлаа тогтмол татаж аваарай.</span><button class="btn sm" data-act="backup">'+ic('download')+'Нөөц татах</button></div>';
+  if(!db.loans.length) return '';
+  const lb = db.settings.lastBackup;
+  if(lb && diffDays(lb.slice(0,10), todayISO()) < 7) return '';
+  return '<div class="notice"><span>Бүртгэл зөвхөн энэ хөтөчид хадгалагдаж байна. '+(lb?'Сүүлд '+fmtDate(lb.slice(0,10))+'-нд нөөцөлсөн.':'Одоогоор нөөц файл татаагүй байна.')+'</span><button class="btn sm" data-act="backup">'+ic('download')+'Нөөц татах</button></div>';
+}
+function viewWelcome(){
+  return '<div class="welcome">'+
+    '<svg width="46" height="46" viewBox="0 0 34 34" aria-hidden="true"><path d="M5 3.5h24" stroke="#A57E22" stroke-width="2.2" stroke-linecap="round"/><path d="M17 3.5v5M10 3.5l0 14M24 3.5v14" stroke="#A57E22" stroke-width="1.4"/><circle cx="17" cy="12.5" r="5" fill="#A57E22"/><circle cx="10" cy="23.5" r="5" fill="#A57E22"/><circle cx="24" cy="23.5" r="5" fill="#A57E22"/></svg>'+
+    '<h1>Ломбардын бүртгэлээ эхлүүлье</h1>'+
+    '<p class="lead">Харилцагч, барьцаа хөрөнгө, зээл, төлөлт бүрийг нэг дор бүртгэж, хугацаа нь дөхсөн зээлийг өдөр бүр харна.</p>'+
+    '<ol class="steps">'+
+      '<li><div><b>Харилцагчаа бүртгэнэ</b><span>Нэр, регистрийн дугаар, утас, хаяг</span></div></li>'+
+      '<li><div><b>Барьцаа хүлээн авч зээл бичнэ</b><span>Үнэлгээ, зээлийн дүн, сарын хүү, хугацаа. Тасалбарыг хоёр хувь хэвлэнэ.</span></div></li>'+
+      '<li><div><b>Төлөлт, сунгалтаа бүртгэнэ</b><span>Үлдэгдэл, хүү, дуусах хугацааг систем өөрөө бодно</span></div></li>'+
+    '</ol>'+
+    '<div class="btns"><button class="btn btn-primary" data-act="new-loan">'+ic('plus')+'Эхний зээлээ бичих</button><button class="btn" data-act="new-customer">Харилцагч бүртгэх</button><button class="btn btn-ghost" data-act="demo">Жишээ өгөгдлөөр туршиж үзэх</button></div>'+
+  '</div>';
+}
+function viewDashboard(){
+  if(!db.loans.length && !db.customers.length) return viewWelcome();
+  const T = todayISO(), month = T.slice(0,7);
+  let active=0, prin=0, acc=0, overdue=0, monthInt=0;
+  const attention=[], feed=[];
+  for(const l of db.loans){
+    const x = calc(l,T), c = custById(l.customerId);
+    if(l.status==='active'){
+      active++; prin+=x.bal; acc+=x.acc;
+      if(x.state==='overdue') overdue++;
+      if(x.state==='overdue'||x.state==='soon') attention.push({l,x,c});
+    }
+    for(const e of l.events){
+      if(e.type==='payment' && e.date.slice(0,7)===month && x.alloc[e.id]) monthInt += x.alloc[e.id].i;
+      feed.push({e,l,c});
+    }
+  }
+  attention.sort((a,b)=>a.x.daysLeft-b.x.daysLeft || a.l.ticketNo-b.l.ticketNo);
+  feed.sort((a,b)=> a.e.date<b.e.date?1 : a.e.date>b.e.date?-1 : (b.e.at||0)-(a.e.at||0));
+  const shown = attention.slice(0,8);
+  let h = '<div class="wrap">'+
+    '<header class="page-head"><div><h1>Өнөөдөр</h1><p class="sub">'+fmtLong(T)+'</p></div>'+
+    '<div class="head-btns"><button class="btn btn-ghost" data-act="new-customer">'+ic('plus')+'Харилцагч</button><button class="btn btn-primary" data-act="new-loan">'+ic('plus')+'Шинэ зээл</button></div></header>'+
+    backupNotice()+
+    '<dl class="ledger">'+
+      '<div><dt>Идэвхтэй зээл</dt><dd>'+active+'<small>тасалбар</small></dd></div>'+
+      '<div><dt>Зээлийн үлдэгдэл</dt><dd>'+money(prin)+'</dd></div>'+
+      '<div><dt>Хуримтлагдсан хүү</dt><dd>'+money(acc)+'</dd></div>'+
+      '<div><dt>Энэ сард орсон хүү</dt><dd>'+money(monthInt)+'</dd></div>'+
+      '<div class="'+(overdue?'alert':'')+'"><dt>Хугацаа хэтэрсэн</dt><dd>'+overdue+'<small>тасалбар</small></dd></div>'+
+    '</dl>'+
+    '<div class="dash"><section>'+
+      '<div class="sec-head"><h2>Анхаарах тасалбарууд</h2>'+(attention.length>shown.length?'<a class="link" href="#loans" data-act="filter-go" data-f="active">Бүгдийг харах ('+attention.length+')</a>':'<span class="sub">Хэтэрсэн ба 3 хоногт дуусах</span>')+'</div>';
+  if(shown.length) h += shown.map(a=>ticketHTML(a.l,a.x,a.c)).join('');
+  else h += '<div class="panel"><div class="empty"><p>Хугацаа хэтэрсэн, дуусах дөхсөн зээл алга.</p><a class="btn sm" href="#loans">Бүх зээлийг харах</a></div></div>';
+  h += '</section><section><div class="sec-head"><h2>Сүүлийн үйлдэл</h2></div><div class="panel">';
+  if(feed.length){
+    h += '<ul class="feed">'+feed.slice(0,9).map(f=>{
+      const e=f.e, l=f.l; let t='';
+      if(e.type==='issue') t='Зээл олгосон '+money(l.principal);
+      else if(e.type==='payment') t='Төлөлт '+money(e.amount);
+      else if(e.type==='extend') t='Хугацаа сунгасан';
+      else if(e.type==='redeem') t='Төлж хаасан';
+      else if(e.type==='forfeit') t='Барьцаа хураасан';
+      return '<li class="k-'+e.type+'"><button data-act="open-loan" data-id="'+l.id+'"><span class="dot"></span><span><span class="t">'+esc(t)+'</span><span class="s">'+tno(l)+', '+esc(shortName(f.c))+'</span></span><span class="d">'+fmtDate(e.date)+'</span></button></li>';
+    }).join('')+'</ul>';
+  } else h += '<div class="empty"><p>Одоогоор зээл бичигдээгүй байна.</p></div>';
+  h += '</div></section></div></div>';
+  return h;
+}
+
+/* ================= Харагдац: Зээлүүд ================= */
+function viewLoans(){
+  return '<div class="wrap"><header class="page-head"><div><h1>Зээлүүд</h1><p class="sub">Тасалбар бүрийн өр, төлөлт, хугацааны явц</p></div>'+
+    '<div class="head-btns"><button class="btn btn-primary" data-act="new-loan">'+ic('plus')+'Шинэ зээл</button></div></header>'+
+    '<div class="toolbar"><label class="search">'+ic('search')+'<input type="search" id="loan-q" placeholder="Тасалбар, нэр, РД, утас, барьцаагаар хайх" aria-label="Зээл хайх" value="'+esc(ui.loanQ)+'"></label><div class="chips" id="loan-chips"></div></div>'+
+    '<div class="panel" id="loan-list"></div></div>';
+}
+function loanMatch(r, q){
+  const c=r.c||{}, it=r.l.item||{};
+  return [tno(r.l), String(r.l.ticketNo), c.lastName, c.firstName, c.regNo, c.phone, c.phone2, it.name, it.serial].join(' ').toLowerCase().includes(q);
+}
+function loanRow(r){
+  const l=r.l, c=r.c, x=r.x, act=l.status==='active';
+  return '<button class="lrow" data-act="open-loan" data-id="'+l.id+'">'+
+    '<span class="c-no"><span class="tno-s">'+tno(l)+'</span></span>'+
+    '<span class="c-who"><b class="ell">'+esc(shortName(c))+'</b><span class="cell-sub">'+esc(c?c.phone:'')+'</span></span>'+
+    '<span class="c-item"><span class="ell">'+esc(itemLine(l))+'</span><span class="cell-sub">'+esc(catOf(l.item.category).name)+'</span></span>'+
+    '<span class="c-prin r num">'+money(l.principal)+'</span>'+
+    '<span class="c-owed r num"><b>'+(act?money(x.owed):'—')+'</b>'+(act&&x.acc?'<span class="cell-sub">хүү '+money(x.acc)+'</span>':'')+'</span>'+
+    '<span class="c-due"><span class="due-line'+(x.state==='overdue'?' red':'')+'">'+esc(dueText(x))+'</span><span class="bar st-'+x.state+'"><i style="width:'+(x.timePct*100).toFixed(1)+'%"></i></span><span class="cell-sub">'+(act?'Дуусах ':'Хаагдсан ')+fmtDate(act?x.due:l.closedDate)+'</span></span>'+
+    '<span class="c-st">'+badge(x.state)+'</span></button>';
+}
+function renderLoanList(){
+  const box = $('#loan-list'); if(!box) return;
+  const T=todayISO(), q=ui.loanQ.trim().toLowerCase();
+  let rows = db.loans.map(l=>({l, c:custById(l.customerId), x:calc(l,T)}));
+  const cnt = {active:0, overdue:0, redeemed:0, forfeited:0, all:rows.length};
+  rows.forEach(r=>{ if(r.l.status==='active'){ cnt.active++; if(r.x.state==='overdue') cnt.overdue++; } else cnt[r.l.status]=(cnt[r.l.status]||0)+1; });
+  const F = [['active','Идэвхтэй'],['overdue','Хугацаа хэтэрсэн'],['redeemed','Хаагдсан'],['forfeited','Хураагдсан'],['all','Бүгд']];
+  $('#loan-chips').innerHTML = F.map(f=>'<button class="chip'+(ui.loanF===f[0]?' on':'')+'" data-act="filter" data-f="'+f[0]+'" aria-pressed="'+(ui.loanF===f[0])+'">'+f[1]+'<span class="c">'+(cnt[f[0]]||0)+'</span></button>').join('');
+  rows = rows.filter(r=>{
+    if(ui.loanF==='active') return r.l.status==='active';
+    if(ui.loanF==='overdue') return r.x.state==='overdue';
+    if(ui.loanF==='all') return true;
+    return r.l.status===ui.loanF;
+  });
+  if(q) rows = rows.filter(r=>loanMatch(r,q));
+  rows.sort((a,b)=>{
+    const aa=a.l.status==='active', bb=b.l.status==='active';
+    if(aa!==bb) return aa?-1:1;
+    if(aa) return a.x.due<b.x.due?-1 : a.x.due>b.x.due?1 : a.l.ticketNo-b.l.ticketNo;
+    return (b.l.closedDate||'').localeCompare(a.l.closedDate||'') || b.l.ticketNo-a.l.ticketNo;
+  });
+  const head = '<div class="lrow lhead" aria-hidden="true"><span>Тасалбар</span><span>Харилцагч</span><span>Барьцаа</span><span class="r c-prin">Зээлийн дүн</span><span class="r">Одоогийн өр</span><span>Хугацаа</span><span>Төлөв</span></div>';
+  if(!rows.length){
+    const msg = q ? 'Хайлтад тохирох зээл олдсонгүй.' :
+      ({active:'Идэвхтэй зээл алга.', overdue:'Хугацаа хэтэрсэн зээл алга.', redeemed:'Хаагдсан зээл алга.', forfeited:'Хураагдсан барьцаа алга.', all:'Зээл бичигдээгүй байна.'})[ui.loanF];
+    box.innerHTML = '<div class="empty"><p>'+msg+'</p>'+((!q && (ui.loanF==='active'||ui.loanF==='all'))?'<button class="btn btn-primary sm" data-act="new-loan">'+ic('plus')+'Шинэ зээл бичих</button>':'')+'</div>';
+    return;
+  }
+  box.innerHTML = head + rows.map(loanRow).join('');
+}
+
+/* ================= Харагдац: Харилцагчид ================= */
+function viewCustomers(){
+  return '<div class="wrap"><header class="page-head"><div><h1>Харилцагчид</h1><p class="sub">Нийт '+db.customers.length+' харилцагч</p></div>'+
+    '<div class="head-btns"><button class="btn btn-primary" data-act="new-customer">'+ic('plus')+'Шинэ харилцагч</button></div></header>'+
+    '<div class="toolbar"><label class="search">'+ic('search')+'<input type="search" id="cust-q" placeholder="Нэр, РД, утасны дугаараар хайх" aria-label="Харилцагч хайх" value="'+esc(ui.custQ)+'"></label></div>'+
+    '<div class="panel" id="cust-list"></div></div>';
+}
+function custMatch(c,q){ return [c.lastName,c.firstName,c.regNo,c.phone,c.phone2].join(' ').toLowerCase().includes(q); }
+function custStats(){
+  const T=todayISO(), m=new Map();
+  for(const l of db.loans){
+    const s = m.get(l.customerId) || {n:0, act:0, owed:0, overdue:0};
+    s.n++;
+    if(l.status==='active'){ const x=calc(l,T); s.act++; s.owed+=x.owed; if(x.state==='overdue') s.overdue++; }
+    m.set(l.customerId, s);
+  }
+  return m;
+}
+function renderCustList(){
+  const box = $('#cust-list'); if(!box) return;
+  const q = ui.custQ.trim().toLowerCase(), st = custStats();
+  const list = db.customers.filter(c=>!q || custMatch(c,q)).sort((a,b)=>fullName(a).localeCompare(fullName(b),'mn'));
+  if(!list.length){
+    box.innerHTML = '<div class="empty"><p>'+(q?'Хайлтад тохирох харилцагч олдсонгүй.':'Харилцагч бүртгэгдээгүй байна.')+'</p>'+(q?'':'<button class="btn btn-primary sm" data-act="new-customer">'+ic('plus')+'Шинэ харилцагч</button>')+'</div>';
+    return;
+  }
+  box.innerHTML = '<div class="crow lhead" aria-hidden="true"><span>Нэр</span><span>Регистр</span><span>Утас</span><span class="r">Зээл</span><span class="r">Идэвхтэй</span><span class="r">Одоогийн өр</span></div>'+
+    list.map(c=>{ const s=st.get(c.id)||{n:0,act:0,owed:0,overdue:0};
+      return '<button class="crow" data-act="open-customer" data-id="'+c.id+'">'+
+        '<span class="c-name"><b class="ell">'+esc(fullName(c))+'</b></span>'+
+        '<span class="c-reg">'+esc(c.regNo||'—')+'</span>'+
+        '<span class="c-phone">'+esc(c.phone||'—')+'</span>'+
+        '<span class="c-n r num">'+s.n+'</span>'+
+        '<span class="c-act r num">'+(s.act?(s.overdue?'<span class="badge b-overdue">'+s.act+' зээл</span>':s.act+' зээл'):'<span class="muted">—</span>')+'</span>'+
+        '<span class="c-owed r num"><b>'+(s.owed?money(s.owed):'<span class="muted">—</span>')+'</b></span></button>';
+    }).join('');
+}
+
+/* ================= Харагдац: Тохиргоо ================= */
+function viewSettings(){
+  const s = db.settings;
+  return '<div class="wrap narrow"><header class="page-head"><div><h1>Тохиргоо</h1><p class="sub">Ломбардын мэдээлэл ба өгөгдлийн нөөц</p></div></header>'+
+  '<section class="panel pad"><div><h2>Ломбардын мэдээлэл</h2><p class="sub">Хэвлэсэн тасалбар дээр гарна.</p></div>'+
+  '<form id="set-form" class="form" novalidate>'+
+    '<div class="field"><label for="s-name" class="req">Ломбардын нэр</label><input type="text" id="s-name" value="'+esc(s.shopName)+'" maxlength="60"></div>'+
+    '<div class="grid2"><div class="field"><label for="s-phone">Утас</label><input type="tel" id="s-phone" value="'+esc(s.phone)+'"></div>'+
+    '<div class="field"><label for="s-addr">Хаяг</label><input type="text" id="s-addr" value="'+esc(s.address)+'"></div></div>'+
+    '<div class="grid3"><div class="field"><label for="s-rate">Үндсэн сарын хүү, %</label><input type="number" id="s-rate" step="0.1" min="0" value="'+esc(s.defaultRate)+'"></div>'+
+    '<div class="field"><label for="s-term">Үндсэн хугацаа, хоног</label><input type="number" id="s-term" step="1" min="1" value="'+esc(s.defaultTerm)+'"></div>'+
+    '<div class="field"><label for="s-next">Дараагийн тасалбарын дугаар</label><input type="number" id="s-next" step="1" min="1" value="'+esc(s.nextTicket)+'"></div></div>'+
+    '<div class="field"><label for="s-terms">Тасалбар дээрх нөхцөл</label><textarea id="s-terms" rows="4">'+esc(s.terms)+'</textarea><span class="hint">Өөрийн гэрээний нөхцөлөөр солиорой.</span></div>'+
+    '<div><button class="btn btn-primary" type="submit">Тохиргоог хадгалах</button></div>'+
+  '</form></section>'+
+  '<section class="panel pad"><div><h2>Нөөцлөлт</h2><p class="sub">Сүүлд нөөцөлсөн: '+(s.lastBackup?fmtDate(s.lastBackup.slice(0,10)):'хараахан нөөцлөөгүй')+'</p></div>'+
+    '<p>Бүх бүртгэл зөвхөн энэ төхөөрөмжийн хөтөчид хадгалагдана. Хөтчийн түүх цэвэрлэх, өөр компьютер ашиглахад алга болж болох тул долоо хоногт нэгээс доошгүй удаа нөөц файл татаж, өөр газар хадгалаарай. Өөр компьютер руу шилжүүлэхдээ тэр файлаа "Нөөцөөс сэргээх"-ээр оруулна.</p>'+
+    '<div class="row-btns"><button class="btn btn-primary" data-act="backup">'+ic('download')+'Нөөц файл татах</button><button class="btn" data-act="import">Нөөцөөс сэргээх</button><button class="btn" data-act="csv">Зээлийн жагсаалт татах (Excel)</button></div></section>'+
+  '<section class="panel pad"><div><h2>Бүх өгөгдлийг устгах</h2><p class="sub">Харилцагч, зээл, төлөлтийн бүх бүртгэл буцаагдахгүйгээр устна.</p></div>'+
+    '<div><button class="btn btn-danger" data-act="wipe">'+ic('trash')+'Бүгдийг устгах</button></div></section></div>';
+}
+function bindSettings(){
+  const f = $('#set-form'); if(!f) return;
+  f.addEventListener('submit', e=>{
+    e.preventDefault();
+    const name=$('#s-name').value.trim(), rate=parseRate($('#s-rate').value), term=parseInt($('#s-term').value,10), next=parseInt($('#s-next').value,10);
+    if(!name) return fieldErr($('#s-name'),'Ломбардын нэрийг оруулна уу');
+    if(!(rate>=0)) return fieldErr($('#s-rate'),'Хүүгийн хувийг зөв оруулна уу');
+    if(!(term>=1)) return fieldErr($('#s-term'),'Хугацааг хоногоор оруулна уу');
+    if(!(next>=1)) return fieldErr($('#s-next'),'Тасалбарын дугаар 1-ээс их байна');
+    const maxNo = db.loans.reduce((m,l)=>Math.max(m,l.ticketNo||0),0);
+    if(next<=maxNo) return fieldErr($('#s-next'),'№'+String(maxNo).padStart(4,'0')+' тасалбар бичигдсэн тул '+(maxNo+1)+'-ээс эхлүүлнэ үү');
+    Object.assign(db.settings, {shopName:name, phone:$('#s-phone').value.trim(), address:$('#s-addr').value.trim(), defaultRate:rate, defaultTerm:term, nextTicket:next, terms:$('#s-terms').value.trim()});
+    changed(); toast('Тохиргоог хадгаллаа');
+  });
+}
+
+/* ================= Үндсэн рендер ================= */
+function route(){ const h=(location.hash||'').replace('#',''); return ['loans','customers','settings'].includes(h) ? h : 'dashboard'; }
+function render(){
+  const r = route();
+  $$('[data-nav]').forEach(a=>{ const on=a.dataset.nav===r; a.classList.toggle('on',on); if(on) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
+  $('#brand-name').textContent = db.settings.shopName || 'Ломбард';
+  const lb = db.settings.lastBackup;
+  $('#side-foot').innerHTML = storageOK ? 'Бүртгэл энэ хөтөчид хадгалагдана.<br>Сүүлийн нөөц: <b>'+(lb?fmtDate(lb.slice(0,10)):'алга')+'</b>' : '<b>Хадгалах боломжгүй хөтөч</b>';
+  const v = $('#view');
+  const sy = window.scrollY;
+  if(r==='loans'){ v.innerHTML = viewLoans(); renderLoanList(); }
+  else if(r==='customers'){ v.innerHTML = viewCustomers(); renderCustList(); }
+  else if(r==='settings'){ v.innerHTML = viewSettings(); bindSettings(); }
+  else v.innerHTML = viewDashboard();
+  window.scrollTo(0, sy);
+  document.title = (db.settings.shopName||'Ломбард') + ': ' + ({dashboard:'Самбар',loans:'Зээлүүд',customers:'Харилцагчид',settings:'Тохиргоо'})[r];
+}
+document.addEventListener('input', e=>{
+  if(e.target.id==='loan-q'){ ui.loanQ=e.target.value; renderLoanList(); }
+  if(e.target.id==='cust-q'){ ui.custQ=e.target.value; renderCustList(); }
+});
+window.addEventListener('hashchange', ()=>{ closeAllModals(); render(); window.scrollTo(0,0); });
+function closeAllModals(){ while(modalStack.length) closeModal(); }
+
+/* ================= Зээлийн дэлгэрэнгүй ================= */
+function loanDetail(id){
+  const l = loanById(id); if(!l) return null;
+  const c = custById(l.customerId), T = todayISO(), x = calc(l,T), act = l.status==='active';
+  const it = l.item||{}, cat = catOf(it.category);
+  let owedLabel, owedVal;
+  if(act){ owedLabel='Өнөөдөр хаахад төлөх'; owedVal=x.owed; }
+  else if(l.status==='redeemed'){ owedLabel='Нийт төлсөн'; owedVal=x.paid; }
+  else { owedLabel='Хураах үеийн өр'; owedVal=x.owed; }
+  let h = '<div class="ticket big st-'+x.state+'">'+
+    '<div class="stub"><span class="tno">'+tno(l)+'</span><span class="stub-due">'+(act?'Дуусах':'Хаагдсан')+'<b>'+fmtDate(act?x.due:l.closedDate)+'</b></span></div>'+
+    '<div class="tbody">'+
+      '<div class="t-top"><div class="who">'+(c?'<button class="link" data-act="open-customer" data-id="'+c.id+'">'+esc(fullName(c))+'</button>':'<b>Устгагдсан харилцагч</b>')+(c&&c.phone?'<span>'+esc(c.phone)+'</span>':'')+(c&&c.regNo?'<span>РД '+esc(c.regNo)+'</span>':'')+'</div>'+badge(x.state)+'</div>'+
+      '<div class="what"><span class="cat">'+esc(cat.name)+(it.serial?', '+esc(it.serial):'')+'</span><b>'+esc(itemLine(l))+'</b></div>'+
+      '<div class="owed-line"><span>'+owedLabel+'</span><b>'+money(owedVal)+'</b></div>'+
+    '</div></div>';
+  if(act){
+    h += '<div class="actions"><button class="btn btn-primary" data-act="pay" data-id="'+l.id+'">'+ic('cash')+'Төлөлт бүртгэх</button>'+
+      '<button class="btn" data-act="extend" data-id="'+l.id+'">'+ic('clock')+'Хугацаа сунгах</button>'+
+      '<button class="btn" data-act="redeem" data-id="'+l.id+'">'+ic('check')+'Төлж хаах</button></div>';
+  }
+  h += '<div class="actions-2"><button class="btn btn-ghost sm" data-act="print" data-id="'+l.id+'">'+ic('print')+'Тасалбар хэвлэх</button>'+
+    '<button class="btn btn-ghost sm" data-act="edit-loan" data-id="'+l.id+'">'+ic('edit')+'Засах</button>'+
+    (act?'<button class="btn btn-ghost sm" data-act="forfeit" data-id="'+l.id+'">'+ic('lock')+'Барьцаа хураах</button>':'<button class="btn btn-ghost sm" data-act="reopen" data-id="'+l.id+'">'+ic('undo')+'Дахин нээх</button>')+
+    '<button class="btn btn-ghost sm danger" data-act="del-loan" data-id="'+l.id+'">'+ic('trash')+'Устгах</button></div>';
+
+  h += '<div class="pgs"><div><div class="pg-head"><span>Хугацааны явц</span><b class="'+(x.state==='overdue'?'red':'')+'">'+esc(dueText(x))+'</b></div>'+
+      '<span class="track st-'+x.state+'"><i style="width:'+(x.timePct*100).toFixed(1)+'%"></i></span>'+
+      '<div class="pg-scale"><span>'+fmtDate(l.startDate)+' олгосон</span><span>'+(act?(Math.max(0,x.elapsed))+' / '+x.term+' хоног':x.elapsed+' хоног')+'</span><span>'+fmtDate(x.due)+' дуусах</span></div></div>'+
+    '<div><div class="pg-head"><span>Үндсэн зээлийн төлөлт</span><b>'+Math.round(x.payPct*100)+'%</b></div>'+
+      '<span class="track pay"><i style="width:'+(x.payPct*100).toFixed(1)+'%"></i></span>'+
+      '<div class="pg-scale"><span>'+money(x.prinPaid)+' төлсөн</span><span>'+money(l.principal)+'</span></div></div></div>';
+
+  const ext = l.events.filter(e=>e.type==='extend');
+  const figs = [
+    ['Зээлийн дүн', money(l.principal)],
+    ['Барьцааны үнэлгээ', it.est?money(it.est)+(l.principal?' <small>('+Math.round(l.principal/it.est*100)+'%)</small>':''):'—'],
+    ['Хүү', 'Сарын '+fmtRate(l.rate)+'% <small>(хоногт '+money((+l.principal||0)*(+l.rate||0)/100/30)+')</small>'],
+    ['Үндсэн зээлийн үлдэгдэл', money(x.bal)],
+    [act?'Хуримтлагдсан хүү':'Хаах үеийн хүү', money(x.acc)],
+    ['Төлсөн хүү', money(x.intPaid)],
+    ['Нийт төлсөн', money(x.paid)+(x.over?' <small>(илүү '+money(x.over)+')</small>':'')],
+    ['Анхны хугацаа', l.termDays+' хоног'],
+    ['Сунгалт', ext.length?ext.length+' удаа <small>(+'+ext.reduce((s,e)=>s+(+e.days||0),0)+' хоног)</small>':'Сунгаагүй']
+  ];
+  h += '<dl class="figs">'+figs.map(f=>'<div><dt>'+f[0]+'</dt><dd>'+f[1]+'</dd></div>').join('')+'</dl>';
+  if(l.note) h += '<div class="note-box">'+esc(l.note)+'</div>';
+
+  h += '<h3>Түүх</h3><ol class="tl">';
+  for(const e of sortEvents(l.events)){
+    let t='', s='';
+    if(e.type==='issue'){ t='Зээл олгосон '+money(l.principal); s='Сарын '+fmtRate(l.rate)+'% хүүтэй, '+l.termDays+' хоногийн хугацаатай'; }
+    else if(e.type==='payment'){ t='Төлөлт '+money(e.amount); const a=x.alloc[e.id]; if(a){ const p=[]; if(a.i) p.push('хүүнд '+money(a.i)); if(a.p) p.push('үндсэн зээлд '+money(a.p)); if(a.o) p.push('илүү төлөлт '+money(a.o)); s=p.join(', '); } }
+    else if(e.type==='extend'){ t='Хугацаа '+(e.req||e.days)+' хоногоор сунгасан'; s='Шинэ дуусах огноо '+fmtDate(e.newDue||''); }
+    else if(e.type==='redeem'){ t='Төлж хаасан, барьцааг буцаан олгосон'; if(e.remaining>0) s='Хөнгөлөлт '+money(e.remaining); }
+    else if(e.type==='forfeit'){ t='Барьцааг хураасан'; if(e.remaining>0) s='Хураах үеийн өр '+money(e.remaining); }
+    const del = act && (e.type==='payment'||e.type==='extend') ? '<button class="icon-btn sm" data-act="del-event" data-id="'+l.id+'" data-ev="'+e.id+'" aria-label="Энэ бичлэгийг устгах" title="Устгах">'+ic('trash')+'</button>' : '<span></span>';
+    h += '<li class="ev-'+e.type+'"><span class="d">'+fmtDate(e.date)+'</span><span class="dot"></span><span class="what"><b>'+esc(t)+'</b>'+(s?'<span>'+esc(s)+'</span>':'')+(e.note?'<span class="note">'+esc(e.note)+'</span>':'')+'</span>'+del+'</li>';
+  }
+  if(act){
+    const future = x.due > T ? calc(l, x.due).owed : null;
+    h += '<li class="ev-pending '+x.state+'"><span class="d">'+fmtDate(x.due)+'</span><span class="dot"></span><span class="what"><b>Дуусах хугацаа</b><span>'+esc(dueText(x))+(future!==null?'. Тэр өдөр хаахад '+money(future):'')+'</span></span><span></span></li>';
+  }
+  h += '</ol>';
+  return { title: tno(l)+' тасалбар', body:h };
+}
+function openLoan(id){
+  const d = loanDetail(id); if(!d) return;
+  const m = openModal({title:d.title, body:d.body, wide:true, dismissOutside:true});
+  m.refresh = ()=>{ const d2=loanDetail(id); if(!d2) return false; m.el.querySelector('.m-head h2').textContent=d2.title; m.el.querySelector('.m-body').innerHTML=d2.body; return true; };
+}
+
+/* ================= Зээлийн маягт ================= */
+function openLoanForm(opts){
+  opts = opts || {};
+  const editing = opts.id ? loanById(opts.id) : null, s = db.settings;
+  const l = editing || { customerId:opts.customerId||'', item:{category:'gold'}, principal:0, rate:s.defaultRate, termDays:s.defaultTerm, startDate:todayISO(), note:'' };
+  const it = l.item || {};
+  const hasPays = editing && editing.events.some(e=>e.type==='payment');
+  const body = '<form id="loan-form" class="form" novalidate>'+
+    '<div class="fs-title">Харилцагч</div>'+
+    '<div class="field"><label for="lf-cust" class="req">Харилцагч сонгох</label>'+
+      '<div class="pick"><input type="search" id="lf-cq" placeholder="Нэр, РД, утсаар шүүх" aria-label="Харилцагч шүүх"><select id="lf-cust"></select></div>'+
+      '<div><button type="button" class="btn btn-ghost sm" id="lf-newc" style="margin-left:-10px">'+ic('plus')+'Шинэ харилцагч бүртгэх</button></div></div>'+
+    '<div class="fs-title">Барьцаа хөрөнгө</div>'+
+    '<div class="grid2"><div class="field"><label for="lf-cat">Төрөл</label><select id="lf-cat">'+CATS.map(c=>'<option value="'+c.id+'"'+(it.category===c.id?' selected':'')+'>'+c.name+'</option>').join('')+'</select></div>'+
+      '<div class="field"><label for="lf-name" class="req">Нэр, тодорхойлолт</label><input type="text" id="lf-name" value="'+esc(it.name||'')+'" placeholder="Жишээ нь: Алтан бөгж, iPhone 14 Pro"></div></div>'+
+    '<div class="grid2 metal"><div class="field"><label for="lf-weight">Жин, гр</label><input type="text" inputmode="decimal" id="lf-weight" value="'+esc(it.weight||'')+'"></div>'+
+      '<div class="field"><label for="lf-purity">Сорьц</label><input type="text" id="lf-purity" value="'+esc(it.purity||'')+'" placeholder="585, 750"></div></div>'+
+    '<div class="grid2"><div class="field"><label for="lf-serial">Сериал, IMEI, улсын дугаар</label><input type="text" id="lf-serial" value="'+esc(it.serial||'')+'"></div>'+
+      '<div class="field"><label for="lf-est">Үнэлгээ, ₮</label><input type="text" inputmode="numeric" class="money" id="lf-est" value="'+(it.est?num(it.est):'')+'" placeholder="0"></div></div>'+
+    '<div class="fs-title">Зээл</div>'+
+    (hasPays?'<p class="hint">Энэ зээлд төлөлт бүртгэгдсэн тул дүн, хүүг өөрчлөхөд үлдэгдэл дахин бодогдоно.</p>':'')+
+    '<div class="grid2"><div class="field"><label for="lf-amt" class="req">Зээлийн дүн, ₮</label><input type="text" inputmode="numeric" class="money" id="lf-amt" value="'+(l.principal?num(l.principal):'')+'" placeholder="0"></div>'+
+      '<div class="field"><label for="lf-rate" class="req">Сарын хүү, %</label><input type="number" id="lf-rate" step="0.1" min="0" value="'+esc(l.rate)+'"></div></div>'+
+    '<div class="grid2"><div class="field"><label for="lf-term" class="req">Хугацаа, хоног</label><input type="number" id="lf-term" step="1" min="1" value="'+esc(l.termDays)+'">'+
+      '<div class="quick">'+[7,14,30,60,90].map(n=>'<button type="button" data-term="'+n+'">'+n+' хоног</button>').join('')+'</div></div>'+
+      '<div class="field"><label for="lf-start" class="req">Олгосон огноо</label><input type="date" id="lf-start" value="'+esc(l.startDate)+'"></div></div>'+
+    '<div class="calc" id="lf-calc"></div>'+
+    '<div class="field"><label for="lf-note">Тэмдэглэл</label><textarea id="lf-note" rows="2" placeholder="Барьцааны байдал, дагалдах зүйл гэх мэт">'+esc(l.note||'')+'</textarea></div>'+
+  '</form>';
+  const m = openModal({ title: editing ? tno(editing)+' тасалбарыг засах' : 'Шинэ зээл бичих', body,
+    foot:'<button class="btn" data-dismiss>Болих</button><button class="btn btn-primary" type="submit" form="loan-form">'+(editing?'Өөрчлөлтийг хадгалах':'Зээл бичих')+'</button>' });
+  const f = m.el;
+  bindMoney(f);
+  const sel=$('#lf-cust',f), cq=$('#lf-cq',f);
+  function fillCust(q, selectId){
+    q = (q||'').trim().toLowerCase();
+    const cur = selectId || sel.value || l.customerId;
+    const list = db.customers.filter(c=>!q || custMatch(c,q) || c.id===cur).sort((a,b)=>fullName(a).localeCompare(fullName(b),'mn'));
+    sel.innerHTML = '<option value="">'+(db.customers.length?'Сонгоно уу':'Эхлээд харилцагч бүртгэнэ үү')+'</option>'+
+      list.map(c=>'<option value="'+c.id+'">'+esc(fullName(c))+(c.regNo?' ('+esc(c.regNo)+')':c.phone?' ('+esc(c.phone)+')':'')+'</option>').join('');
+    if(cur && list.some(c=>c.id===cur)) sel.value = cur;
+    else if(q && list.length===1) sel.value = list[0].id;
+  }
+  fillCust('', l.customerId);
+  cq.addEventListener('input', ()=>fillCust(cq.value));
+  $('#lf-newc',f).addEventListener('click', ()=>openCustomerForm({ onSaved:c=>{ cq.value=''; fillCust('', c.id); sel.classList.remove('bad'); } }));
+  const cat=$('#lf-cat',f);
+  function metal(){ const on=catOf(cat.value).metal; $$('.metal',f).forEach(el=>el.style.display=on?'':'none'); }
+  cat.addEventListener('change', metal); metal();
+  $$('[data-term]',f).forEach(b=>b.addEventListener('click', ()=>{ $('#lf-term',f).value=b.dataset.term; upd(); }));
+  function upd(){
+    const P=parseMoney($('#lf-amt',f).value), R=parseRate($('#lf-rate',f).value)||0, N=parseInt($('#lf-term',f).value,10)||0, S=isISO($('#lf-start',f).value)?$('#lf-start',f).value:todayISO(), E=parseMoney($('#lf-est',f).value);
+    const daily=P*R/100/30, ti=Math.round(daily*N);
+    $('#lf-calc',f).innerHTML =
+      '<div><span>Дуусах огноо</span><b>'+(N?fmtDate(addDays(S,N)):'—')+'</b></div>'+
+      '<div><span>Хоногийн хүү</span><b>'+money(daily)+'</b></div>'+
+      '<div><span>Хугацааны хүү</span><b>'+money(ti)+'</b></div>'+
+      '<div><span>Үнэлгээний харьцаа</span><b>'+(E&&P?Math.round(P/E*100)+'%':'—')+'</b></div>'+
+      '<div class="total"><span>Хугацаандаа төлөх нийт дүн</span><b>'+money(P+ti)+'</b></div>';
+  }
+  ['lf-amt','lf-rate','lf-term','lf-start','lf-est'].forEach(id=>$('#'+id,f).addEventListener('input',upd));
+  upd();
+  setTimeout(()=>{ (sel.value ? $('#lf-name',f) : (db.customers.length? cq : $('#lf-newc',f))).focus(); }, 30);
+
+  $('#loan-form',f).addEventListener('submit', e=>{
+    e.preventDefault();
+    const cid=sel.value, name=$('#lf-name',f).value.trim(), P=parseMoney($('#lf-amt',f).value), R=parseRate($('#lf-rate',f).value), N=parseInt($('#lf-term',f).value,10), S=$('#lf-start',f).value;
+    if(!cid) return fieldErr(sel,'Харилцагч сонгоно уу');
+    if(!name) return fieldErr($('#lf-name',f),'Барьцаа хөрөнгийн нэрийг бичнэ үү');
+    if(!(P>0)) return fieldErr($('#lf-amt',f),'Зээлийн дүнг оруулна уу');
+    if(!(R>=0)) return fieldErr($('#lf-rate',f),'Сарын хүүг оруулна уу');
+    if(!(N>=1)) return fieldErr($('#lf-term',f),'Хугацааг хоногоор оруулна уу');
+    if(!isISO(S)) return fieldErr($('#lf-start',f),'Олгосон огноог оруулна уу');
+    const item = { category:cat.value, name, serial:$('#lf-serial',f).value.trim(), est:parseMoney($('#lf-est',f).value),
+      weight: catOf(cat.value).metal ? $('#lf-weight',f).value.trim() : '', purity: catOf(cat.value).metal ? $('#lf-purity',f).value.trim() : '' };
+    const note = $('#lf-note',f).value.trim();
+    if(editing){
+      Object.assign(editing, {customerId:cid, item, principal:P, rate:R, termDays:N, startDate:S, note});
+      const iss = editing.events.find(e=>e.type==='issue'); if(iss) iss.date = S;
+      closeModal(m); changed(); toast('Өөрчлөлтийг хадгаллаа');
+    } else {
+      const maxNo = db.loans.reduce((mx,x)=>Math.max(mx,x.ticketNo||0),0);
+      const no = Math.max(+db.settings.nextTicket||1, maxNo+1);
+      const loan = { id:uid(), ticketNo:no, customerId:cid, item, principal:P, rate:R, termDays:N, startDate:S, status:'active', closedDate:null, note,
+        createdAt:new Date().toISOString(), events:[{id:uid(), type:'issue', date:S, at:stamp()}] };
+      db.loans.push(loan); db.settings.nextTicket = no+1;
+      closeModal(m); changed(); openLoan(loan.id);
+      toast(tno(loan)+' тасалбар бичигдлээ. Тасалбараа хэвлэж болно.');
+    }
+  });
+}
+
+/* ================= Төлөлт ================= */
+function openPayment(id){
+  const l = loanById(id); if(!l) return;
+  const T = todayISO();
+  const body = '<form id="pay-form" class="form" novalidate>'+
+    '<div class="calc plain" id="pf-now"></div>'+
+    '<div class="grid2"><div class="field"><label for="pf-date" class="req">Огноо</label><input type="date" id="pf-date" value="'+T+'"></div>'+
+    '<div class="field"><label for="pf-amt" class="req">Төлсөн дүн, ₮</label><input type="text" inputmode="numeric" class="money" id="pf-amt" placeholder="0" autofocus>'+
+      '<div class="quick" id="pf-quick"></div></div></div>'+
+    '<div class="calc" id="pf-prev"></div>'+
+    '<label class="check"><input type="checkbox" id="pf-close"><span>Энэ төлөлтөөр зээлийг хааж, барьцааг буцаан олгох</span></label>'+
+    '<div class="field"><label for="pf-note">Тэмдэглэл</label><input type="text" id="pf-note" placeholder="Бэлэн, данс гэх мэт"></div>'+
+    '<p class="hint">Төлбөр эхлээд хуримтлагдсан хүүнд, үлдсэн нь үндсэн зээлд орно.</p>'+
+  '</form>';
+  const m = openModal({ title:tno(l)+': төлөлт бүртгэх', body,
+    foot:'<button class="btn" data-dismiss>Болих</button><button class="btn btn-primary" type="submit" form="pay-form">Төлөлт бүртгэх</button>' });
+  const f=m.el; bindMoney(f);
+  const dt=$('#pf-date',f), amt=$('#pf-amt',f), cl=$('#pf-close',f);
+  let userTouchedClose=false;
+  cl.addEventListener('change', ()=>{ userTouchedClose=true; });
+  function upd(){
+    const D = isISO(dt.value) ? dt.value : T;
+    const x = calc(l, D);
+    $('#pf-now',f).innerHTML = '<div><span>Үндсэн үлдэгдэл</span><b>'+money(x.bal)+'</b></div><div><span>Хуримтлагдсан хүү</span><b>'+money(x.acc)+'</b></div><div class="total"><span>'+fmtDate(D)+'-ны байдлаар нийт өр</span><b>'+money(x.owed)+'</b></div>';
+    $('#pf-quick',f).innerHTML = (x.acc?'<button type="button" data-v="'+x.acc+'">Зөвхөн хүү '+money(x.acc)+'</button>':'')+'<button type="button" data-v="'+x.owed+'">Бүтэн '+money(x.owed)+'</button>';
+    $$('#pf-quick button',f).forEach(b=>b.addEventListener('click', ()=>{ amt.value=num(b.dataset.v); upd(); }));
+    const A = parseMoney(amt.value);
+    const ti=Math.min(A,x.acc), tp=Math.min(A-ti,x.bal), ov=A-ti-tp, rem=x.owed-ti-tp;
+    $('#pf-prev',f).innerHTML = '<div><span>Хүүнд</span><b>'+money(ti)+'</b></div><div><span>Үндсэн зээлд</span><b>'+money(tp)+'</b></div>'+
+      (ov>0?'<div><span>Илүү төлөлт</span><b>'+money(ov)+'</b></div>':'')+
+      '<div class="total"><span>Төлөлтийн дараах өр</span><b>'+money(rem)+'</b></div>';
+    if(!userTouchedClose) cl.checked = A>0 && A>=x.owed;
+  }
+  dt.addEventListener('input', upd); amt.addEventListener('input', upd); upd();
+  $('#pay-form',f).addEventListener('submit', e=>{
+    e.preventDefault();
+    const D=dt.value, A=parseMoney(amt.value);
+    if(!isISO(D)) return fieldErr(dt,'Огноог оруулна уу');
+    if(D<l.startDate) return fieldErr(dt,'Огноо зээл олгосноос өмнө байж болохгүй');
+    if(!(A>0)) return fieldErr(amt,'Төлсөн дүнг оруулна уу');
+    opPay(l, D, A, $('#pf-note',f).value.trim());
+    if(cl.checked) opClose(l, D, 'redeem', '');
+    closeModal(m); changed();
+    toast(cl.checked ? tno(l)+' зээл хаагдлаа. Барьцааг буцаан олгоно уу.' : 'Төлөлт '+money(A)+' бүртгэгдлээ');
+  });
+}
+
+/* ================= Сунгалт ================= */
+function openExtend(id){
+  const l = loanById(id); if(!l) return;
+  const T = todayISO(), x0 = calc(l,T);
+  const body = '<form id="ext-form" class="form" novalidate>'+
+    '<div class="calc plain"><div><span>Одоогийн дуусах огноо</span><b>'+fmtDate(x0.due)+'</b></div><div><span>Хуримтлагдсан хүү</span><b>'+money(x0.acc)+'</b></div></div>'+
+    '<div class="grid2"><div class="field"><label for="ef-days" class="req">Сунгах хоног</label><input type="number" id="ef-days" min="1" step="1" value="'+esc(db.settings.defaultTerm)+'" autofocus>'+
+      '<div class="quick">'+[7,14,30].map(n=>'<button type="button" data-d="'+n+'">'+n+' хоног</button>').join('')+'</div></div>'+
+    '<div class="field"><label for="ef-date" class="req">Огноо</label><input type="date" id="ef-date" value="'+T+'"></div></div>'+
+    '<div class="field"><label for="ef-amt">Сунгалтын үед төлсөн хүү, ₮</label><input type="text" inputmode="numeric" class="money" id="ef-amt" value="'+(x0.acc?num(x0.acc):'')+'" placeholder="0"><span class="hint">Хүү төлөөгүй бол хоосон үлдээнэ.</span></div>'+
+    '<div class="calc" id="ef-prev"></div>'+
+    '<div class="field"><label for="ef-note">Тэмдэглэл</label><input type="text" id="ef-note"></div>'+
+  '</form>';
+  const m = openModal({ title:tno(l)+': хугацаа сунгах', body,
+    foot:'<button class="btn" data-dismiss>Болих</button><button class="btn btn-primary" type="submit" form="ext-form">Сунгах</button>' });
+  const f=m.el; bindMoney(f);
+  const days=$('#ef-days',f), dt=$('#ef-date',f);
+  function upd(){
+    const n=parseInt(days.value,10)||0, D=isISO(dt.value)?dt.value:T, cur=dueOf(l), base=D>cur?D:cur;
+    $('#ef-prev',f).innerHTML = '<div class="total"><span>Шинэ дуусах огноо</span><b>'+(n?fmtDate(addDays(base,n)):'—')+'</b></div>'+
+      (D>cur?'<div style="grid-column:1/-1"><span class="hint">Хугацаа хэтэрсэн тул сунгалтыг өнөөдрөөс тоолно.</span></div>':'');
+  }
+  $$('[data-d]',f).forEach(b=>b.addEventListener('click', ()=>{ days.value=b.dataset.d; upd(); }));
+  days.addEventListener('input',upd); dt.addEventListener('input',upd); upd();
+  $('#ext-form',f).addEventListener('submit', e=>{
+    e.preventDefault();
+    const n=parseInt(days.value,10), D=dt.value, A=parseMoney($('#ef-amt',f).value), note=$('#ef-note',f).value.trim();
+    if(!(n>=1)) return fieldErr(days,'Сунгах хоногийг оруулна уу');
+    if(!isISO(D)) return fieldErr(dt,'Огноог оруулна уу');
+    if(D<l.startDate) return fieldErr(dt,'Огноо зээл олгосноос өмнө байж болохгүй');
+    if(A>0) opPay(l, D, A, 'Сунгалтын хүү');
+    opExtend(l, D, n, note);
+    closeModal(m); changed();
+    toast(tno(l)+' тасалбарыг '+fmtDate(dueOf(l))+' хүртэл сунгалаа');
+  });
+}
+
+/* ================= Төлж хаах ================= */
+function openRedeem(id){
+  const l = loanById(id); if(!l) return;
+  const T = todayISO();
+  const body = '<form id="rd-form" class="form" novalidate>'+
+    '<div class="calc" id="rd-now"></div>'+
+    '<div class="grid2"><div class="field"><label for="rd-date" class="req">Огноо</label><input type="date" id="rd-date" value="'+T+'"></div>'+
+    '<div class="field"><label for="rd-amt" class="req">Хүлээн авсан дүн, ₮</label><input type="text" inputmode="numeric" class="money" id="rd-amt"></div></div>'+
+    '<p class="hint" id="rd-diff"></p>'+
+    '<div class="field"><label for="rd-note">Тэмдэглэл</label><input type="text" id="rd-note" placeholder="Барьцааг хэн хүлээн авсан гэх мэт"></div>'+
+  '</form>';
+  const m = openModal({ title:tno(l)+': төлж хаах', body,
+    foot:'<button class="btn" data-dismiss>Болих</button><button class="btn btn-primary" type="submit" form="rd-form">'+ic('check')+'Төлж хаах</button>' });
+  const f=m.el; bindMoney(f);
+  const dt=$('#rd-date',f), amt=$('#rd-amt',f);
+  let lastOwed=null;
+  function upd(){
+    const D=isISO(dt.value)?dt.value:T, x=calc(l,D);
+    $('#rd-now',f).innerHTML = '<div><span>Үндсэн үлдэгдэл</span><b>'+money(x.bal)+'</b></div><div><span>Хүү</span><b>'+money(x.acc)+'</b></div><div class="total"><span>Хаахад төлөх</span><b>'+money(x.owed)+'</b></div>';
+    if(lastOwed===null || parseMoney(amt.value)===lastOwed) amt.value = x.owed?num(x.owed):'';
+    lastOwed = x.owed;
+    const A=parseMoney(amt.value), dlt=x.owed-A;
+    $('#rd-diff',f).textContent = dlt>0 ? 'Дутуу '+money(dlt)+' хөнгөлөлт гэж бүртгэгдэнэ.' : dlt<0 ? 'Илүү '+money(-dlt)+' хүлээн авсан байна.' : '';
+  }
+  dt.addEventListener('input',upd); amt.addEventListener('input',upd); upd();
+  setTimeout(()=>amt.focus(),30);
+  $('#rd-form',f).addEventListener('submit', e=>{
+    e.preventDefault();
+    const D=dt.value, A=parseMoney(amt.value);
+    if(!isISO(D)) return fieldErr(dt,'Огноог оруулна уу');
+    if(D<l.startDate) return fieldErr(dt,'Огноо зээл олгосноос өмнө байж болохгүй');
+    if(A>0) opPay(l, D, A, 'Хаалтын төлбөр');
+    opClose(l, D, 'redeem', $('#rd-note',f).value.trim());
+    closeModal(m); changed(); toast(tno(l)+' зээл хаагдлаа. Барьцааг буцаан олгоно уу.');
+  });
+}
+
+/* ================= Хураах ================= */
+function openForfeit(id){
+  const l = loanById(id); if(!l) return;
+  const T=todayISO(), x=calc(l,T);
+  const body = '<form id="ff-form" class="form" novalidate>'+
+    '<p class="lead">'+esc(itemLine(l))+' барьцааг ломбардын өмчид шилжүүлж, зээлийг хаана. Өнөөдрийн байдлаар өр <b>'+money(x.owed)+'</b>.</p>'+
+    '<div class="grid2"><div class="field"><label for="ff-date" class="req">Огноо</label><input type="date" id="ff-date" value="'+T+'"></div></div>'+
+    '<div class="field"><label for="ff-note">Тэмдэглэл</label><input type="text" id="ff-note" placeholder="Жишээ нь: харилцагчид мэдэгдсэн, зарах үнэ"></div>'+
+  '</form>';
+  const m = openModal({ title:tno(l)+': барьцаа хураах', body,
+    foot:'<button class="btn" data-dismiss>Болих</button><button class="btn btn-danger" type="submit" form="ff-form">'+ic('lock')+'Барьцаа хураах</button>' });
+  const f=m.el;
+  $('#ff-form',f).addEventListener('submit', e=>{
+    e.preventDefault();
+    const D=$('#ff-date',f).value;
+    if(!isISO(D)) return fieldErr($('#ff-date',f),'Огноог оруулна уу');
+    if(D<l.startDate) return fieldErr($('#ff-date',f),'Огноо зээл олгосноос өмнө байж болохгүй');
+    opClose(l, D, 'forfeit', $('#ff-note',f).value.trim());
+    closeModal(m); changed(); toast(tno(l)+' барьцааг хураалаа');
+  });
+}
+
+/* ================= Харилцагч ================= */
+function openCustomerForm(opts){
+  opts = opts || {};
+  const c = opts.id ? custById(opts.id) : null, v = c || {};
+  const body = '<form id="cust-form" class="form" novalidate>'+
+    '<div class="grid2"><div class="field"><label for="cf-last">Овог</label><input type="text" id="cf-last" value="'+esc(v.lastName||'')+'" autofocus></div>'+
+    '<div class="field"><label for="cf-first" class="req">Нэр</label><input type="text" id="cf-first" value="'+esc(v.firstName||'')+'"></div></div>'+
+    '<div class="field"><label for="cf-reg">Регистрийн дугаар</label><input type="text" id="cf-reg" value="'+esc(v.regNo||'')+'" placeholder="УБ00000000" autocapitalize="characters"></div>'+
+    '<div class="grid2"><div class="field"><label for="cf-phone" class="req">Утас</label><input type="tel" id="cf-phone" value="'+esc(v.phone||'')+'"></div>'+
+    '<div class="field"><label for="cf-phone2">Нэмэлт утас</label><input type="tel" id="cf-phone2" value="'+esc(v.phone2||'')+'" placeholder="Гэр бүлийн гишүүний утас"></div></div>'+
+    '<div class="field"><label for="cf-addr">Хаяг</label><input type="text" id="cf-addr" value="'+esc(v.address||'')+'"></div>'+
+    '<div class="field"><label for="cf-note">Тэмдэглэл</label><textarea id="cf-note" rows="2">'+esc(v.note||'')+'</textarea></div>'+
+  '</form>';
+  const m = openModal({ title: c ? 'Харилцагчийн мэдээлэл засах' : 'Шинэ харилцагч', body,
+    foot:'<button class="btn" data-dismiss>Болих</button><button class="btn btn-primary" type="submit" form="cust-form">'+(c?'Хадгалах':'Бүртгэх')+'</button>' });
+  const f = m.el;
+  $('#cust-form',f).addEventListener('submit', e=>{
+    e.preventDefault();
+    const first=$('#cf-first',f).value.trim(), phone=$('#cf-phone',f).value.trim(), reg=$('#cf-reg',f).value.trim().toUpperCase().replace(/\s+/g,'');
+    if(!first) return fieldErr($('#cf-first',f),'Нэрийг бичнэ үү');
+    if(!phone) return fieldErr($('#cf-phone',f),'Утасны дугаарыг бичнэ үү');
+    if(reg){ const dup=db.customers.find(x=>x.regNo===reg && (!c || x.id!==c.id)); if(dup) return fieldErr($('#cf-reg',f),'Энэ РД-тэй харилцагч бүртгэлтэй байна: '+fullName(dup)); }
+    const data = { lastName:$('#cf-last',f).value.trim(), firstName:first, regNo:reg, phone, phone2:$('#cf-phone2',f).value.trim(), address:$('#cf-addr',f).value.trim(), note:$('#cf-note',f).value.trim() };
+    let saved;
+    if(c){ Object.assign(c,data); saved=c; }
+    else { saved = Object.assign({id:uid(), createdAt:new Date().toISOString()}, data); db.customers.push(saved); }
+    closeModal(m); changed();
+    toast(c ? 'Харилцагчийн мэдээллийг хадгаллаа' : fullName(saved)+' бүртгэгдлээ');
+    if(opts.onSaved) opts.onSaved(saved);
+  });
+}
+function customerDetail(id){
+  const c = custById(id); if(!c) return null;
+  const T = todayISO();
+  const rows = db.loans.filter(l=>l.customerId===id).map(l=>({l, x:calc(l,T)}))
+    .sort((a,b)=>(a.l.status==='active'?0:1)-(b.l.status==='active'?0:1) || b.l.startDate.localeCompare(a.l.startDate));
+  const act = rows.filter(r=>r.l.status==='active'), owed = act.reduce((s,r)=>s+r.x.owed,0);
+  const figs = [
+    ['Регистр', esc(c.regNo||'—')], ['Утас', esc(c.phone||'—')], ['Нэмэлт утас', esc(c.phone2||'—')],
+    ['Идэвхтэй зээл', act.length+' <small>/ нийт '+rows.length+'</small>'], ['Одоогийн нийт өр', money(owed)], ['Бүртгэсэн', c.createdAt?fmtDate(c.createdAt.slice(0,10)):'—']
+  ];
+  let h = '<dl class="figs">'+figs.map(f=>'<div><dt>'+f[0]+'</dt><dd>'+f[1]+'</dd></div>').join('')+'</dl>';
+  if(c.address) h += '<p style="margin:-10px 0 16px"><span class="muted">Хаяг: </span>'+esc(c.address)+'</p>';
+  if(c.note) h += '<div class="note-box">'+esc(c.note)+'</div>';
+  h += '<div class="actions" style="margin-top:0"><button class="btn btn-primary" data-act="new-loan" data-cust="'+c.id+'">'+ic('plus')+'Шинэ зээл бичих</button>'+
+    '<button class="btn" data-act="edit-customer" data-id="'+c.id+'">'+ic('edit')+'Засах</button>'+
+    '<button class="btn btn-ghost danger" data-act="del-customer" data-id="'+c.id+'">'+ic('trash')+'Устгах</button></div>';
+  h += '<h3 class="mini-title">Зээлийн түүх</h3>';
+  if(rows.length){
+    h += '<div class="panel">'+rows.map((r,i)=>'<button class="mrow" data-act="open-loan" data-id="'+r.l.id+'"'+(i===0?' style="border-top:0"':'')+'>'+
+      '<span class="tno-s">'+tno(r.l)+'</span>'+
+      '<span><span class="ell">'+esc(itemLine(r.l))+'</span><span class="cell-sub">'+fmtDate(r.l.startDate)+' олгосон, '+money(r.l.principal)+'</span></span>'+
+      '<span class="r num">'+(r.l.status==='active'?'<b>'+money(r.x.owed)+'</b>':'')+'</span>'+badge(r.x.state)+'</button>').join('')+'</div>';
+  } else h += '<div class="panel"><div class="empty"><p>Энэ харилцагчид зээл бичигдээгүй байна.</p></div></div>';
+  return { title: fullName(c), body:h };
+}
+function openCustomer(id){
+  const d = customerDetail(id); if(!d) return;
+  const m = openModal({title:d.title, body:d.body, wide:true, dismissOutside:true});
+  m.refresh = ()=>{ const d2=customerDetail(id); if(!d2) return false; m.el.querySelector('.m-head h2').textContent=d2.title; m.el.querySelector('.m-body').innerHTML=d2.body; return true; };
+}
+
+/* ================= Хэвлэх ================= */
+function printLoan(id){
+  const l = loanById(id); if(!l) return;
+  const c = custById(l.customerId) || {}, s = db.settings, it = l.item||{};
+  const due = dueOf(l);
+  const atDue = l.status==='active' ? calc(l, due).owed : calc(l).owed;
+  const termInt = Math.round((+l.principal||0)*(+l.rate||0)/100/30*(+l.termDays||0));
+  const row = (k,v,full)=>'<div'+(full?' class="full"':'')+'><span>'+k+'</span><b>'+v+'</b></div>';
+  const copy = label=>'<div class="pt">'+
+    '<div class="pt-head"><div><strong>'+esc(s.shopName)+'</strong><span>'+esc([s.address,s.phone].filter(Boolean).join(', '))+'</span></div><div class="pt-no"><small>Барьцааны тасалбар</small>'+tno(l)+'</div></div>'+
+    '<div class="pt-grid">'+
+      row('Зээлдэгч', esc(fullName(c)))+row('Регистр', esc(c.regNo||''))+
+      row('Утас', esc([c.phone,c.phone2].filter(Boolean).join(', ')))+row('Олгосон огноо', fmtDate(l.startDate))+
+      row('Барьцаа', esc(catOf(it.category).name+': '+itemLine(l))+(it.serial?', '+esc(it.serial):''), true)+
+      row('Үнэлгээ', it.est?money(it.est):'')+row('Зээлийн дүн', money(l.principal))+
+      row('Сарын хүү', fmtRate(l.rate)+'%')+row('Хугацаа', l.termDays+' хоног')+
+      row('Хугацааны хүү', money(termInt))+row('Дуусах огноо', fmtDate(due))+
+      row('Дуусах өдөр төлөх нийт дүн', money(atDue), true)+
+    '</div>'+
+    (s.terms?'<p class="pt-terms">'+esc(s.terms)+'</p>':'')+
+    '<div class="pt-sign"><span>Зээлдэгч: ____________________</span><span>Ажилтан: ____________________</span></div>'+
+    '<div class="pt-copy">'+label+'</div></div>';
+  $('#print-area').innerHTML = copy('Харилцагчийн хувь') + '<div class="pt-cut"><span>энд хайчилна</span></div>' + copy('Ломбардын хувь');
+  try{ window.print(); }catch(e){ toast('Хэвлэх боломжгүй байна','err'); }
+}
+
+/* ================= Нөөц, экспорт ================= */
+function exportJSON(){
+  const T = todayISO();
+  db.settings.lastBackup = new Date().toISOString();
+  const ok = download('lombard-nuots-'+T+'.json', JSON.stringify(db,null,2), 'application/json');
+  if(ok){ save(); render(); refreshModals(); toast('Нөөц файл татагдлаа'); }
+}
+function exportCSV(){
+  const T=todayISO();
+  const head=['Тасалбар','Төлөв','Харилцагч','РД','Утас','Барьцааны төрөл','Барьцаа','Сериал','Үнэлгээ','Зээлийн дүн','Сарын хүү %','Олгосон','Дуусах','Хаагдсан','Үндсэн үлдэгдэл','Хуримтлагдсан хүү','Нийт өр','Төлсөн хүү','Нийт төлсөн'];
+  const q = v=>{ v=String(v==null?'':v); return /[",\n;]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; };
+  const lines=[head.map(q).join(',')];
+  db.loans.slice().sort((a,b)=>a.ticketNo-b.ticketNo).forEach(l=>{
+    const c=custById(l.customerId)||{}, x=calc(l,T), it=l.item||{};
+    lines.push([tno(l), STATE[x.state][0], fullName(c), c.regNo, c.phone, catOf(it.category).name, itemLine(l), it.serial, it.est||'', l.principal, l.rate, l.startDate, x.due, l.closedDate||'', x.bal, x.acc, x.owed, x.intPaid, x.paid].map(q).join(','));
+  });
+  if(download('lombard-zeel-'+T+'.csv', '﻿'+lines.join('\r\n'), 'text/csv;charset=utf-8')) toast('Жагсаалт татагдлаа');
+}
+$('#import-file').addEventListener('change', e=>{
+  const file = e.target.files && e.target.files[0]; e.target.value='';
+  if(!file) return;
+  const rd = new FileReader();
+  rd.onload = ()=>{
+    let data;
+    try{ data = JSON.parse(rd.result); }catch(err){ toast('Файл уншигдсангүй. Энэ хуудаснаас татсан .json нөөц файл сонгоно уу.','err',5000); return; }
+    if(!data || !Array.isArray(data.loans) || !Array.isArray(data.customers)){ toast('Энэ файл ломбардын нөөц биш байна','err',5000); return; }
+    confirmBox({ title:'Нөөцөөс сэргээх үү?', danger:true, ok:'Сэргээх',
+      text:'Файлд '+data.customers.length+' харилцагч, '+data.loans.length+' зээл байна. Одоогийн бүх бүртгэл ('+db.customers.length+' харилцагч, '+db.loans.length+' зээл) файлынхаар солигдоно.',
+      onOk:()=>{ db = normalize(data); changed(); toast('Нөөцөөс сэргээлээ'); } });
+  };
+  rd.onerror = ()=>toast('Файл уншигдсангүй','err');
+  rd.readAsText(file);
+});
+
+/* ================= Жишээ өгөгдөл ================= */
+function loadDemo(){
+  if(db.loans.length || db.customers.length) return;
+  const T=todayISO(), D=n=>addDays(T,n);
+  const ppl=[['Батсүх','Энхжин','УП95031512','9911 2233','СХД, 32-р хороо'],['Дорж','Тэмүүлэн','ЧЕ88120433','8805 4471','БЗД, 14-р хороо'],['Цэрэндорж','Номин','УЗ01250718','9518 0062','ХУД, 3-р хороо'],['Ганбаатар','Мөнх-Эрдэнэ','ИЮ92070921','9907 3315','СБД, 8-р хороо'],['Отгонбаяр','Сарангэрэл','ФА85111206','8611 9024','ЧД, 5-р хороо'],['Пүрэвдорж','Билгүүн','УЕ99041530','9440 2718','БГД, 20-р хороо']];
+  const cs = ppl.map((p,i)=>({id:uid()+i, lastName:p[0], firstName:p[1], regNo:p[2], phone:p[3], phone2:'', address:p[4], note:'', createdAt:new Date(toUTC(D(-90+i*5))).toISOString()}));
+  db.customers = cs;
+  let no = 1;
+  const mk = (ci, cat, name, extra, est, P, R, start, term)=>{
+    const l = { id:uid()+no, ticketNo:no++, customerId:cs[ci].id, item:Object.assign({category:cat, name, serial:'', weight:'', purity:'', est}, extra||{}),
+      principal:P, rate:R, termDays:term, startDate:D(start), status:'active', closedDate:null, note:'', createdAt:new Date().toISOString(),
+      events:[{id:uid(), type:'issue', date:D(start), at:stamp()}] };
+    db.loans.push(l); return l;
+  };
+  let l;
+  l = mk(4,'watch','Apple Watch Series 8',{serial:'GX7QK2'},700000,350000,4,-80,30); opClose(l,D(-40),'forfeit','Харилцагч утсаа авахгүй байна');
+  l = mk(5,'electronics','Samsung 55" QLED зурагт',{},900000,450000,4.5,-50,30); opPay(l,D(-22),calc(l,D(-22)).owed,'Бэлэн'); opClose(l,D(-22),'redeem','');
+  l = mk(3,'car','Toyota Prius 30, 2012 он',{serial:'1234 УБА'},18000000,8000000,3,-45,60); opPay(l,D(-15),1000000,'Данс');
+  l = mk(4,'gold','Алтан гинж',{weight:'12.5', purity:'750'},3500000,2400000,3,-40,30); opPay(l,D(-10),calc(l,D(-10)).acc,'Сунгалтын хүү'); opExtend(l,D(-10),30,'');
+  l = mk(4,'other','Canon EOS 90D камер',{serial:'083021004512'},1600000,800000,4,-38,30); opPay(l,D(-20),200000,'');
+  l = mk(0,'gold','Алтан бөгж',{weight:'4.2', purity:'585'},1300000,900000,3.5,-34,30);
+  l = mk(1,'gold','Алтан ээмэг',{weight:'3.1', purity:'585'},950000,600000,3.5,-29,30);
+  l = mk(1,'phone','iPhone 14 Pro 256GB',{serial:'IMEI 356728114902337'},1800000,1000000,4,-28,30); opPay(l,D(-14),100000,'');
+  l = mk(2,'computer','MacBook Air M2 13"',{serial:'C02HX1Q4MD6T'},2600000,1500000,3.5,-10,30);
+  l = mk(2,'phone','Samsung Galaxy S23',{serial:'IMEI 351234567890125'},1400000,700000,4,-1,14);
+  db.settings.nextTicket = no;
+  changed(); toast('Жишээ өгөгдөл ачааллаа. Тохиргоо хэсгээс бүгдийг устгаж болно.',null,4500);
+}
+
+/* ================= Товчлуурын үйлдлүүд ================= */
+document.addEventListener('click', e=>{
+  const b = e.target.closest('[data-act]'); if(!b) return;
+  const a=b.dataset.act, id=b.dataset.id;
+  switch(a){
+    case 'new-loan': openLoanForm({customerId:b.dataset.cust}); break;
+    case 'open-loan': openLoan(id); break;
+    case 'new-customer': openCustomerForm({}); break;
+    case 'open-customer': openCustomer(id); break;
+    case 'edit-customer': openCustomerForm({id}); break;
+    case 'del-customer': {
+      const c=custById(id), n=db.loans.filter(l=>l.customerId===id).length;
+      if(n){ toast('Энэ харилцагчид '+n+' зээл бүртгэлтэй тул устгах боломжгүй','err',4000); break; }
+      confirmBox({title:'Харилцагчийг устгах уу?', text:esc(fullName(c))+' харилцагчийн мэдээлэл устна.', ok:'Устгах', danger:true,
+        onOk:()=>{ db.customers=db.customers.filter(x=>x.id!==id); changed(); toast('Харилцагчийг устгалаа'); }});
+      break; }
+    case 'filter': ui.loanF=b.dataset.f; renderLoanList(); break;
+    case 'filter-go': ui.loanF=b.dataset.f; break;
+    case 'pay': openPayment(id); break;
+    case 'extend': openExtend(id); break;
+    case 'redeem': openRedeem(id); break;
+    case 'forfeit': openForfeit(id); break;
+    case 'print': printLoan(id); break;
+    case 'edit-loan': openLoanForm({id}); break;
+    case 'reopen': {
+      const l=loanById(id);
+      confirmBox({title:tno(l)+' зээлийг дахин нээх үү?', text:'Зээл идэвхтэй төлөвт буцна. Хаах үед бүртгэсэн төлөлт түүхэнд хэвээр үлдэх тул шаардлагатай бол тусад нь устгана уу.', ok:'Дахин нээх',
+        onOk:()=>{ opReopen(l); changed(); toast(tno(l)+' зээлийг дахин нээлээ'); }});
+      break; }
+    case 'del-loan': {
+      const l=loanById(id);
+      confirmBox({title:tno(l)+' тасалбарыг устгах уу?', text:'Энэ зээлийн бүх төлөлт, сунгалтын түүх хамт устна. Алдаатай бичсэн тасалбарыг л устгана уу.', ok:'Устгах', danger:true,
+        onOk:()=>{ db.loans=db.loans.filter(x=>x.id!==id); changed(); toast(tno(l)+' тасалбарыг устгалаа'); }});
+      break; }
+    case 'del-event': {
+      const l=loanById(id), ev=l&&l.events.find(x=>x.id===b.dataset.ev); if(!ev) break;
+      confirmBox({title:'Бичлэгийг устгах уу?', text:(ev.type==='payment'?'Төлөлт '+money(ev.amount):'Сунгалт')+' ('+fmtDate(ev.date)+') устаж, үлдэгдэл дахин бодогдоно.', ok:'Устгах', danger:true,
+        onOk:()=>{ l.events=l.events.filter(x=>x.id!==ev.id); changed(); toast('Бичлэгийг устгалаа'); }});
+      break; }
+    case 'demo': loadDemo(); break;
+    case 'backup': exportJSON(); break;
+    case 'csv': exportCSV(); break;
+    case 'import': $('#import-file').click(); break;
+    case 'wipe':
+      confirmBox({title:'Бүх өгөгдлийг устгах уу?', text:'Харилцагч, зээл, төлөлтийн бүх бүртгэл устна. Үүнийг буцаах боломжгүй.', ok:'Бүгдийг устгах', danger:true, typed:'УСТГАХ',
+        onOk:()=>{ const keep=Object.assign({}, db.settings, {nextTicket:1}); db=defaultDB(); db.settings=Object.assign(db.settings, keep); changed(); toast('Бүх бүртгэл устлаа'); }});
+      break;
+  }
+});
+
+render();
+})();
+</script>
+</body>
+</html>
