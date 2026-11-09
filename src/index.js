@@ -2,6 +2,8 @@
 // Сайтын файлууд public/ хавтаснаас, өгөгдөл нь Cloudflare D1 (env.DB)-ээс ирнэ.
 // Бүх /api/ хүсэлт APP_PASSWORD нууц үгээр хамгаалагдсан.
 
+import { runOverdueSms, sendSms, smsConfigured, normalizePhone, insertLogs } from './sms.js';
+
 // Үнэгүй хувилбарт нэг хүсэлтэд 50 хүртэл query ажиллуулж болно. Нөөцтэй байлгахын тулд 40.
 const MAX_STATEMENTS = 40;
 // D1-д нэг query 100 хүртэл параметртэй байж болно.
@@ -25,11 +27,27 @@ const SCHEMA = [
   `CREATE INDEX IF NOT EXISTS loans_ticket_no ON loans (ticket_no)`,
   `CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)`,
   `INSERT OR IGNORE INTO meta (key, value) VALUES ('next_ticket', '1')`,
+  `CREATE TABLE IF NOT EXISTS sms_log (
+     id INTEGER PRIMARY KEY AUTOINCREMENT,
+     loan_id TEXT,
+     ticket_no INTEGER,
+     due TEXT,
+     phone TEXT,
+     text TEXT,
+     status TEXT,
+     info TEXT,
+     created_at INTEGER NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS sms_log_loan ON sms_log (loan_id, due)`,
 ];
 
 let schemaReady = null;
 
 export default {
+  // Cloudflare өдөр бүр 10:00-17:00 цагийн хооронд цаг тутам ажиллуулна (wrangler.jsonc > triggers)
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(ensureSchema(env).then(() => runOverdueSms(env)));
+  },
+
   async fetch(request, env) {
     const url = new URL(request.url);
     if (!url.pathname.startsWith('/api/')) {
@@ -43,7 +61,7 @@ export default {
 
       switch (request.method + ' ' + url.pathname) {
         case 'GET /api/data':
-          return json(await readAll(env));
+          return await readAll(env);
         case 'GET /api/rev':
           return json({ rev: await readRev(env) });
         case 'POST /api/sync':
@@ -54,6 +72,10 @@ export default {
           return json(await setNextTicket(env, await readBody(request)));
         case 'POST /api/wipe':
           return json(await wipe(env));
+        case 'POST /api/sms/run':
+          return json(await runOverdueSms(env));
+        case 'POST /api/sms/test':
+          return json(await testSms(env, await readBody(request)));
         default:
           return json({ error: 'not_found' }, 404);
       }
@@ -150,21 +172,40 @@ function revStatement(env) {
 
 /* ---------------- унших ---------------- */
 
+// Мөр бүрийг задлахгүйгээр хариуг шууд угсарна: үнэгүй хувилбарын 10ms CPU хязгаарт хэмнэлттэй
 async function readAll(env) {
-  const [customers, loans, settings, next, rev] = await env.DB.batch([
+  const [customers, loans, settings, next, rev, sms] = await env.DB.batch([
     env.DB.prepare(`SELECT data FROM customers`),
     env.DB.prepare(`SELECT data FROM loans ORDER BY ticket_no`),
     env.DB.prepare(`SELECT value FROM meta WHERE key = 'settings'`),
     env.DB.prepare(`SELECT value FROM meta WHERE key = 'next_ticket'`),
     env.DB.prepare(`SELECT value FROM meta WHERE key = 'rev'`),
+    env.DB.prepare(
+      `SELECT loan_id, ticket_no, due, phone, text, status, info, created_at FROM sms_log ORDER BY id DESC LIMIT 300`
+    ),
   ]);
-  return {
-    settings: settings.results[0] ? JSON.parse(settings.results[0].value) : null,
-    nextTicket: Number(next.results[0] ? next.results[0].value : 1) || 1,
-    customers: customers.results.map((r) => JSON.parse(r.data)),
-    loans: loans.results.map((r) => JSON.parse(r.data)),
-    rev: rev.results[0] ? rev.results[0].value : '0',
-  };
+  const body =
+    '{"settings":' + (settings.results[0] ? settings.results[0].value : 'null') +
+    ',"nextTicket":' + (Number(next.results[0] ? next.results[0].value : 1) || 1) +
+    ',"rev":' + JSON.stringify(rev.results[0] ? rev.results[0].value : '0') +
+    ',"smsConfigured":' + smsConfigured(env) +
+    ',"sms":' + JSON.stringify(sms.results) +
+    ',"customers":[' + customers.results.map((r) => r.data).join(',') + ']' +
+    ',"loans":[' + loans.results.map((r) => r.data).join(',') + ']}';
+  return new Response(body, {
+    headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
+  });
+}
+
+async function testSms(env, body) {
+  if (!smsConfigured(env)) throw fail(400, 'sms_not_configured', 'SMS_API_KEY, SMS_FROM тохируулаагүй байна');
+  const phone = normalizePhone(body && body.to);
+  if (!phone) throw fail(400, 'bad_phone', 'Утасны дугаар буруу байна');
+  const text = String((body && body.text) || '').trim().slice(0, 480);
+  if (!text) throw fail(400, 'bad_text', 'Мессежийн текст хоосон байна');
+  const r = await sendSms(env, phone, text);
+  await insertLogs(env, [[null, null, null, phone, text, r.ok ? 'test' : 'failed', r.info, Date.now()]]);
+  return { ok: r.ok, info: r.info };
 }
 
 /* ---------------- бичих ---------------- */

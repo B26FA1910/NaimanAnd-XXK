@@ -280,6 +280,12 @@ body.modal-open{overflow:hidden}
 .tl .ev-payment .dot,.tl .ev-redeem .dot{background:var(--green)}
 .tl .ev-extend .dot{background:var(--amber)}
 .tl .ev-forfeit .dot{background:var(--slate)}
+.tl .ev-sms .dot{background:#3B6EA8}
+.sms-prev{background:#F5F7F9;border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.sms-prev .lbl{font-size:13px;color:var(--muted)}
+.sms-prev p{white-space:pre-wrap;word-break:break-word}
+.smsrow{cursor:default}
+.smsrow:hover{background:none}
 .tl .ev-pending .dot{background:var(--surface);border:2.5px solid var(--brass)}
 .tl .ev-pending.overdue .dot{border-color:var(--red)}
 .tl .what b{display:block;font-weight:500}
@@ -472,6 +478,7 @@ const CATS = [
   {id:'other', name:'Бусад'}
 ];
 const DEFAULT_TERMS = 'Зээлдэгч зээлийг дуусах хугацаанд нь хүүгийн хамт төлж барьцаа хөрөнгөө буцаан авна. Хугацаа хэтэрсэн хоног бүрт хүү үргэлжлэн бодогдоно. Хугацаа хэтэрч, төлбөр төлөгдөөгүй тохиолдолд ломбард барьцаа хөрөнгийг худалдан борлуулах эрхтэй.';
+const DEFAULT_SMS_TEMPLATE = '{SHOP}: Сайн байна уу, {NAME}. Таны {TICKET} зээлийн хугацаа {DUE}-нд дууссан. Төлөх дүн {AMOUNT}. Утас: {PHONE}';
 const WD = ['Ням','Даваа','Мягмар','Лхагва','Пүрэв','Баасан','Бямба'];
 
 const ICON = {
@@ -493,7 +500,8 @@ function ic(n){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColo
 /* ================= Хадгалалт: Cloudflare D1 сервер ================= */
 function defaultDB(){
   return { version:1,
-    settings:{ shopName:'Миний ломбард', phone:'', address:'', defaultRate:3, defaultTerm:30, nextTicket:1, lastBackup:null, terms:DEFAULT_TERMS },
+    settings:{ shopName:'Миний ломбард', phone:'', address:'', defaultRate:3, defaultTerm:30, nextTicket:1, lastBackup:null, terms:DEFAULT_TERMS,
+      smsEnabled:false, smsRepeatDays:0, smsLatin:true, smsTemplate:DEFAULT_SMS_TEMPLATE },
     customers:[], loans:[] };
 }
 function normalize(d){
@@ -516,6 +524,7 @@ let db = defaultDB();
 let pass = ''; try{ pass = localStorage.getItem(PASS_KEY) || ''; }catch(e){}
 let loaded = false, everLoaded = false, syncing = false, syncAgain = false, knownRev = null, retryTimer = null;
 const synced = { customers:new Map(), loans:new Map(), settings:'' };
+let smsInfo = { configured:false, log:[] };
 
 async function api(path, opts){
   opts = opts || {};
@@ -537,6 +546,7 @@ function markSynced(){
 function applyServer(data){
   db = normalize({ settings:Object.assign({}, data.settings||{}, {nextTicket:data.nextTicket||1}), customers:data.customers||[], loans:data.loans||[] });
   knownRev = data.rev; markSynced();
+  smsInfo = { configured: !!data.smsConfigured, log: Array.isArray(data.sms) ? data.sms : [] };
 }
 // Сүүлд серверт илгээснээс хойш өөрчлөгдсөн зүйлсийг олно
 function computeDiff(){
@@ -1052,6 +1062,111 @@ function renderCustList(){
 }
 
 /* ================= Харагдац: Тохиргоо ================= */
+/* ================= SMS сануулга ================= */
+const GSM7 = "@£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ !\"#¤%&'()*+,-./0123456789:;<=>?¡ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§¿abcdefghijklmnopqrstuvwxyzäöñüà";
+const GSM7_EXT = "^{}\\[~]|€";
+const LAT = {а:'a',б:'b',в:'v',г:'g',д:'d',е:'ye',ё:'yo',ж:'j',з:'z',и:'i',й:'i',к:'k',л:'l',м:'m',н:'n',о:'o',ө:'u',п:'p',р:'r',с:'s',т:'t',у:'u',ү:'u',ф:'f',х:'h',ц:'ts',ч:'ch',ш:'sh',щ:'sh',ъ:'i',ы:'y',ь:'i',э:'e',ю:'yu',я:'ya'};
+function toLatin(t){
+  return String(t).replace(/№\s*/g,'No.').replace(/₮/g,' tug').replace(/[«»“”„]/g,'"').replace(/[‘’]/g,"'").replace(/[–—]/g,'-')
+    .replace(/[Ѐ-ӿ]/g, ch=>{ const lo=ch.toLowerCase(), v=LAT[lo]; if(v===undefined) return ''; return ch===lo ? v : v.charAt(0).toUpperCase()+v.slice(1); });
+}
+function smsCount(t){
+  let len=0;
+  for(const ch of t){ if(GSM7.includes(ch)) len++; else if(GSM7_EXT.includes(ch)) len+=2; else { const n=[...t].length; return {len:n, parts:n<=70?1:Math.ceil(n/67), latin:false}; } }
+  return {len, parts:len<=160?1:Math.ceil(len/153), latin:true};
+}
+function ubDate(ms){ return new Date(+ms + 8*3600e3).toISOString().slice(0,10); }
+function fmtStamp(ms){ const iso=new Date(+ms + 8*3600e3).toISOString(); return fmtDate(iso.slice(0,10))+' '+iso.slice(11,16); }
+function smsText(tpl, latin, l, c){
+  const T=todayISO(); let v;
+  if(l){ const x=calc(l,T); v={SHOP:db.settings.shopName||'Ломбард', NAME:(c&&(c.firstName||c.lastName))||'', TICKET:tno(l), DUE:fmtDate(x.due), DAYS:Math.max(0,-x.daysLeft), AMOUNT:money(x.owed), PHONE:db.settings.phone||'', ITEM:(l.item&&l.item.name)||''}; }
+  else v={SHOP:db.settings.shopName||'Ломбард', NAME:'Болд', TICKET:'№0012', DUE:fmtDate(addDays(T,-2)), DAYS:2, AMOUNT:money(935700), PHONE:db.settings.phone||'', ITEM:'Алтан бөгж'};
+  const t = String(tpl||DEFAULT_SMS_TEMPLATE).replace(/\{(SHOP|NAME|TICKET|DUE|DAYS|AMOUNT|PHONE|ITEM)\}/g, (_,k)=>String(v[k]==null?'':v[k])).replace(/\s+/g,' ').trim();
+  return latin ? toLatin(t) : t;
+}
+function sampleLoan(){
+  const T=todayISO(), act=db.loans.filter(l=>l.status==='active');
+  return act.find(l=>calc(l,T).state==='overdue') || act[0] || null;
+}
+function smsBadge(st){ const m={sent:['Илгээсэн','b-redeemed'],test:['Тест','b-active'],failed:['Алдаа','b-overdue'],skipped:['Алгассан','b-forfeited']}[st]||[st,'b-forfeited']; return '<span class="badge '+m[1]+'">'+esc(m[0])+'</span>'; }
+function smsSection(){
+  const s=db.settings, on=!!s.smsEnabled, cfg=smsInfo.configured;
+  const rows = smsInfo.log.slice(0,8);
+  return '<section class="panel pad" id="sms-section"><div class="cust-sum" style="margin:0"><div><h2>Автомат SMS сануулга</h2><p class="sub">Зээлийн хугацаа хэтэрсэн өдрөөс эхлэн харилцагч руу SMS илгээнэ. Өдөр бүр 10:00–17:00 цагийн хооронд шалгана.</p></div>'+
+    (cfg?'<span class="badge b-redeemed">SMS үйлчилгээ холбогдсон</span>':'<span class="badge b-soon">SMS үйлчилгээ холбогдоогүй</span>')+'</div>'+
+    (cfg?'':'<div class="notice" style="margin:0"><span>SMS илгээхийн тулд MessagePro (CallPro)-оос API түлхүүр авч, Cloudflare дээр <b>SMS_API_KEY</b>, <b>SMS_FROM</b> гэсэн хоёр Secret нэмнэ. Тэр болтол тохиргоогоо урьдчилан хийж болно.</span></div>')+
+    '<form id="sms-form" class="form" novalidate>'+
+      '<label class="check"><input type="checkbox" id="sm-on"'+(on?' checked':'')+'><span>Хугацаа хэтэрсэн зээлийн харилцагчид автоматаар SMS илгээх</span></label>'+
+      '<div class="grid2"><div class="field"><label for="sm-repeat">Давтамж</label><select id="sm-repeat">'+
+        [[0,'Нэг удаа илгээх'],[3,'Төлөөгүй бол 3 хоног тутам'],[7,'Төлөөгүй бол 7 хоног тутам']].map(o=>'<option value="'+o[0]+'"'+((+s.smsRepeatDays||0)===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+
+        '</select><span class="hint">Нэг хугацаанд хамгийн ихдээ 5 SMS илгээнэ.</span></div>'+
+      '<div class="field"><span class="lbl">Үсэг</span><label class="check" style="margin-top:9px"><input type="checkbox" id="sm-latin"'+(s.smsLatin!==false?' checked':'')+'><span>Латин үсгээр илгээх. Нэг SMS-д 160 тэмдэгт багтдаг тул хямд. Кириллээр 70.</span></label></div></div>'+
+      '<div class="field"><label for="sm-text">Мессежийн загвар</label><textarea id="sm-text" rows="3">'+esc(s.smsTemplate||DEFAULT_SMS_TEMPLATE)+'</textarea>'+
+        '<span class="hint">Орлуулах үгс: {SHOP} ломбардын нэр, {NAME} харилцагчийн нэр, {TICKET} тасалбар, {DUE} дуусах огноо, {DAYS} хэтэрсэн хоног, {AMOUNT} төлөх дүн, {ITEM} барьцаа, {PHONE} ломбардын утас</span></div>'+
+      '<div class="sms-prev"><span class="lbl" id="sm-prev-l">Харилцагчид очих мессеж</span><p id="sm-prev"></p><span class="hint" id="sm-count"></span></div>'+
+      '<div class="row-btns"><button class="btn btn-primary" type="submit">SMS тохиргоог хадгалах</button><button class="btn btn-ghost" type="button" id="sm-reset">Анхны загвар</button></div>'+
+    '</form>'+
+    '<div class="grid2"><div class="field"><label for="sm-test">Туршилтын SMS</label><div class="pick" style="grid-template-columns:minmax(0,1fr) auto"><input type="tel" id="sm-test" placeholder="Өөрийн дугаар, 99112233"><button class="btn" data-act="sms-test"'+(cfg?'':' disabled')+'>Илгээх</button></div><span class="hint">Дээрх жишээ мессежийг таны дугаар руу илгээнэ.</span></div>'+
+      '<div class="field"><span class="lbl">Одоо шалгах</span><div><button class="btn" data-act="sms-run"'+(cfg&&on?'':' disabled')+'>Хэтэрсэн зээлийг одоо шалгаж илгээх</button></div><span class="hint">Өнөөдөр SMS очсон харилцагч руу дахин илгээхгүй.</span></div></div>'+
+    (rows.length ? '<div><h3 class="mini-title">Сүүлд илгээсэн SMS</h3><div class="panel">'+rows.map((r,i)=>'<div class="mrow smsrow"'+(i===0?' style="border-top:0"':'')+'><span class="tno-s">'+(r.ticket_no?tno({ticketNo:r.ticket_no}):'Тест')+'</span><span><span class="ell">'+esc(r.text||'')+'</span><span class="cell-sub">'+fmtStamp(r.created_at)+', '+esc(r.phone||'')+((r.status==='failed'||r.status==='skipped')?', '+esc(r.info||''):'')+'</span></span><span></span>'+smsBadge(r.status)+'</div>').join('')+'</div></div>' : '')+
+  '</section>';
+}
+function bindSmsForm(){
+  const f=$('#sms-form'); if(!f) return;
+  const upd=()=>{
+    const l=sampleLoan(), c=l?custById(l.customerId):null, latin=$('#sm-latin').checked;
+    const t=smsText($('#sm-text').value, latin, l, c), n=smsCount(t);
+    $('#sm-prev').textContent=t;
+    $('#sm-prev-l').textContent = l ? 'Жишээ: '+tno(l)+' тасалбарын харилцагчид очих мессеж' : 'Жишээ мессеж';
+    $('#sm-count').textContent = n.len+' тэмдэгт, '+n.parts+' SMS'+(n.latin?'':'. Кирилл үсэг орсон тул нэг SMS 70 тэмдэгт.');
+  };
+  ['sm-text','sm-latin'].forEach(id=>{ $('#'+id).addEventListener('input',upd); $('#'+id).addEventListener('change',upd); });
+  $('#sm-reset').addEventListener('click',()=>{ $('#sm-text').value=DEFAULT_SMS_TEMPLATE; upd(); });
+  upd();
+  f.addEventListener('submit', e=>{
+    e.preventDefault();
+    const tpl=$('#sm-text').value.trim();
+    if(!tpl) return fieldErr($('#sm-text'),'Мессежийн загварыг бичнэ үү');
+    const on=$('#sm-on').checked;
+    Object.assign(db.settings, {smsEnabled:on, smsRepeatDays:+$('#sm-repeat').value||0, smsLatin:$('#sm-latin').checked, smsTemplate:tpl});
+    changed();
+    toast(on ? (smsInfo.configured ? 'SMS сануулга асаалттай' : 'Хадгаллаа. SMS үйлчилгээ холбогдсоны дараа илгээж эхэлнэ.') : 'SMS сануулга унтраалттай', null, 4000);
+  });
+}
+async function flushSync(){
+  for(let i=0; i<50 && loaded && (syncing || computeDiff().count); i++){
+    if(!syncing) await pushSync(); else await new Promise(r=>setTimeout(r,200));
+  }
+}
+async function reloadData(){
+  if(!loaded || syncing || computeDiff().count) return;
+  try{ applyServer(await api('/api/data')); render(); refreshModals(); }catch(e){}
+}
+async function smsTest(btn){
+  const to=$('#sm-test').value.trim(), digits=to.replace(/\D/g,'');
+  if(!/^(976)?[5-9]\d{7}$/.test(digits)) return fieldErr($('#sm-test'),'8 оронтой утасны дугаар оруулна уу');
+  const text=$('#sm-prev').textContent;
+  btn.disabled=true;
+  try{ const r=await api('/api/sms/test',{method:'POST', body:{to:digits, text}}); toast(r.ok?'Туршилтын SMS илгээлээ. Утсаа шалгана уу.':'SMS илгээж чадсангүй: '+r.info, r.ok?null:'err', 6000); await reloadData(); }
+  catch(e){ handleApiError(e,false); if(e.status!==401&&e.status!==503) toast('SMS илгээж чадсангүй: '+e.message,'err',6000); }
+  finally{ btn.disabled=false; }
+}
+async function smsRun(btn){
+  btn.disabled=true;
+  try{
+    await flushSync();
+    const r=await api('/api/sms/run',{method:'POST'});
+    let msg;
+    if(r.enabled===false) msg='SMS сануулга унтраалттай байна.';
+    else if(r.configured===false) msg='SMS үйлчилгээ холбогдоогүй байна.';
+    else if(!r.sent && !r.failed && !r.skipped) msg='Одоогоор SMS илгээх хугацаа хэтэрсэн зээл алга.';
+    else msg='Илгээсэн '+r.sent+(r.failed?', алдаа '+r.failed:'')+(r.skipped?', дугаар буруу '+r.skipped:'')+(r.remaining?'. Үлдсэн '+r.remaining+' нь дараагийн цагт илгээгдэнэ.':'');
+    toast(msg, r.failed?'err':null, 6000);
+    await reloadData();
+  }catch(e){ handleApiError(e,false); if(e.status!==401&&e.status!==503) toast('Шалгаж чадсангүй: '+e.message,'err',6000); }
+  finally{ btn.disabled=false; }
+}
+
 function viewSettings(){
   const s = db.settings;
   return '<div class="wrap narrow"><header class="page-head"><div><h1>Тохиргоо</h1><p class="sub">Ломбардын мэдээлэл ба өгөгдлийн нөөц</p></div></header>'+
@@ -1069,6 +1184,7 @@ function viewSettings(){
   '<section class="panel pad"><div><h2>Нөөцлөлт</h2><p class="sub">Сүүлд нөөцөлсөн: '+(s.lastBackup?fmtDate(s.lastBackup.slice(0,10)):'хараахан нөөцлөөгүй')+'</p></div>'+
     '<p>Бүх бүртгэл Cloudflare-ийн D1 серверт хадгалагдаж, нууц үгээр нэвтэрсэн бүх төхөөрөмжөөс нэг дор харагдана. Нэмэлт хамгаалалт болгож сард нэг удаа нөөц файл татаж, өөр газар хадгалаарай. "Нөөцөөс сэргээх" нь сервер дээрх бүртгэлийг файлынхаар солино.</p>'+
     '<div class="row-btns"><button class="btn btn-primary" data-act="backup">'+ic('download')+'Нөөц файл татах</button><button class="btn" data-act="import">Нөөцөөс сэргээх</button><button class="btn" data-act="csv">Зээлийн жагсаалт татах (Excel)</button></div></section>'+
+  smsSection()+
   '<section class="panel pad"><div><h2>Нэвтрэлт</h2><p class="sub">Нууц үгийг Cloudflare дээрх APP_PASSWORD тохиргооноос солино.</p></div>'+
     '<p>Энэ төхөөрөмж нууц үгийг санаж байгаа. Олон хүн ашигладаг компьютер дээр ажлаа дуусгаад гарч байгаарай.</p>'+
     '<div><button class="btn" data-act="logout">Энэ төхөөрөмжөөс гарах</button></div></section>'+
@@ -1076,6 +1192,7 @@ function viewSettings(){
     '<div><button class="btn btn-danger" data-act="wipe">'+ic('trash')+'Бүгдийг устгах</button></div></section></div>';
 }
 function bindSettings(){
+  bindSmsForm();
   const f = $('#set-form'); if(!f) return;
   f.addEventListener('submit', async e=>{
     e.preventDefault();
@@ -1170,13 +1287,15 @@ function loanDetail(id){
   if(l.note) h += '<div class="note-box">'+esc(l.note)+'</div>';
 
   h += '<h3>Түүх</h3><ol class="tl">';
-  for(const e of sortEvents(l.events)){
+  const smsEv = smsInfo.log.filter(r=>r.loan_id===l.id && r.status!=='test').map(r=>({id:'sms'+r.created_at, type:'sms', date:ubDate(r.created_at), at:r.created_at*1000, sms:r}));
+  for(const e of sortEvents(l.events.concat(smsEv))){
     let t='', s='';
     if(e.type==='issue'){ t='Зээл олгосон '+money(l.principal); s='Сарын '+fmtRate(l.rate)+'% хүүтэй, '+l.termDays+' хоногийн хугацаатай'; }
     else if(e.type==='payment'){ t='Төлөлт '+money(e.amount); const a=x.alloc[e.id]; if(a){ const p=[]; if(a.i) p.push('хүүнд '+money(a.i)); if(a.p) p.push('үндсэн зээлд '+money(a.p)); if(a.o) p.push('илүү төлөлт '+money(a.o)); s=p.join(', '); } }
     else if(e.type==='extend'){ t='Хугацаа '+(e.req||e.days)+' хоногоор сунгасан'; s='Шинэ дуусах огноо '+fmtDate(e.newDue||''); }
     else if(e.type==='redeem'){ t='Төлж хаасан, барьцааг буцаан олгосон'; if(e.remaining>0) s='Хөнгөлөлт '+money(e.remaining); }
     else if(e.type==='forfeit'){ t='Барьцааг хураасан'; if(e.remaining>0) s='Хураах үеийн өр '+money(e.remaining); }
+    else if(e.type==='sms'){ const r=e.sms; t = r.status==='sent'?'SMS сануулга илгээсэн':r.status==='skipped'?'SMS илгээгээгүй':'SMS илгээж чадсангүй'; s = r.status==='sent' ? (r.phone+' дугаар руу, '+fmtStamp(r.created_at).slice(11)+' цагт') : (r.info||''); }
     const del = act && (e.type==='payment'||e.type==='extend') ? '<button class="icon-btn sm" data-act="del-event" data-id="'+l.id+'" data-ev="'+e.id+'" aria-label="Энэ бичлэгийг устгах" title="Устгах">'+ic('trash')+'</button>' : '<span></span>';
     h += '<li class="ev-'+e.type+'"><span class="d">'+fmtDate(e.date)+'</span><span class="dot"></span><span class="what"><b>'+esc(t)+'</b>'+(s?'<span>'+esc(s)+'</span>':'')+(e.note?'<span class="note">'+esc(e.note)+'</span>':'')+'</span>'+del+'</li>';
   }
@@ -1440,7 +1559,7 @@ function openCustomerForm(opts){
     '<div class="grid2"><div class="field"><label for="cf-last">Овог</label><input type="text" id="cf-last" value="'+esc(v.lastName||'')+'" autofocus></div>'+
     '<div class="field"><label for="cf-first" class="req">Нэр</label><input type="text" id="cf-first" value="'+esc(v.firstName||'')+'"></div></div>'+
     '<div class="field"><label for="cf-reg">Регистрийн дугаар</label><input type="text" id="cf-reg" value="'+esc(v.regNo||'')+'" placeholder="УБ00000000" autocapitalize="characters"></div>'+
-    '<div class="grid2"><div class="field"><label for="cf-phone" class="req">Утас</label><input type="tel" id="cf-phone" value="'+esc(v.phone||'')+'"></div>'+
+    '<div class="grid2"><div class="field"><label for="cf-phone" class="req">Утас</label><input type="tel" id="cf-phone" value="'+esc(v.phone||'')+'"><span class="hint">Хугацаа хэтэрвэл SMS сануулга энэ дугаар руу очно</span></div>'+
     '<div class="field"><label for="cf-phone2">Нэмэлт утас</label><input type="tel" id="cf-phone2" value="'+esc(v.phone2||'')+'" placeholder="Гэр бүлийн гишүүний утас"></div></div>'+
     '<div class="field"><label for="cf-addr">Хаяг</label><input type="text" id="cf-addr" value="'+esc(v.address||'')+'"></div>'+
     '<div class="field"><label for="cf-note">Тэмдэглэл</label><textarea id="cf-note" rows="2">'+esc(v.note||'')+'</textarea></div>'+
@@ -1636,6 +1755,8 @@ document.addEventListener('click', e=>{
       break;
     case 'logout': logout(); break;
     case 'retry-sync': pushSync(); break;
+    case 'sms-test': smsTest(b); break;
+    case 'sms-run': smsRun(b); break;
   }
 });
 

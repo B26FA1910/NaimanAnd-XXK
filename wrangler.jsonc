@@ -16,7 +16,12 @@
       "database_name": "lombard-db",
       "database_id": "1744e395-7fad-439a-aecb-06885ecff979"
     }
-  ]
+  ],
+  // Хугацаа хэтэрсэн зээлийн SMS-ийг Улаанбаатарын цагаар 10:00-17:00 хооронд цаг тутам шалгана (UTC 02:00-09:00)
+  "triggers": {
+    "crons": ["0 2-9 * * *"]
+  }
   // Нэвтрэх нууц үгийг энд бичихгүй. Cloudflare dashboard дээр
   // Settings > Variables and Secrets хэсэгт APP_PASSWORD нэртэй Secret болгон нэмнэ.
+  // SMS-ийн хувьд мөн тэнд SMS_API_KEY, SMS_FROM гэсэн хоёр Secret нэмнэ (MessagePro-оос авна).
 }
