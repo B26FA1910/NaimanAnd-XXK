@@ -22,6 +22,7 @@
   --stamp:'Oswald', 'Arial Narrow', 'Roboto Condensed', sans-serif;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;font:15px/1.5 var(--font);color:var(--ink);background:var(--paper)}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -153,6 +154,7 @@ button.ticket:hover{border-color:#B2BCC7}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .panel.pad{padding:22px 24px;display:flex;flex-direction:column;gap:14px}
 .panel+.panel{margin-top:18px}
+.cashgrid>.panel,.rgrid>.panel{margin-top:0}
 .lrow,.crow,.mrow{display:grid;gap:14px;align-items:center;padding:13px 18px;border:0;border-top:1px solid var(--line-2);width:100%;background:none;text-align:left;cursor:pointer;color:var(--ink)}
 .lrow{grid-template-columns:82px minmax(0,1.2fr) minmax(0,1.4fr) minmax(0,.95fr) minmax(0,1fr) minmax(0,1.3fr) 132px}
 .crow{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr) 70px 90px minmax(0,1fr)}
@@ -315,6 +317,119 @@ body.modal-open{overflow:hidden}
 .spin{width:22px;height:22px;border-radius:50%;border:2.5px solid var(--line);border-top-color:var(--brass);animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* ---------- v3: navigation, tables, finance ---------- */
+.side{overflow-y:auto;gap:18px}
+.nav-g{font-size:12px;color:#6F7B89;padding:12px 12px 4px}
+.nav a{padding:8px 12px}
+.qs{position:relative}
+.qs-ic{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#8D98A5;display:flex}
+.qs-ic svg{width:17px;height:17px}
+.qs input[type=search]{height:38px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#fff;padding-left:34px;border-radius:8px}
+.qs input::placeholder{color:#8D98A5}
+.qs input[type=search]:focus{border-color:var(--brass-light);box-shadow:none;background:rgba(255,255,255,.1)}
+.side-user{color:#C3CCD5;margin-bottom:6px}
+.side-user b{color:#fff;font-weight:500}
+.tb-menu{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;color:#9AA5B1;font-size:11.5px;padding:5px 0;background:none;border:0;cursor:pointer}
+.tb-menu svg{width:22px;height:22px}
+.menu-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.menu-list a,.menu-list button{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:10px;text-decoration:none;color:var(--ink);background:#fff;font-weight:500;cursor:pointer;font-size:15px;text-align:left}
+.menu-list svg{width:20px;height:20px;color:var(--brass-ink);flex:none}
+.m-search{position:relative;margin-bottom:16px}
+.m-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted);pointer-events:none}
+.m-search input[type=search]{padding-left:38px}
+.dash-search{display:none}
+
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.filters select,.filters input[type=date]{width:auto;min-width:140px}
+.filters .search{flex:1 1 220px}
+.tbl-wrap{overflow-x:auto}
+.dt{width:100%;border-collapse:collapse;font-size:14px}
+.dt th{font-size:13px;font-weight:500;color:var(--muted);text-align:left;padding:11px 12px;background:#F7F8FA;border-bottom:1px solid var(--line-2);white-space:nowrap}
+.dt th.sort{cursor:pointer;user-select:none}
+.dt th.sort:hover{color:var(--ink)}
+.dt th .arr{display:inline-block;margin-left:3px;opacity:.35;font-size:11px}
+.dt th.on{color:var(--ink)}
+.dt th.on .arr{opacity:1}
+.dt td{padding:10px 12px;border-top:1px solid var(--line-2);vertical-align:middle}
+.dt tbody tr:first-child td{border-top:0}
+.dt tbody tr[data-act]{cursor:pointer}
+.dt tbody tr[data-act]:hover{background:var(--hover)}
+.dt .r{text-align:right}
+.dt td.num,.dt .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.dt .neg{color:var(--red)}
+.dt .pos{color:var(--green)}
+.dt .sub{display:block;font-size:12.5px;color:var(--muted)}
+.dt .clip{max-width:340px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dt .btn.sm{height:30px;padding:0 10px;font-size:13px}
+.cb{display:inline-block;background:#E7EEF7;color:#2D5687;border-radius:5px;padding:1px 7px;font-size:12.5px;font-weight:600;margin:1px 3px 1px 0;white-space:nowrap}
+.xd{font-weight:600;font-variant-numeric:tabular-nums}
+.xd.neg{color:var(--red)}
+.pager{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-top:1px solid var(--line-2);flex-wrap:wrap;gap:10px;font-size:14px;color:var(--ink-2)}
+.pager .pg{display:flex;gap:4px;flex-wrap:wrap}
+.pager button{min-width:34px;height:34px;padding:0 10px;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;font-variant-numeric:tabular-nums}
+.pager button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.pager button:disabled{opacity:.4;cursor:default}
+.sumbar{display:flex;gap:22px;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--line-2);font-size:14px}
+.sumbar span{color:var(--muted)}
+.sumbar b{font-variant-numeric:tabular-nums}
+.st-bad .stub{background:var(--red-tint)} .st-bad .tno{color:#7A1A12}
+.bar.st-bad i,.track.st-bad i{background:#7A1A12}
+.b-bad{background:#7A1A12;color:#fff}
+.b-income{background:var(--green-tint);color:var(--green)}
+.b-expense{background:var(--red-tint);color:var(--red)}
+.b-transfer{background:#E7EEF7;color:#2D5687}
+.bl-warn{background:var(--red-tint);border:1px solid #F3C4BD;color:#7A1A12;border-radius:10px;padding:10px 14px;font-size:14px}
+.bl-warn b{color:#7A1A12}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fff}
+.seg button{border:0;background:none;padding:9px 14px;cursor:pointer;font-weight:500}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.on{background:var(--ink);color:#fff}
+.items-ed{display:flex;flex-direction:column;gap:10px}
+.irow{border:1px solid var(--line-2);border-radius:10px;padding:10px;display:grid;grid-template-columns:150px minmax(0,1fr) 130px 30px;gap:8px;align-items:center;background:#FBFCFD}
+.irow .ext{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) 110px 110px;gap:8px}
+.irow .ext.nometal{grid-template-columns:minmax(0,1fr)}
+.irow input[type=text],.irow select{height:38px}
+.cashgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px}
+.cashcard{padding:18px 20px}
+.cashcard h2{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:14.5px}
+.kv span{color:var(--ink-2)}
+.kv b{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+.kv.sub{padding-left:14px;font-size:13.5px}
+.kv.sub span{color:var(--muted)}
+.kv.sub b{font-weight:500}
+.kv.total{border-top:1px solid var(--line);margin-top:6px;padding-top:10px;font-size:16px}
+.kv.head{margin-top:8px}
+.kv.head span{color:var(--ink);font-weight:600}
+.daynav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.daynav input[type=date]{width:auto}
+.rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-bottom:18px}
+.rgrid .panel{padding:18px 20px}
+.rgrid h2{margin-bottom:8px}
+.presets{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.cat-ed{display:flex;flex-direction:column;gap:8px}
+.cat-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center}
+.gate-box .linkbtn{background:none;border:0;padding:0;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px;cursor:pointer;font-size:14px;align-self:flex-start}
+@media (max-width:860px){
+  .dash-search{display:block}
+  .cashgrid,.rgrid{grid-template-columns:1fr}
+  .dt.cards thead{display:none}
+  .dt.cards,.dt.cards tbody,.dt.cards tr,.dt.cards td{display:block;width:100%}
+  .dt.cards tr{padding:10px 14px;border-top:1px solid var(--line-2)}
+  .dt.cards tbody tr:first-child{border-top:0}
+  .dt.cards td{border:0;padding:2px 0;display:flex;justify-content:flex-end;align-items:baseline;gap:6px 8px;text-align:right}
+  .dt.cards td::before{content:attr(data-l);color:var(--muted);font-size:13px;text-align:left;flex:none;margin-right:auto;padding-right:6px}
+  .dt.cards td.main{font-weight:600;font-size:15px;text-align:left;justify-content:flex-start}
+  .dt.cards td.main::before,.dt.cards td.noL::before{content:none}
+  .dt.cards td:empty{display:none}
+  .dt .clip{max-width:60vw}
+  .irow{grid-template-columns:minmax(0,1fr) 110px 30px}
+  .irow .icat{grid-column:1/-1}
+  .irow .ext{grid-template-columns:1fr 1fr}
+  .irow .ext .iserial{grid-column:1/-1}
+  .menu-list{grid-template-columns:1fr}
+}
+
 /* toast */
 .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:10px;font-size:14.5px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:80;max-width:calc(100vw - 32px);box-shadow:0 10px 30px rgba(15,23,32,.25)}
 .toast.show{opacity:1;transform:translate(-50%,0)}
@@ -433,10 +548,20 @@ body.modal-open{overflow:hidden}
       <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><path d="M5 3.5h24" stroke="#C9A04A" stroke-width="2.2" stroke-linecap="round"/><path d="M17 3.5v5M10 3.5l0 14M24 3.5v14" stroke="#C9A04A" stroke-width="1.4"/><circle cx="17" cy="12.5" r="5" fill="#C9A04A"/><circle cx="10" cy="23.5" r="5" fill="#C9A04A"/><circle cx="24" cy="23.5" r="5" fill="#C9A04A"/></svg>
       <div><div class="brand-name" id="brand-name">Ломбард</div><div class="brand-sub">Барьцаат зээлийн бүртгэл</div></div>
     </div>
+    <form class="qs" id="qs-form" role="search"><span class="qs-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg></span><input type="search" id="qs" placeholder="Регистр, №, нэр, утас" aria-label="Шуурхай хайх" autocomplete="off"></form>
     <nav class="nav">
       <a href="#dashboard" data-nav="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5h4v5"/></svg>Самбар</a>
+      <div class="nav-g">Зээл</div>
       <a href="#loans" data-nav="loans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2.5a2.5 2.5 0 0 0 0 5V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2.5a2.5 2.5 0 0 0 0-5z"/><path d="M15 5v2M15 11v2M15 17v2"/></svg>Зээлүүд</a>
       <a href="#customers" data-nav="customers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c1.8.7 3 2.4 3.5 5.2"/></svg>Харилцагчид</a>
+      <a href="#blacklist" data-nav="blacklist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.3"/></svg>Хар жагсаалт</a>
+      <div class="nav-g">Санхүү</div>
+      <a href="#txns" data-nav="txns"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h14l-3.5-3.5M20 16H6l3.5 3.5"/></svg>Бусад гүйлгээ</a>
+      <a href="#cash" data-nav="cash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg>Касс</a>
+      <a href="#reports" data-nav="reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V4M4 20h16"/><path d="M8 16v-4M12 16V8M16 16v-6"/></svg>Тайлан</a>
+      <div class="nav-g">Бусад</div>
+      <a href="#audit" data-nav="audit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.5 4.5v4h4"/><path d="M12 8v4.2l3 1.8"/></svg>Засварын түүх</a>
+      <a href="#users" data-nav="users" data-admin hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="9" r="3"/><circle cx="16.5" cy="9" r="3"/><path d="M2.5 19c.6-3 2.8-4.5 5.5-4.5s4.9 1.5 5.5 4.5M13.5 15c.9-.4 1.9-.5 3-.5 2.7 0 4.9 1.5 5.5 4.5"/></svg>Хэрэглэгч</a>
       <a href="#settings" data-nav="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>Тохиргоо</a>
     </nav>
     <button class="btn btn-brass" data-act="new-loan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Шинэ зээл бичих</button>
@@ -450,7 +575,7 @@ body.modal-open{overflow:hidden}
   <a href="#loans" data-nav="loans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2.5a2.5 2.5 0 0 0 0 5V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2.5a2.5 2.5 0 0 0 0-5z"/><path d="M15 5v2M15 11v2M15 17v2"/></svg>Зээлүүд</a>
   <button class="tb-new" data-act="new-loan" aria-label="Шинэ зээл бичих"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
   <a href="#customers" data-nav="customers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c1.8.7 3 2.4 3.5 5.2"/></svg>Харилцагч</a>
-  <a href="#settings" data-nav="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>Тохиргоо</a>
+  <button class="tb-menu" data-act="menu" aria-label="Бүх цэс"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Цэс</button>
 </nav>
 
 <button id="sync-chip" class="sync-chip" data-act="retry-sync"></button>
@@ -468,15 +593,28 @@ body.modal-open{overflow:hidden}
 
 /* ================= Тогтмол утгууд ================= */
 const KEY = 'lombard-data-v1';
-const CATS = [
-  {id:'gold', name:'Алт, мөнгөн эдлэл', metal:true},
+// Анхны ангиллууд (Тохиргоо хэсгээс өөрчилж болно)
+const DEFAULT_CATS = [
+  {id:'gold', name:'Алт', metal:true},
+  {id:'silver', name:'Мөнгө', metal:true},
+  {id:'coin', name:'Монет'},
   {id:'phone', name:'Гар утас'},
-  {id:'computer', name:'Компьютер, таблет'},
+  {id:'tablet', name:'Таблет'},
+  {id:'laptop', name:'Ноутбүүк'},
+  {id:'computer', name:'Компьютер'},
   {id:'electronics', name:'Цахилгаан бараа'},
   {id:'watch', name:'Цаг'},
+  {id:'snuff', name:'Хөөрөг'},
   {id:'car', name:'Автомашин'},
   {id:'other', name:'Бусад'}
 ];
+const DEFAULT_TXN_CATS = {
+  income: ['Барьцаа борлуулалт','Хөрөнгө оруулалт','Бусад орлого'],
+  expense: ['Түрээс','Цалин','Интернет','Ус, дулаан, цахилгаан','Программ','Бусад зардал']
+};
+const BL_CATS = ['Муу зээлдэгч','Хулгай, дээрэм','Луйвар, залилан','Бусад'];
+const ACC = {cash:'Бэлэн', bank:'Данс'};
+const TXN_T = {income:'Орлого', expense:'Зардал', transfer:'Шилжүүлэлт'};
 const DEFAULT_TERMS = 'Зээлдэгч зээлийг дуусах хугацаанд нь хүүгийн хамт төлж барьцаа хөрөнгөө буцаан авна. Хугацаа хэтэрсэн хоног бүрт хүү үргэлжлэн бодогдоно. Хугацаа хэтэрч, төлбөр төлөгдөөгүй тохиолдолд ломбард барьцаа хөрөнгийг худалдан борлуулах эрхтэй.';
 const DEFAULT_SMS_TEMPLATE = '{SHOP}: Сайн байна уу, {NAME}. Таны {TICKET} зээлийн хугацаа {DUE}-нд дууссан. Төлөх дүн {AMOUNT}. Утас: {PHONE}';
 const WD = ['Ням','Даваа','Мягмар','Лхагва','Пүрэв','Баасан','Бямба'];
@@ -493,66 +631,92 @@ const ICON = {
   check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
   lock:'<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/>',
   undo:'<path d="M9 7 4.5 11.5 9 16"/><path d="M5 11.5h9a5.5 5.5 0 0 1 0 11h-2"/>',
-  download:'<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 20h14"/>'
+  download:'<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 20h14"/>',
+  alert:'<path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.3"/>',
+  swap:'<path d="M4 8h14l-3.5-3.5M20 16H6l3.5 3.5"/>',
+  chart:'<path d="M4 20V4M4 20h16"/><path d="M8 16v-4M12 16V8M16 16v-6"/>',
+  history:'<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.5 4.5v4h4"/><path d="M12 8v4.2l3 1.8"/>',
+  team:'<circle cx="8" cy="9" r="3"/><circle cx="16.5" cy="9" r="3"/><path d="M2.5 19c.6-3 2.8-4.5 5.5-4.5s4.9 1.5 5.5 4.5M13.5 15c.9-.4 1.9-.5 3-.5 2.7 0 4.9 1.5 5.5 4.5"/>',
+  home:'<path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5h4v5"/>',
+  ticket:'<path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2.5a2.5 2.5 0 0 0 0 5V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2.5a2.5 2.5 0 0 0 0-5z"/><path d="M15 5v2M15 11v2M15 17v2"/>',
+  user:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c1.8.7 3 2.4 3.5 5.2"/>',
+  sliders:'<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
+  logout:'<path d="M14 5h4a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-4"/><path d="M10 16l-4-4 4-4M6 12h10"/>'
 };
 function ic(n){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON[n]+'</svg>'; }
 
 /* ================= Хадгалалт: Cloudflare D1 сервер ================= */
-function defaultDB(){
-  return { version:1,
-    settings:{ shopName:'Миний ломбард', phone:'', address:'', defaultRate:3, defaultTerm:30, nextTicket:1, lastBackup:null, terms:DEFAULT_TERMS,
-      smsEnabled:false, smsRepeatDays:0, smsLatin:true, smsTemplate:DEFAULT_SMS_TEMPLATE },
-    customers:[], loans:[] };
+const KINDS = ['customers','loans','txns','blacklist'];
+function defaultSettings(){
+  return { shopName:'Миний ломбард', phone:'', address:'', defaultRate:3, defaultTerm:30, nextTicket:1, terms:DEFAULT_TERMS, badAfterDays:15,
+    smsEnabled:false, smsRepeatDays:0, smsLatin:true, smsTemplate:DEFAULT_SMS_TEMPLATE,
+    categories: DEFAULT_CATS.map(c=>Object.assign({}, c)), txnCategories: JSON.parse(JSON.stringify(DEFAULT_TXN_CATS)),
+    opening: {date:'', cash:0, bank:0} };
 }
+function defaultDB(){ return { version:3, settings:defaultSettings(), customers:[], loans:[], txns:[], blacklist:[] }; }
 function normalize(d){
   const b = defaultDB();
   if(!d || typeof d!=='object') return b;
   d.settings = Object.assign(b.settings, d.settings||{});
-  d.customers = Array.isArray(d.customers) ? d.customers : [];
-  d.loans = Array.isArray(d.loans) ? d.loans : [];
+  const st = d.settings;
+  if(!Array.isArray(st.categories) || !st.categories.length) st.categories = b.settings.categories;
+  if(!st.txnCategories || !Array.isArray(st.txnCategories.income) || !Array.isArray(st.txnCategories.expense)) st.txnCategories = b.settings.txnCategories;
+  if(!st.opening || typeof st.opening!=='object') st.opening = b.settings.opening;
+  for(const k of KINDS) d[k] = Array.isArray(d[k]) ? d[k] : [];
   d.loans.forEach(l=>{
     l.events = Array.isArray(l.events) ? l.events : [];
-    l.item = l.item || {};
+    if(!Array.isArray(l.items)){ const it = l.item||{}; l.items = (it.name||it.category) ? [Object.assign({id:uid()}, it)] : []; }
+    delete l.item;
     l.principal = +l.principal||0; l.rate = +l.rate||0; l.termDays = +l.termDays||0;
     l.status = l.status || 'active';
   });
-  d.version = 1;
+  d.version = 3;
   return d;
 }
-const PASS_KEY = 'lombard-pass';            // энэ төхөөрөмж дээр хадгалсан нууц үг
+const TOKEN_KEY = 'lombard-token', SHOP_KEY = 'lombard-shop', BACKUP_KEY = 'lombard-last-backup';
 let db = defaultDB();
-let pass = ''; try{ pass = localStorage.getItem(PASS_KEY) || ''; }catch(e){}
+let token = ''; try{ token = localStorage.getItem(TOKEN_KEY) || ''; localStorage.removeItem('lombard-pass'); }catch(e){}
+let me = null, users = [];
 let loaded = false, everLoaded = false, syncing = false, syncAgain = false, knownRev = null, retryTimer = null;
-const synced = { customers:new Map(), loans:new Map(), settings:'' };
+const synced = { customers:new Map(), loans:new Map(), txns:new Map(), blacklist:new Map(), settings:'' };
 let smsInfo = { configured:false, log:[] };
+const isAdmin = ()=> !!me && me.role==='admin';
+function setToken(t){ token = t||''; try{ if(token) localStorage.setItem(TOKEN_KEY, token); else localStorage.removeItem(TOKEN_KEY); }catch(e){} }
+function userName(u){ if(!u) return ''; const x = users.find(v=>v.username===u); return x ? (x.name||x.username) : u; }
+function lastBackup(){ try{ return localStorage.getItem(BACKUP_KEY)||''; }catch(e){ return ''; } }
 
 async function api(path, opts){
   opts = opts || {};
-  const headers = { 'authorization':'Bearer '+encodeURIComponent(pass) };
+  const headers = {};
+  if(token) headers['authorization'] = 'Bearer '+token;
   if(opts.body!==undefined) headers['content-type'] = 'application/json';
   let res, data = null;
   try{ res = await fetch(path, { method:opts.method||'GET', headers, body:opts.body!==undefined?JSON.stringify(opts.body):undefined, cache:'no-store' }); }
-  catch(e){ const err=new Error('network'); err.status=0; err.code='network'; throw err; }
+  catch(e){ const err=new Error('Сервертэй холбогдож чадсангүй'); err.status=0; err.code='network'; throw err; }
   try{ data = await res.json(); }catch(e){}
   if(!res.ok || !data){ const err=new Error((data&&data.message)||('HTTP '+res.status)); err.status=res.status; err.code=(data&&data.error)||'http'; throw err; }
   return data;
 }
-function settingsJSON(){ const s=Object.assign({}, db.settings); delete s.nextTicket; return JSON.stringify(s); }
+function settingsJSON(){ const s=Object.assign({}, db.settings); delete s.nextTicket; delete s.lastBackup; return JSON.stringify(s); }
 function markSynced(){
-  synced.customers = new Map(db.customers.map(c=>[c.id, JSON.stringify(c)]));
-  synced.loans = new Map(db.loans.map(l=>[l.id, JSON.stringify(l)]));
+  for(const k of KINDS) synced[k] = new Map(db[k].map(o=>[o.id, JSON.stringify(o)]));
   synced.settings = settingsJSON();
 }
 function applyServer(data){
-  db = normalize({ settings:Object.assign({}, data.settings||{}, {nextTicket:data.nextTicket||1}), customers:data.customers||[], loans:data.loans||[] });
+  const d = { settings:Object.assign({}, data.settings||{}, {nextTicket:data.nextTicket||1}) };
+  for(const k of KINDS) d[k] = data[k]||[];
+  db = normalize(d);
   knownRev = data.rev; markSynced();
+  me = data.me || me; users = Array.isArray(data.users) ? data.users : users;
   smsInfo = { configured: !!data.smsConfigured, log: Array.isArray(data.sms) ? data.sms : [] };
+  try{ localStorage.setItem(SHOP_KEY, db.settings.shopName||''); }catch(e){}
 }
 // Сүүлд серверт илгээснээс хойш өөрчлөгдсөн зүйлсийг олно
 function computeDiff(){
-  const up={customers:[],loans:[]}, del={customers:[],loans:[]}, sent={customers:new Map(),loans:new Map()};
+  const up={}, del={}, sent={};
   let count = 0;
-  for(const k of ['customers','loans']){
+  for(const k of KINDS){
+    up[k]=[]; del[k]=[]; sent[k]=new Map();
     const seen = new Set();
     for(const o of db[k]){ const j=JSON.stringify(o); seen.add(o.id); if(synced[k].get(o.id)!==j){ up[k].push(o); sent[k].set(o.id,j); count++; } }
     for(const id of synced[k].keys()) if(!seen.has(id)){ del[k].push(id); count++; }
@@ -570,20 +734,26 @@ async function pushSync(){
   syncing = true; setSync('busy'); clearTimeout(retryTimer);
   let failed = null;
   try{
-    const cu = d.up.customers.slice(), lu = d.up.loans.slice();
-    let first = true;
-    while(first || cu.length || lu.length){   // том өөрчлөлтийг хэсэгчлэн илгээнэ
-      const part = { upsert:{ customers:cu.splice(0,300), loans:lu.splice(0,300) } };
-      if(first){ part.delete = d.del; part.settings = d.settings; }
-      await api('/api/sync', {method:'POST', body:part});
-      part.upsert.customers.forEach(c=>synced.customers.set(c.id, d.sent.customers.get(c.id)));
-      part.upsert.loans.forEach(l=>synced.loans.set(l.id, d.sent.loans.get(l.id)));
-      if(first){ d.del.customers.forEach(id=>synced.customers.delete(id)); d.del.loans.forEach(id=>synced.loans.delete(id)); if(d.settings) synced.settings = d.sj; }
-      first = false;
+    // том өөрчлөлтийг 300 бичлэгээр хэсэгчлэн илгээнэ
+    const parts = []; let cur = {}, n = 0;
+    for(const k of KINDS) for(const o of d.up[k]){ if(n>=300){ parts.push(cur); cur={}; n=0; } (cur[k]=cur[k]||[]).push(o); n++; }
+    parts.push(cur);
+    for(let i=0;i<parts.length;i++){
+      const body = { upsert:parts[i] };
+      if(i===0){ body.delete = d.del; body.settings = d.settings; }
+      await api('/api/sync', {method:'POST', body});
+      for(const k of KINDS) (parts[i][k]||[]).forEach(o=>synced[k].set(o.id, d.sent[k].get(o.id)));
+      if(i===0){ for(const k of KINDS) d.del[k].forEach(id=>synced[k].delete(id)); if(d.settings) synced.settings = d.sj; }
     }
   }catch(e){ failed = e; }
   syncing = false;
   if(failed){
+    if(failed.status===403){
+      // эрхгүй өөрчлөлтийг буцааж серверийн өгөгдлийг ачаална
+      toast(failed.message+'. Өөрчлөлтийг буцаалаа.','err',5000);
+      try{ applyServer(await api('/api/data')); render(); refreshModals(); setSync('ok'); }catch(e){ setSync('err'); }
+      return;
+    }
     setSync('err'); handleApiError(failed, true);
     if(loaded) retryTimer = setTimeout(pushSync, 15000);
     return;
@@ -598,95 +768,117 @@ function setSync(st){
   if(chip){ chip.className = 'sync-chip '+(st==='ok'?'':st); chip.textContent = st==='err' ? 'Хадгалж чадсангүй. Дарж дахин оролдоно уу' : txt; }
 }
 function handleApiError(e, background){
-  if(e.status===401){ loaded=false; showGate('login', 'Нууц үг өөрчлөгдсөн эсвэл буруу байна. Дахин нэвтэрнэ үү.'); return; }
-  if(e.status===503){ loaded=false; showGate('setup'); return; }
+  if(e.status===401){ loaded=false; setToken(''); showGate('login', 'Нэвтрэх хугацаа дууссан эсвэл эрх хаагдсан байна. Дахин нэвтэрнэ үү.'); return; }
+  if(e.status===403){ toast(e.message,'err',5000); return; }
   if(background) toast('Сервертэй холбогдож чадсангүй. Интернэтээ шалгана уу, өөрчлөлтийг дахин илгээх болно.','err',5000);
 }
+// Нөөц файл эсвэл өмнөх хувилбарын бүртгэлийг сервер дээрх бүх өгөгдлийн оронд оруулна (зөвхөн админ)
 async function runImport(data){
   const d = normalize(JSON.parse(JSON.stringify(data)));
-  const settings = Object.assign({}, d.settings); delete settings.nextTicket;
+  const settings = Object.assign({}, d.settings); delete settings.nextTicket; delete settings.lastBackup;
   syncing = true; setSync('busy');
   try{
-    const cu = d.customers.slice(), lu = d.loans.slice();
+    const all = []; for(const k of KINDS) for(const o of d[k]) all.push([k,o]);
     let first = true;
-    while(first || cu.length || lu.length){
-      const part = { upsert:{ customers:cu.splice(0,300), loans:lu.splice(0,300) } };
-      if(first){ part.reset = true; part.settings = settings; }
-      await api('/api/sync', {method:'POST', body:part});
+    for(let i=0; first || i<all.length; i+=300){
+      const part = {};
+      for(const [k,o] of all.slice(i,i+300)) (part[k]=part[k]||[]).push(o);
+      const body = { upsert:part };
+      if(first){ body.reset = true; body.settings = settings; }
+      await api('/api/sync', {method:'POST', body});
       first = false;
     }
-    await api('/api/ticket', {method:'PUT', body:{ next:+d.settings.nextTicket||1 }});
+    await api('/api/ticket', {method:'PUT', body:{ next:+d.settings.nextTicket||1, silent:true }});
     applyServer(await api('/api/data'));
   } finally { syncing = false; syncAgain = false; }
   render(); refreshModals(); setSync('ok');
 }
+function typingInView(){ const a=document.activeElement; return !!(a && a.closest && a.closest('#view') && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)); }
 async function refreshFromServer(){
-  if(!loaded || syncing || modalStack.length || document.hidden) return;
+  if(!loaded || syncing || modalStack.length || document.hidden || typingInView()) return;
   if(computeDiff().count){ pushSync(); return; }
   try{
     const r = await api('/api/rev');
     if(r.rev === knownRev) return;
     const data = await api('/api/data');
-    if(!loaded || syncing || modalStack.length || computeDiff().count) return;
+    if(!loaded || syncing || modalStack.length || typingInView() || computeDiff().count) return;
     applyServer(data); render();
-  }catch(e){ if(e.status===401 || e.status===503) handleApiError(e, true); }
+  }catch(e){ if(e.status===401) handleApiError(e, true); }
 }
 setInterval(refreshFromServer, 45000);
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) refreshFromServer(); });
 window.addEventListener('beforeunload', e=>{ if(loaded && (syncing || computeDiff().count)){ e.preventDefault(); e.returnValue=''; } });
 
+/* ---------- нэвтрэх цонх ---------- */
 const LOGO = '<svg width="46" height="46" viewBox="0 0 34 34" aria-hidden="true"><path d="M5 3.5h24" stroke="#A57E22" stroke-width="2.2" stroke-linecap="round"/><path d="M17 3.5v5M10 3.5l0 14M24 3.5v14" stroke="#A57E22" stroke-width="1.4"/><circle cx="17" cy="12.5" r="5" fill="#A57E22"/><circle cx="10" cy="23.5" r="5" fill="#A57E22"/><circle cx="24" cy="23.5" r="5" fill="#A57E22"/></svg>';
+function gField(id, label, type, ac, ph){ return '<div class="field"><label for="'+id+'">'+label+'</label><input type="'+type+'" id="'+id+'" autocomplete="'+ac+'"'+(ph?' placeholder="'+esc(ph)+'"':'')+(type==='text'?' autocapitalize="off" spellcheck="false"':'')+'></div>'; }
 function showGate(kind, msg){
   closeAllModals();
   const g = document.getElementById('gate'); g.hidden = false;
+  let shop = ''; try{ shop = localStorage.getItem(SHOP_KEY)||''; }catch(e){}
   let h = LOGO;
+  const err = '<p class="gate-err" role="alert"'+(msg?'':' hidden')+'>'+esc(msg||'')+'</p>';
   if(kind==='loading') h += '<div class="spin" role="status" aria-label="Ачаалж байна"></div><p class="lead">Бүртгэлийг серверээс ачаалж байна…</p>';
-  else if(kind==='login') h += '<h1>Ломбардын бүртгэл</h1><p class="lead">Нэвтрэхийн тулд нууц үгээ оруулна уу.</p>'+
-    '<form id="gate-form" class="form" novalidate><div class="field"><label for="gate-pass">Нууц үг</label><input type="password" id="gate-pass" autocomplete="current-password"></div>'+
-    (msg?'<p class="gate-err" role="alert">'+esc(msg)+'</p>':'')+'<button class="btn btn-primary" type="submit">Нэвтрэх</button></form>';
-  else if(kind==='setup') h += '<h1>Нууц үг тохируулаагүй байна</h1><p class="lead">Бүртгэлийг хамгаалах нууц үгийг Cloudflare дээр нэг удаа тохируулна:</p>'+
-    '<ol><li>Cloudflare → Workers &amp; Pages → энэ сайтын Worker-ийг нээнэ</li><li><b>Settings</b> → <b>Variables and Secrets</b> → <b>Add</b></li><li>Type: <b>Secret</b>, Variable name: <code>APP_PASSWORD</code>, Value: өөрийн нууц үг</li><li><b>Deploy</b> дарна</li></ol>'+
+  else if(kind==='login') h += '<h1>'+esc(shop||'Ломбардын бүртгэл')+'</h1><p class="lead">Өөрийн нэвтрэх нэр, нууц үгээ оруулна уу.</p>'+
+    '<form id="gate-form" class="form" data-kind="login" novalidate>'+gField('g-user','Нэвтрэх нэр','text','username')+gField('g-pass','Нууц үг','password','current-password')+err+
+    '<button class="btn btn-primary" type="submit">Нэвтрэх</button><button type="button" class="linkbtn" data-gate="reset">Админ нууц үгээ мартсан</button></form>';
+  else if(kind==='setup') h += '<h1>Анхны админ үүсгэх</h1><p class="lead">Ломбардын эзэн өөрийн нэвтрэх эрхийг үүсгэнэ. Баталгаажуулахын тулд Cloudflare дээр тохируулсан APP_PASSWORD-ийг оруулна. Ажилтнуудыг дараа нь Хэрэглэгч хэсгээс нэмнэ.</p>'+
+    '<form id="gate-form" class="form" data-kind="setup" novalidate>'+gField('g-secret','Cloudflare дээрх APP_PASSWORD','password','off')+gField('g-name','Таны нэр','text','name','Жишээ нь: Отгонсүрэн')+
+    gField('g-user','Нэвтрэх нэр (латинаар)','text','username','Жишээ нь: otgonsuren')+gField('g-pass','Шинэ нууц үг (6-аас дээш тэмдэгт)','password','new-password')+err+
+    '<button class="btn btn-primary" type="submit">Админ үүсгэх</button></form>';
+  else if(kind==='reset') h += '<h1>Админы нууц үг сэргээх</h1><p class="lead">Cloudflare дээрх APP_PASSWORD-оор баталгаажуулж, админ хэрэглэгчийн нууц үгийг шинээр тавина. Ажилтны нууц үгийг админ Хэрэглэгч хэсгээс солино.</p>'+
+    '<form id="gate-form" class="form" data-kind="reset" novalidate>'+gField('g-secret','Cloudflare дээрх APP_PASSWORD','password','off')+gField('g-user','Админы нэвтрэх нэр','text','username')+
+    gField('g-pass','Шинэ нууц үг','password','new-password')+err+'<button class="btn btn-primary" type="submit">Нууц үг сэргээх</button><button type="button" class="linkbtn" data-gate="login">Нэвтрэх хуудас руу буцах</button></form>';
+  else if(kind==='nosecret') h += '<h1>APP_PASSWORD тохируулаагүй байна</h1><p class="lead">Анхны админыг үүсгэхэд Cloudflare дээрх APP_PASSWORD хэрэгтэй:</p>'+
+    '<ol><li>Cloudflare → Workers &amp; Pages → энэ сайтын Worker</li><li><b>Settings</b> → <b>Variables and Secrets</b> → <b>Add</b></li><li>Type: <b>Secret</b>, нэр: <code>APP_PASSWORD</code>, утга: нууц үг</li><li><b>Deploy</b> дарна</li></ol>'+
     '<button class="btn btn-primary" id="gate-retry">Дахин шалгах</button>';
   else h += '<h1>Сервертэй холбогдож чадсангүй</h1><p class="lead">'+esc(msg||'Интернэт холболтоо шалгаад дахин оролдоно уу.')+'</p>'+(location.protocol==='file:'?'':'<button class="btn btn-primary" id="gate-retry">Дахин оролдох</button>');
   g.innerHTML = '<div class="gate-box">'+h+'</div>';
   const form = document.getElementById('gate-form');
   if(form){
-    const inp = document.getElementById('gate-pass'); setTimeout(()=>inp.focus(), 30);
-    form.addEventListener('submit', e=>{ e.preventDefault(); const v=inp.value; if(!v){ inp.focus(); return; } form.querySelector('button').disabled=true; login(v); });
+    setTimeout(()=>{ const f=form.querySelector('input'); f && f.focus(); }, 30);
+    form.addEventListener('submit', e=>{ e.preventDefault(); gateSubmit(form.dataset.kind, form); });
   }
+  g.querySelectorAll('[data-gate]').forEach(b=>b.addEventListener('click', ()=>showGate(b.dataset.gate)));
   const retry = document.getElementById('gate-retry');
-  if(retry) retry.addEventListener('click', ()=>{ showGate('loading'); login(pass); });
+  if(retry) retry.addEventListener('click', ()=>boot());
 }
 function hideGate(){ const g=document.getElementById('gate'); g.hidden=true; g.innerHTML=''; }
-async function login(p){
-  pass = p || '';
-  if(!pass){ showGate('login'); return; }
+async function gateSubmit(kind, f){
+  const v = id=>{ const el=f.querySelector('#'+id); return el ? el.value : ''; };
+  const btn = f.querySelector('button[type=submit]'), errEl = f.querySelector('.gate-err');
+  const showErr = m=>{ errEl.textContent = m; errEl.hidden = false; btn.disabled = false; };
+  if(kind==='login' && (!v('g-user').trim() || !v('g-pass'))) return showErr('Нэвтрэх нэр, нууц үгээ оруулна уу');
+  if(kind!=='login' && !v('g-secret')) return showErr('APP_PASSWORD-ийг оруулна уу');
+  btn.disabled = true;
   try{
-    if(everLoaded && computeDiff().count){
-      await api('/api/rev');                       // нууц үгийг шалгана
-      try{ localStorage.setItem(PASS_KEY, pass); }catch(e){}
-      loaded = true; hideGate(); render(); pushSync(); return;
-    }
-    const data = await api('/api/data');
-    try{ localStorage.setItem(PASS_KEY, pass); }catch(e){}
-    applyServer(data); loaded = true; everLoaded = true;
-    hideGate(); render(); setSync('ok'); offerMigration();
-  }catch(e){
-    if(e.status===401) showGate('login', 'Нууц үг буруу байна.');
-    else if(e.status===503) showGate('setup');
-    else if(e.status===0) showGate('offline');
-    else showGate('offline', 'Серверт алдаа гарлаа ('+e.message+'). Хэсэг хүлээгээд дахин оролдоно уу.');
+    let r;
+    if(kind==='login') r = await api('/api/auth/login', {method:'POST', body:{username:v('g-user'), password:v('g-pass')}});
+    else if(kind==='setup') r = await api('/api/auth/setup', {method:'POST', body:{secret:v('g-secret'), name:v('g-name'), username:v('g-user'), password:v('g-pass')}});
+    else r = await api('/api/auth/reset', {method:'POST', body:{secret:v('g-secret'), username:v('g-user'), password:v('g-pass')}});
+    setToken(r.token);
+    await loadAfterLogin();
+  }catch(e){ showErr(e.message || 'Алдаа гарлаа'); }
+}
+async function loadAfterLogin(){
+  const data = await api('/api/data');
+  if(everLoaded && computeDiff().count){
+    // нэвтрэх хугацаа дуусахаас өмнөх хадгалагдаагүй өөрчлөлтийг алдахгүй
+    me = data.me; users = data.users || users;
+    loaded = true; hideGate(); render(); pushSync(); return;
   }
+  applyServer(data); loaded = true; everLoaded = true;
+  hideGate(); render(); setSync('ok'); offerMigration();
 }
 function logout(){
-  const go = ()=>{ try{ localStorage.removeItem(PASS_KEY); }catch(e){} pass=''; loaded=false; location.hash=''; location.reload(); };
+  const go = async ()=>{ try{ await api('/api/auth/logout', {method:'POST'}); }catch(e){} setToken(''); loaded=false; location.hash=''; location.reload(); };
   if(syncing || computeDiff().count){
     confirmBox({title:'Хадгалагдаагүй өөрчлөлт байна', text:'Серверт хараахан хадгалагдаагүй өөрчлөлт байна. Одоо гарвал тэдгээр нь алга болно.', ok:'Гарах', danger:true, onOk:go});
   } else go();
 }
-// Өмнөх хувилбарт энэ хөтөч дээр бичсэн бүртгэлийг серверт шилжүүлэх санал
+// Хамгийн анхны хувилбарт энэ хөтөч дээр бичсэн бүртгэлийг серверт шилжүүлэх санал (зөвхөн админ)
 function offerMigration(){
-  if(db.loans.length || db.customers.length) return;
+  if(!isAdmin() || db.loans.length || db.customers.length) return;
   let raw = null; try{ raw = localStorage.getItem(KEY); }catch(e){}
   if(!raw) return;
   let old; try{ old = normalize(JSON.parse(raw)); }catch(e){ return; }
@@ -701,9 +893,16 @@ function offerMigration(){
 }
 async function boot(){
   if(location.protocol==='file:'){ showGate('offline', 'Энэ хувилбар бүртгэлээ серверт хадгалдаг тул файлыг компьютер дээрээс шууд нээвэл ажиллахгүй. Сайтын хаягаар нь нээнэ үү.'); return; }
-  if(!pass){ showGate('login'); return; }
   showGate('loading');
-  await login(pass);
+  try{
+    if(token){
+      try{ await loadAfterLogin(); return; }
+      catch(e){ if(e.status!==401) throw e; setToken(''); }
+    }
+    const st = await api('/api/auth/state');
+    if(!st.hasUsers) showGate(st.secretSet ? 'setup' : 'nosecret');
+    else showGate('login');
+  }catch(e){ showGate('offline', e.status===0 ? null : 'Серверт алдаа гарлаа ('+e.message+'). Хэсэг хүлээгээд дахин оролдоно уу.'); }
 }
 
 /* ================= Туслах функцууд ================= */
@@ -748,8 +947,15 @@ const loanById = id=>db.loans.find(l=>l.id===id);
 function fullName(c){ return c ? [c.lastName,c.firstName].filter(Boolean).join(' ') : 'Устгагдсан харилцагч'; }
 function shortName(c){ if(!c) return 'Устгагдсан харилцагч'; return c.lastName ? c.lastName.trim().charAt(0)+'. '+c.firstName : c.firstName; }
 function tno(l){ return '№'+String(l.ticketNo).padStart(4,'0'); }
-function catOf(id){ return CATS.find(c=>c.id===id) || CATS[CATS.length-1]; }
-function itemLine(l){ const it=l.item||{}; const p=[it.name]; if(it.weight) p.push(it.weight+' гр'); if(it.purity) p.push(it.purity+' сорьц'); return p.filter(Boolean).join(', '); }
+function cats(){ return (db.settings.categories && db.settings.categories.length) ? db.settings.categories : DEFAULT_CATS; }
+function catOf(id){ return cats().find(c=>c.id===id) || DEFAULT_CATS.find(c=>c.id===id) || {id:id||'other', name: id && id!=='other' ? id : 'Бусад'}; }
+function itemText(i){ const p=[i.name]; if(i.weight) p.push(i.weight+' гр'); if(i.purity) p.push(i.purity+' сорьц'); return p.filter(Boolean).join(' '); }
+function itemLine(l){ return (l.items||[]).map(itemText).filter(Boolean).join(', '); }
+function estTotal(l){ return (l.items||[]).reduce((s,i)=>s+(+i.est||0),0); }
+function catBadges(l){ const ids=[...new Set((l.items||[]).map(i=>i.category))]; return ids.length ? ids.map(id=>'<span class="cb">'+esc(catOf(id).name)+'</span>').join('') : ''; }
+function normReg(r){ return String(r||'').toUpperCase().replace(/\s+/g,''); }
+function blacklistHit(reg){ reg = normReg(reg); if(!reg) return null; return db.blacklist.find(b=>b.status!=='inactive' && normReg(b.regNo)===reg) || null; }
+const late = x => x.state==='overdue' || x.state==='bad';
 function extDays(l){ return l.events.filter(e=>e.type==='extend').reduce((s,e)=>s+(+e.days||0),0); }
 function dueOf(l){ return addDays(l.startDate, (+l.termDays||0) + extDays(l)); }
 function sortEvents(evts){ return evts.slice().sort((a,b)=> a.date<b.date?-1 : a.date>b.date?1 : (a.at||0)-(b.at||0)); }
@@ -782,7 +988,7 @@ function calc(l, asOf){
   let state;
   if(l.status==='redeemed') state='redeemed';
   else if(l.status==='forfeited') state='forfeited';
-  else if(daysLeft<0) state='overdue';
+  else if(daysLeft<0) state = (-daysLeft > (+db.settings.badAfterDays||15)) ? 'bad' : 'overdue';
   else if(daysLeft<=3) state='soon';
   else state='active';
   return { bal, acc, owed:bal+acc, intPaid, prinPaid, over, paid:intPaid+prinPaid+over, alloc,
@@ -791,7 +997,7 @@ function calc(l, asOf){
     payPct: l.principal>0 ? Math.min(1, prinPaid/l.principal) : 0 };
 }
 const STATE = {
-  active:['Идэвхтэй','b-active'], soon:['Дуусах дөхсөн','b-soon'], overdue:['Хугацаа хэтэрсэн','b-overdue'],
+  active:['Хэвийн','b-active'], soon:['Дуусах дөхсөн','b-soon'], overdue:['Хугацаа хэтэрсэн','b-overdue'], bad:['Муу','b-bad'],
   redeemed:['Хаагдсан','b-redeemed'], forfeited:['Хураагдсан','b-forfeited']
 };
 function badge(s){ const v=STATE[s]; return '<span class="badge '+v[1]+'">'+v[0]+'</span>'; }
@@ -805,16 +1011,16 @@ function dueText(x){
 }
 
 /* ---- Үйлдлүүд (өгөгдөл өөрчлөх) ---- */
-function opPay(l, date, amount, note){ l.events.push({id:uid(), type:'payment', date, amount:Math.round(amount), note:note||'', at:stamp()}); }
+function opPay(l, date, amount, note, method){ l.events.push({id:uid(), type:'payment', date, amount:Math.round(amount), method:method==='bank'?'bank':'cash', note:note||'', at:stamp(), by:me?me.username:''}); }
 function opExtend(l, date, days, note){
   const cur = dueOf(l); const base = date>cur ? date : cur; const newDue = addDays(base, days);
-  l.events.push({id:uid(), type:'extend', date, days:diffDays(cur,newDue), req:days, newDue, note:note||'', at:stamp()});
+  l.events.push({id:uid(), type:'extend', date, days:diffDays(cur,newDue), req:days, newDue, note:note||'', at:stamp(), by:me?me.username:''});
 }
 function opClose(l, date, kind, note){
   l.status = kind==='redeem' ? 'redeemed' : 'forfeited';
   l.closedDate = date;
   const x = calc(l, date);
-  l.events.push({id:uid(), type:kind, date, note:note||'', remaining:x.owed, at:stamp()});
+  l.events.push({id:uid(), type:kind, date, note:note||'', remaining:x.owed, at:stamp(), by:me?me.username:''});
 }
 function opReopen(l){
   const evs = sortEvents(l.events);
@@ -888,7 +1094,10 @@ function bindMoney(root){
 function fieldErr(el, msg){ el.classList.add('bad'); el.focus(); toast(msg,'err'); el.addEventListener('input', ()=>el.classList.remove('bad'), {once:true}); el.addEventListener('change', ()=>el.classList.remove('bad'), {once:true}); return false; }
 
 /* ================= Харагдац: Самбар ================= */
-const ui = { loanF:'active', loanQ:'', custQ:'' };
+const ui = { loan:{tab:'normal', q:'', cat:'', sort:'date', dir:'desc', size:25, page:1}, custQ:'',
+  txn:{type:'all', cat:'', acc:'', from:'', to:'', q:'', sort:'date', dir:'desc', size:25, page:1},
+  bl:{status:'active', cat:'', q:'', page:1, size:25}, audit:{kind:'', user:'', from:'', to:'', q:'', page:1, size:50},
+  cashDay:'', rep:{preset:'month', from:'', to:''} };
 
 function ticketHTML(l, x, c){
   return '<button class="ticket st-'+x.state+'" data-act="open-loan" data-id="'+l.id+'">'+
@@ -902,7 +1111,7 @@ function ticketHTML(l, x, c){
 }
 function backupNotice(){
   if(!db.loans.length) return '';
-  const lb = db.settings.lastBackup;
+  const lb = lastBackup();
   if(lb && diffDays(lb.slice(0,10), todayISO()) < 30) return '';
   return '<div class="notice"><span>Бүртгэл серверт хадгалагдаж байгаа ч нэмэлт хамгаалалт болгож сард нэг удаа нөөц файл татаж аваарай. '+(lb?'Сүүлд '+fmtDate(lb.slice(0,10))+'-нд татсан.':'Одоогоор нөөц файл татаагүй байна.')+'</span><button class="btn sm" data-act="backup">'+ic('download')+'Нөөц татах</button></div>';
 }
@@ -922,14 +1131,15 @@ function viewWelcome(){
 function viewDashboard(){
   if(!db.loans.length && !db.customers.length) return viewWelcome();
   const T = todayISO(), month = T.slice(0,7);
-  let active=0, prin=0, acc=0, overdue=0, monthInt=0;
+  let active=0, prin=0, acc=0, overdue=0, bad=0, monthInt=0;
   const attention=[], feed=[];
   for(const l of db.loans){
     const x = calc(l,T), c = custById(l.customerId);
     if(l.status==='active'){
       active++; prin+=x.bal; acc+=x.acc;
       if(x.state==='overdue') overdue++;
-      if(x.state==='overdue'||x.state==='soon') attention.push({l,x,c});
+      if(x.state==='bad') bad++;
+      if(late(x)||x.state==='soon') attention.push({l,x,c});
     }
     for(const e of l.events){
       if(e.type==='payment' && e.date.slice(0,7)===month && x.alloc[e.id]) monthInt += x.alloc[e.id].i;
@@ -940,6 +1150,7 @@ function viewDashboard(){
   feed.sort((a,b)=> a.e.date<b.e.date?1 : a.e.date>b.e.date?-1 : (b.e.at||0)-(a.e.at||0));
   const shown = attention.slice(0,8);
   let h = '<div class="wrap">'+
+    '<form class="m-search dash-search" data-qs>'+ic('search')+'<input type="search" placeholder="Регистр, №, нэр, утасаар хайх" aria-label="Шуурхай хайх"></form>'+
     '<header class="page-head"><div><h1>Өнөөдөр</h1><p class="sub">'+fmtLong(T)+'</p></div>'+
     '<div class="head-btns"><button class="btn btn-ghost" data-act="new-customer">'+ic('plus')+'Харилцагч</button><button class="btn btn-primary" data-act="new-loan">'+ic('plus')+'Шинэ зээл</button></div></header>'+
     backupNotice()+
@@ -948,10 +1159,10 @@ function viewDashboard(){
       '<div><dt>Зээлийн үлдэгдэл</dt><dd>'+money(prin)+'</dd></div>'+
       '<div><dt>Хуримтлагдсан хүү</dt><dd>'+money(acc)+'</dd></div>'+
       '<div><dt>Энэ сард орсон хүү</dt><dd>'+money(monthInt)+'</dd></div>'+
-      '<div class="'+(overdue?'alert':'')+'"><dt>Хугацаа хэтэрсэн</dt><dd>'+overdue+'<small>тасалбар</small></dd></div>'+
+      '<div class="'+(overdue+bad?'alert':'')+'"><dt>Хугацаа хэтэрсэн / Муу</dt><dd>'+overdue+' / '+bad+'</dd></div>'+
     '</dl>'+
     '<div class="dash"><section>'+
-      '<div class="sec-head"><h2>Анхаарах тасалбарууд</h2>'+(attention.length>shown.length?'<a class="link" href="#loans" data-act="filter-go" data-f="active">Бүгдийг харах ('+attention.length+')</a>':'<span class="sub">Хэтэрсэн ба 3 хоногт дуусах</span>')+'</div>';
+      '<div class="sec-head"><h2>Анхаарах тасалбарууд</h2>'+(attention.length>shown.length?'<a class="link" href="#loans" data-act="ltab-go" data-f="overdue">Бүгдийг харах ('+attention.length+')</a>':'<span class="sub">Хэтэрсэн ба 3 хоногт дуусах</span>')+'</div>';
   if(shown.length) h += shown.map(a=>ticketHTML(a.l,a.x,a.c)).join('');
   else h += '<div class="panel"><div class="empty"><p>Хугацаа хэтэрсэн, дуусах дөхсөн зээл алга.</p><a class="btn sm" href="#loans">Бүх зээлийг харах</a></div></div>';
   h += '</section><section><div class="sec-head"><h2>Сүүлийн үйлдэл</h2></div><div class="panel">';
@@ -963,7 +1174,7 @@ function viewDashboard(){
       else if(e.type==='extend') t='Хугацаа сунгасан';
       else if(e.type==='redeem') t='Төлж хаасан';
       else if(e.type==='forfeit') t='Барьцаа хураасан';
-      return '<li class="k-'+e.type+'"><button data-act="open-loan" data-id="'+l.id+'"><span class="dot"></span><span><span class="t">'+esc(t)+'</span><span class="s">'+tno(l)+', '+esc(shortName(f.c))+'</span></span><span class="d">'+fmtDate(e.date)+'</span></button></li>';
+      return '<li class="k-'+e.type+'"><button data-act="open-loan" data-id="'+l.id+'"><span class="dot"></span><span><span class="t">'+esc(t)+'</span><span class="s">'+tno(l)+', '+esc(shortName(f.c))+(e.by||(e.type==='issue'&&l.by)?', '+esc(userName(e.by||l.by)):'')+'</span></span><span class="d">'+fmtDate(e.date)+'</span></button></li>';
     }).join('')+'</ul>';
   } else h += '<div class="empty"><p>Одоогоор зээл бичигдээгүй байна.</p></div>';
   h += '</div></section></div></div>';
@@ -971,56 +1182,105 @@ function viewDashboard(){
 }
 
 /* ================= Харагдац: Зээлүүд ================= */
+const LTABS = [['normal','Хэвийн'],['overdue','Хугацаа хэтэрсэн'],['bad','Муу'],['forfeited','Хураагдсан'],['redeemed','Хаагдсан'],['all','Бүгд']];
+function tabOf(l,x){ if(l.status==='forfeited') return 'forfeited'; if(l.status==='redeemed') return 'redeemed'; if(x.state==='bad') return 'bad'; if(x.state==='overdue') return 'overdue'; return 'normal'; }
+function sizeSel(id, v){ return '<select id="'+id+'" aria-label="Нэг хуудсанд харах мөр">'+[10,25,50,100].map(n=>'<option value="'+n+'"'+(n===+v?' selected':'')+'>'+n+' мөр</option>').join('')+'</select>'; }
+function catSel(id, v){ return '<select id="'+id+'" aria-label="Ангилал"><option value="">Бүх ангилал</option>'+cats().map(c=>'<option value="'+esc(c.id)+'"'+(c.id===v?' selected':'')+'>'+esc(c.name)+'</option>').join('')+'</select>'; }
+function thSort(key, label, cls, u, k){
+  const on = u.sort===key;
+  return '<th class="sort'+(on?' on':'')+(cls?' '+cls:'')+'" data-act="sort" data-k="'+k+'" data-s="'+key+'" aria-sort="'+(on?(u.dir==='asc'?'ascending':'descending'):'none')+'">'+label+'<span class="arr">'+(on?(u.dir==='asc'?'▲':'▼'):'↕')+'</span></th>';
+}
+function pagerHTML(k, total, page, size){
+  const pages = Math.max(1, Math.ceil(total/size)); page = Math.min(Math.max(1,page), pages);
+  const a = total ? (page-1)*size+1 : 0, b = Math.min(total, page*size);
+  const list=[]; for(let p=1;p<=pages;p++){ if(p===1||p===pages||Math.abs(p-page)<=2) list.push(p); else if(list[list.length-1]!=='…') list.push('…'); }
+  const btns = '<button data-act="pg" data-k="'+k+'" data-p="'+(page-1)+'"'+(page<=1?' disabled':'')+'>Өмнөх</button>'+
+    list.map(p=>p==='…'?'<span style="padding:6px 4px">…</span>':'<button data-act="pg" data-k="'+k+'" data-p="'+p+'"'+(p===page?' class="on" aria-current="page"':'')+'>'+p+'</button>').join('')+
+    '<button data-act="pg" data-k="'+k+'" data-p="'+(page+1)+'"'+(page>=pages?' disabled':'')+'>Дараах</button>';
+  return '<div class="pager"><span>Нийт '+total+' ('+a+' - '+b+')</span>'+(pages>1?'<div class="pg">'+btns+'</div>':'')+'</div>';
+}
+function csvDownload(name, head, rows){
+  const q = v=>{ v=String(v==null?'':v); return /[",\n;]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; };
+  const text = '﻿'+[head].concat(rows).map(r=>r.map(q).join(',')).join('\r\n');
+  if(download(name, text, 'text/csv;charset=utf-8')) toast('Excel файл татагдлаа');
+}
 function viewLoans(){
-  return '<div class="wrap"><header class="page-head"><div><h1>Зээлүүд</h1><p class="sub">Тасалбар бүрийн өр, төлөлт, хугацааны явц</p></div>'+
-    '<div class="head-btns"><button class="btn btn-primary" data-act="new-loan">'+ic('plus')+'Шинэ зээл</button></div></header>'+
-    '<div class="toolbar"><label class="search">'+ic('search')+'<input type="search" id="loan-q" placeholder="Тасалбар, нэр, РД, утас, барьцаагаар хайх" aria-label="Зээл хайх" value="'+esc(ui.loanQ)+'"></label><div class="chips" id="loan-chips"></div></div>'+
+  const u = ui.loan;
+  return '<div class="wrap"><header class="page-head"><div><h1>Зээлүүд</h1><p class="sub">Хэвийн, хугацаа хэтэрсэн, муу, хураагдсан, хаагдсан зээлүүд</p></div>'+
+    '<div class="head-btns"><button class="btn" data-act="export-loans">'+ic('download')+'Excel</button><button class="btn btn-primary" data-act="new-loan">'+ic('plus')+'Шинэ зээл</button></div></header>'+
+    '<div class="chips" id="loan-tabs" style="margin-bottom:14px"></div>'+
+    '<div class="filters"><label class="search">'+ic('search')+'<input type="search" id="loan-q" placeholder="№, нэр, РД, утас, барьцаагаар хайх" aria-label="Зээл хайх" value="'+esc(u.q)+'"></label>'+catSel('loan-cat',u.cat)+sizeSel('loan-size',u.size)+'</div>'+
     '<div class="panel" id="loan-list"></div></div>';
 }
 function loanMatch(r, q){
-  const c=r.c||{}, it=r.l.item||{};
-  return [tno(r.l), String(r.l.ticketNo), c.lastName, c.firstName, c.regNo, c.phone, c.phone2, it.name, it.serial].join(' ').toLowerCase().includes(q);
+  const c = r.c||{};
+  return [tno(r.l), String(r.l.ticketNo), c.lastName, c.firstName, c.regNo, c.phone, c.phone2].concat((r.l.items||[]).map(i=>(i.name||'')+' '+(i.serial||''))).join(' ').toLowerCase().includes(q);
 }
-function loanRow(r){
-  const l=r.l, c=r.c, x=r.x, act=l.status==='active';
-  return '<button class="lrow" data-act="open-loan" data-id="'+l.id+'">'+
-    '<span class="c-no"><span class="tno-s">'+tno(l)+'</span></span>'+
-    '<span class="c-who"><b class="ell">'+esc(shortName(c))+'</b><span class="cell-sub">'+esc(c?c.phone:'')+'</span></span>'+
-    '<span class="c-item"><span class="ell">'+esc(itemLine(l))+'</span><span class="cell-sub">'+esc(catOf(l.item.category).name)+'</span></span>'+
-    '<span class="c-prin r num">'+money(l.principal)+'</span>'+
-    '<span class="c-owed r num"><b>'+(act?money(x.owed):'—')+'</b>'+(act&&x.acc?'<span class="cell-sub">хүү '+money(x.acc)+'</span>':'')+'</span>'+
-    '<span class="c-due"><span class="due-line'+(x.state==='overdue'?' red':'')+'">'+esc(dueText(x))+'</span><span class="bar st-'+x.state+'"><i style="width:'+(x.timePct*100).toFixed(1)+'%"></i></span><span class="cell-sub">'+(act?'Дуусах ':'Хаагдсан ')+fmtDate(act?x.due:l.closedDate)+'</span></span>'+
-    '<span class="c-st">'+badge(x.state)+'</span></button>';
+function loanSortVal(r, k){
+  switch(k){
+    case 'no': return r.l.ticketNo;
+    case 'cat': return catOf(((r.l.items||[])[0]||{}).category).name;
+    case 'name': return shortName(r.c);
+    case 'phone': return (r.c&&r.c.phone)||'';
+    case 'bal': return r.x.bal;
+    case 'owed': return r.l.status==='active' ? r.x.owed : 0;
+    case 'rate': return +r.l.rate;
+    case 'x': return r.l.status==='active' ? r.x.daysLeft : 1e9;
+    default: return r.dateKey;
+  }
 }
+function filteredLoans(){
+  const T = todayISO(), u = ui.loan, q = u.q.trim().toLowerCase();
+  const all = db.loans.map(l=>{ const x=calc(l,T); return {l, x, c:custById(l.customerId), tab:tabOf(l,x)}; });
+  const cnt = {all:all.length}; all.forEach(r=>{ cnt[r.tab]=(cnt[r.tab]||0)+1; });
+  let rows = all.filter(r=>u.tab==='all' || r.tab===u.tab);
+  if(u.cat) rows = rows.filter(r=>(r.l.items||[]).some(i=>i.category===u.cat));
+  if(q) rows = rows.filter(r=>loanMatch(r,q));
+  rows.forEach(r=>{ r.dateKey = (r.tab==='forfeited'||r.tab==='redeemed') ? (r.l.closedDate||'') : (r.l.startDate+' '+(r.l.createdAt||'')); });
+  const dir = u.dir==='asc' ? 1 : -1;
+  rows.sort((a,b)=>{ const va=loanSortVal(a,u.sort), vb=loanSortVal(b,u.sort); return (va<vb?-1:va>vb?1:0)*dir || (b.l.ticketNo-a.l.ticketNo); });
+  return {rows, cnt};
+}
+const LCOLS = [['no','№'],['cat','Ангилал'],['name','Овог нэр'],['phone','Утас'],['bal','Үлдэгдэл','r'],['owed','Нийт өр','r'],['rate','%','r'],['x','Х','r'],['date','Олгосон']];
 function renderLoanList(){
   const box = $('#loan-list'); if(!box) return;
-  const T=todayISO(), q=ui.loanQ.trim().toLowerCase();
-  let rows = db.loans.map(l=>({l, c:custById(l.customerId), x:calc(l,T)}));
-  const cnt = {active:0, overdue:0, redeemed:0, forfeited:0, all:rows.length};
-  rows.forEach(r=>{ if(r.l.status==='active'){ cnt.active++; if(r.x.state==='overdue') cnt.overdue++; } else cnt[r.l.status]=(cnt[r.l.status]||0)+1; });
-  const F = [['active','Идэвхтэй'],['overdue','Хугацаа хэтэрсэн'],['redeemed','Хаагдсан'],['forfeited','Хураагдсан'],['all','Бүгд']];
-  $('#loan-chips').innerHTML = F.map(f=>'<button class="chip'+(ui.loanF===f[0]?' on':'')+'" data-act="filter" data-f="'+f[0]+'" aria-pressed="'+(ui.loanF===f[0])+'">'+f[1]+'<span class="c">'+(cnt[f[0]]||0)+'</span></button>').join('');
-  rows = rows.filter(r=>{
-    if(ui.loanF==='active') return r.l.status==='active';
-    if(ui.loanF==='overdue') return r.x.state==='overdue';
-    if(ui.loanF==='all') return true;
-    return r.l.status===ui.loanF;
-  });
-  if(q) rows = rows.filter(r=>loanMatch(r,q));
-  rows.sort((a,b)=>{
-    const aa=a.l.status==='active', bb=b.l.status==='active';
-    if(aa!==bb) return aa?-1:1;
-    if(aa) return a.x.due<b.x.due?-1 : a.x.due>b.x.due?1 : a.l.ticketNo-b.l.ticketNo;
-    return (b.l.closedDate||'').localeCompare(a.l.closedDate||'') || b.l.ticketNo-a.l.ticketNo;
-  });
-  const head = '<div class="lrow lhead" aria-hidden="true"><span>Тасалбар</span><span>Харилцагч</span><span>Барьцаа</span><span class="r c-prin">Зээлийн дүн</span><span class="r">Одоогийн өр</span><span>Хугацаа</span><span>Төлөв</span></div>';
+  const u = ui.loan, {rows, cnt} = filteredLoans();
+  $('#loan-tabs').innerHTML = LTABS.map(t=>'<button class="chip'+(u.tab===t[0]?' on':'')+'" data-act="ltab" data-f="'+t[0]+'" aria-pressed="'+(u.tab===t[0])+'">'+t[1]+'<span class="c">'+(cnt[t[0]]||0)+'</span></button>').join('');
   if(!rows.length){
-    const msg = q ? 'Хайлтад тохирох зээл олдсонгүй.' :
-      ({active:'Идэвхтэй зээл алга.', overdue:'Хугацаа хэтэрсэн зээл алга.', redeemed:'Хаагдсан зээл алга.', forfeited:'Хураагдсан барьцаа алга.', all:'Зээл бичигдээгүй байна.'})[ui.loanF];
-    box.innerHTML = '<div class="empty"><p>'+msg+'</p>'+((!q && (ui.loanF==='active'||ui.loanF==='all'))?'<button class="btn btn-primary sm" data-act="new-loan">'+ic('plus')+'Шинэ зээл бичих</button>':'')+'</div>';
+    box.innerHTML = '<div class="empty"><p>'+(u.q||u.cat?'Хайлтад тохирох зээл олдсонгүй.':'Энэ хэсэгт зээл алга.')+'</p>'+(!u.q&&!u.cat&&(u.tab==='normal'||u.tab==='all')?'<button class="btn btn-primary sm" data-act="new-loan">'+ic('plus')+'Шинэ зээл бичих</button>':'')+'</div>';
     return;
   }
-  box.innerHTML = head + rows.map(loanRow).join('');
+  const pages = Math.max(1, Math.ceil(rows.length/u.size)); if(u.page>pages) u.page = pages;
+  const dateLabel = u.tab==='forfeited'?'Хураагдсан':u.tab==='redeemed'?'Хаагдсан':'Олгосон';
+  const head = '<thead><tr>'+LCOLS.map(c=>thSort(c[0], c[0]==='date'?dateLabel:c[1], c[2], u, 'loan')).join('')+'<th></th></tr></thead>';
+  const body = rows.slice((u.page-1)*u.size, u.page*u.size).map(r=>{
+    const l=r.l, x=r.x, act=l.status==='active', closed=r.tab==='forfeited'||r.tab==='redeemed';
+    const xd = act ? '<span class="xd'+(x.daysLeft<0?' neg':'')+'">'+x.daysLeft+'</span>' : '<span class="muted">—</span>';
+    const d = closed ? fmtDate(l.closedDate||'') : fmtDate(l.startDate)+(l.createdAt?' <span class="sub">'+fmtStamp(Date.parse(l.createdAt)).slice(11)+'</span>':'');
+    let btn = '';
+    if(r.tab==='bad'||r.tab==='overdue') btn = '<button class="btn sm" data-act="forfeit" data-id="'+l.id+'">'+ic('lock')+'Хураах</button>';
+    else if(r.tab==='forfeited') btn = '<button class="btn sm" data-act="reopen" data-id="'+l.id+'">'+ic('undo')+'Буцаах</button>';
+    return '<tr data-act="open-loan" data-id="'+l.id+'">'+
+      '<td class="main" data-l="№"><span class="tno-s">'+tno(l)+'</span></td>'+
+      '<td data-l="Ангилал">'+(catBadges(l)||'<span class="muted">—</span>')+'</td>'+
+      '<td data-l="Овог нэр"><b>'+esc(shortName(r.c))+'</b>'+(blacklistHit(r.c&&r.c.regNo)?' <span class="badge b-bad">Хар жагсаалт</span>':'')+'</td>'+
+      '<td data-l="Утас" class="num">'+esc((r.c&&r.c.phone)||'')+'</td>'+
+      '<td data-l="Үлдэгдэл" class="r num">'+money(x.bal)+'</td>'+
+      '<td data-l="Нийт өр" class="r num">'+(act?'<b>'+money(x.owed)+'</b>':'<span class="muted">—</span>')+'</td>'+
+      '<td data-l="Сарын хүү %" class="r num">'+fmtRate(l.rate)+'</td>'+
+      '<td data-l="Х (үлдсэн хоног)" class="r">'+xd+'</td>'+
+      '<td data-l="'+dateLabel+'" class="num">'+d+'</td>'+
+      '<td class="r noL">'+btn+'</td></tr>';
+  }).join('');
+  box.innerHTML = '<div class="tbl-wrap"><table class="dt cards">'+head+'<tbody>'+body+'</tbody></table></div>'+pagerHTML('loan', rows.length, u.page, u.size);
+}
+function exportLoans(){
+  const {rows} = filteredLoans(), tab = (LTABS.find(t=>t[0]===ui.loan.tab)||['',''])[1];
+  csvDownload('zeel-'+ui.loan.tab+'-'+todayISO()+'.csv',
+    ['Тасалбар','Төлөв','Ангилал','Барьцаа','Үнэлгээ','Харилцагч','РД','Утас','Зээлийн дүн','Үндсэн үлдэгдэл','Хуримтлагдсан хүү','Нийт өр','Сарын хүү %','Х (хоног)','Олгосон','Дуусах','Хаагдсан','Олгосон хэлбэр','Ажилтан'],
+    rows.map(r=>{ const l=r.l, x=r.x, c=r.c||{}, act=l.status==='active';
+      return [tno(l), (LTABS.find(t=>t[0]===r.tab)||['',''])[1], [...new Set((l.items||[]).map(i=>catOf(i.category).name))].join(', '), itemLine(l), estTotal(l)||'', fullName(c), c.regNo, c.phone,
+        l.principal, x.bal, act?x.acc:'', act?x.owed:'', l.rate, act?x.daysLeft:'', l.startDate, x.due, l.closedDate||'', ACC[l.method||'cash'], userName(l.by)]; }));
 }
 
 /* ================= Харагдац: Харилцагчид ================= */
@@ -1052,7 +1312,7 @@ function renderCustList(){
   box.innerHTML = '<div class="crow lhead" aria-hidden="true"><span>Нэр</span><span>Регистр</span><span>Утас</span><span class="r">Зээл</span><span class="r">Идэвхтэй</span><span class="r">Одоогийн өр</span></div>'+
     list.map(c=>{ const s=st.get(c.id)||{n:0,act:0,owed:0,overdue:0};
       return '<button class="crow" data-act="open-customer" data-id="'+c.id+'">'+
-        '<span class="c-name"><b class="ell">'+esc(fullName(c))+'</b></span>'+
+        '<span class="c-name"><b class="ell">'+esc(fullName(c))+(blacklistHit(c.regNo)?' <span class="badge b-bad">Хар жагсаалт</span>':'')+'</b></span>'+
         '<span class="c-reg">'+esc(c.regNo||'—')+'</span>'+
         '<span class="c-phone">'+esc(c.phone||'—')+'</span>'+
         '<span class="c-n r num">'+s.n+'</span>'+
@@ -1086,7 +1346,7 @@ function smsText(tpl, latin, l, c){
 }
 function sampleLoan(){
   const T=todayISO(), act=db.loans.filter(l=>l.status==='active');
-  return act.find(l=>calc(l,T).state==='overdue') || act[0] || null;
+  return act.find(l=>late(calc(l,T))) || act[0] || null;
 }
 function smsBadge(st){ const m={sent:['Илгээсэн','b-redeemed'],test:['Тест','b-active'],failed:['Алдаа','b-overdue'],skipped:['Алгассан','b-forfeited']}[st]||[st,'b-forfeited']; return '<span class="badge '+m[1]+'">'+esc(m[0])+'</span>'; }
 function smsSection(){
@@ -1168,42 +1428,75 @@ async function smsRun(btn){
 }
 
 function viewSettings(){
-  const s = db.settings;
-  return '<div class="wrap narrow"><header class="page-head"><div><h1>Тохиргоо</h1><p class="sub">Ломбардын мэдээлэл ба өгөгдлийн нөөц</p></div></header>'+
-  '<section class="panel pad"><div><h2>Ломбардын мэдээлэл</h2><p class="sub">Хэвлэсэн тасалбар дээр гарна.</p></div>'+
+  const s = db.settings, adm = isAdmin(), lb = lastBackup();
+  let h = '<div class="wrap narrow"><header class="page-head"><div><h1>Тохиргоо</h1><p class="sub">'+(adm?'Ломбардын мэдээлэл, ангилал, SMS, нөөц':'Өөрийн нэвтрэх тохиргоо')+'</p></div></header>';
+  h += '<section class="panel pad"><div><h2>Миний бүртгэл</h2><p class="sub">'+esc(me?(me.name||me.username):'')+', нэвтрэх нэр: <b>'+esc(me?me.username:'')+'</b>, эрх: '+(adm?'Админ':'Ажилтан')+'</p></div>'+
+    '<form id="pw-form" class="form" novalidate><div class="grid3"><div class="field"><label for="pw-cur">Одоогийн нууц үг</label><input type="password" id="pw-cur" autocomplete="current-password"></div>'+
+    '<div class="field"><label for="pw-new">Шинэ нууц үг</label><input type="password" id="pw-new" autocomplete="new-password"></div>'+
+    '<div class="field"><label for="pw-new2">Шинэ нууц үг дахин</label><input type="password" id="pw-new2" autocomplete="new-password"></div></div>'+
+    '<div class="row-btns"><button class="btn btn-primary" type="submit">Нууц үг солих</button><button class="btn" type="button" data-act="logout">'+ic('logout')+'Гарах</button></div></form></section>';
+  if(!adm) return h+'</div>';
+  h += '<section class="panel pad"><div><h2>Ломбардын мэдээлэл</h2><p class="sub">Хэвлэсэн тасалбар дээр гарна.</p></div>'+
   '<form id="set-form" class="form" novalidate>'+
     '<div class="field"><label for="s-name" class="req">Ломбардын нэр</label><input type="text" id="s-name" value="'+esc(s.shopName)+'" maxlength="60"></div>'+
     '<div class="grid2"><div class="field"><label for="s-phone">Утас</label><input type="tel" id="s-phone" value="'+esc(s.phone)+'"></div>'+
     '<div class="field"><label for="s-addr">Хаяг</label><input type="text" id="s-addr" value="'+esc(s.address)+'"></div></div>'+
-    '<div class="grid3"><div class="field"><label for="s-rate">Үндсэн сарын хүү, %</label><input type="number" id="s-rate" step="0.1" min="0" value="'+esc(s.defaultRate)+'"></div>'+
-    '<div class="field"><label for="s-term">Үндсэн хугацаа, хоног</label><input type="number" id="s-term" step="1" min="1" value="'+esc(s.defaultTerm)+'"></div>'+
+    '<div class="grid2"><div class="field"><label for="s-rate">Үндсэн сарын хүү, %</label><input type="number" id="s-rate" step="0.1" min="0" value="'+esc(s.defaultRate)+'"></div>'+
+    '<div class="field"><label for="s-term">Үндсэн хугацаа, хоног</label><input type="number" id="s-term" step="1" min="1" value="'+esc(s.defaultTerm)+'"></div></div>'+
+    '<div class="grid2"><div class="field"><label for="s-bad">Муу зээл гэж тооцох хоног</label><input type="number" id="s-bad" step="1" min="1" value="'+esc(s.badAfterDays)+'"><span class="hint">Хугацаа үүнээс олон хоног хэтэрвэл "Муу" хэсэгт орно.</span></div>'+
     '<div class="field"><label for="s-next">Дараагийн тасалбарын дугаар</label><input type="number" id="s-next" step="1" min="1" value="'+esc(s.nextTicket)+'"></div></div>'+
     '<div class="field"><label for="s-terms">Тасалбар дээрх нөхцөл</label><textarea id="s-terms" rows="4">'+esc(s.terms)+'</textarea><span class="hint">Өөрийн гэрээний нөхцөлөөр солиорой.</span></div>'+
     '<div><button class="btn btn-primary" type="submit">Тохиргоог хадгалах</button></div>'+
-  '</form></section>'+
-  '<section class="panel pad"><div><h2>Нөөцлөлт</h2><p class="sub">Сүүлд нөөцөлсөн: '+(s.lastBackup?fmtDate(s.lastBackup.slice(0,10)):'хараахан нөөцлөөгүй')+'</p></div>'+
-    '<p>Бүх бүртгэл Cloudflare-ийн D1 серверт хадгалагдаж, нууц үгээр нэвтэрсэн бүх төхөөрөмжөөс нэг дор харагдана. Нэмэлт хамгаалалт болгож сард нэг удаа нөөц файл татаж, өөр газар хадгалаарай. "Нөөцөөс сэргээх" нь сервер дээрх бүртгэлийг файлынхаар солино.</p>'+
-    '<div class="row-btns"><button class="btn btn-primary" data-act="backup">'+ic('download')+'Нөөц файл татах</button><button class="btn" data-act="import">Нөөцөөс сэргээх</button><button class="btn" data-act="csv">Зээлийн жагсаалт татах (Excel)</button></div></section>'+
-  smsSection()+
-  '<section class="panel pad"><div><h2>Нэвтрэлт</h2><p class="sub">Нууц үгийг Cloudflare дээрх APP_PASSWORD тохиргооноос солино.</p></div>'+
-    '<p>Энэ төхөөрөмж нууц үгийг санаж байгаа. Олон хүн ашигладаг компьютер дээр ажлаа дуусгаад гарч байгаарай.</p>'+
-    '<div><button class="btn" data-act="logout">Энэ төхөөрөмжөөс гарах</button></div></section>'+
-  '<section class="panel pad"><div><h2>Бүх өгөгдлийг устгах</h2><p class="sub">Харилцагч, зээл, төлөлтийн бүх бүртгэл буцаагдахгүйгээр устна.</p></div>'+
+  '</form></section>';
+  const used = new Set(); db.loans.forEach(l=>(l.items||[]).forEach(i=>used.add(i.category)));
+  h += '<section class="panel pad"><div><h2>Барьцааны ангилал</h2><p class="sub">Зээл бичихэд сонгоно. Жин, сорьцтой ангилалд (алт, мөнгө) жин ба сорьцын талбар гарна.</p></div>'+
+    '<form id="cat-form" class="form" novalidate><div class="cat-ed" id="cat-ed">'+cats().map(c=>catRow(c, used.has(c.id))).join('')+'</div>'+
+    '<div class="row-btns"><button class="btn" type="button" id="cat-add">'+ic('plus')+'Ангилал нэмэх</button><button class="btn btn-primary" type="submit">Ангиллыг хадгалах</button></div></form></section>';
+  const tc = s.txnCategories || DEFAULT_TXN_CATS;
+  h += '<section class="panel pad"><div><h2>Гүйлгээний ангилал</h2><p class="sub">Бусад гүйлгээ бүртгэхэд санал болгоно. Мөр бүрт нэг ангилал.</p></div>'+
+    '<form id="tcat-form" class="form" novalidate><div class="grid2"><div class="field"><label for="tc-inc">Орлогын ангилал</label><textarea id="tc-inc" rows="5">'+esc(tc.income.join('\n'))+'</textarea></div>'+
+    '<div class="field"><label for="tc-exp">Зардлын ангилал</label><textarea id="tc-exp" rows="5">'+esc(tc.expense.join('\n'))+'</textarea></div></div>'+
+    '<div><button class="btn btn-primary" type="submit">Хадгалах</button></div></form></section>';
+  h += smsSection();
+  h += '<section class="panel pad"><div><h2>Нөөцлөлт</h2><p class="sub">Энэ төхөөрөмжөөс сүүлд татсан: '+(lb?fmtDate(lb.slice(0,10)):'хараахан татаагүй')+'</p></div>'+
+    '<p>Бүх бүртгэл Cloudflare-ийн D1 серверт хадгалагдаж, нэвтэрсэн бүх төхөөрөмжөөс нэг дор харагдана. Нэмэлт хамгаалалт болгож сард нэг удаа нөөц файл татаж, өөр газар хадгалаарай. "Нөөцөөс сэргээх" нь сервер дээрх бүх бүртгэлийг файлынхаар солино.</p>'+
+    '<div class="row-btns"><button class="btn btn-primary" data-act="backup">'+ic('download')+'Нөөц файл татах</button><button class="btn" data-act="import">Нөөцөөс сэргээх</button><button class="btn" data-act="csv">Зээлийн жагсаалт татах (Excel)</button></div></section>';
+  h += '<section class="panel pad"><div><h2>Бүх өгөгдлийг устгах</h2><p class="sub">Харилцагч, зээл, төлөлт, гүйлгээ, хар жагсаалтын бүх бүртгэл буцаагдахгүйгээр устна. Хэрэглэгч, тохиргоо, засварын түүх үлдэнэ.</p></div>'+
     '<div><button class="btn btn-danger" data-act="wipe">'+ic('trash')+'Бүгдийг устгах</button></div></section></div>';
+  return h;
+}
+function catRow(c, used){
+  return '<div class="cat-row" data-id="'+esc(c.id||'')+'"><input type="text" class="cat-name" value="'+esc(c.name||'')+'" aria-label="Ангиллын нэр" placeholder="Ангиллын нэр">'+
+    '<label class="check"><input type="checkbox" class="cat-metal"'+(c.metal?' checked':'')+'><span>Жин, сорьцтой</span></label>'+
+    '<button type="button" class="icon-btn sm cat-del" aria-label="Устгах" title="'+(used?'Зээлд ашиглагдаж байгаа тул устгах боломжгүй':'Устгах')+'"'+(used?' disabled':'')+'>'+ic('trash')+'</button></div>';
 }
 function bindSettings(){
+  const pw = $('#pw-form');
+  if(pw) pw.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const cur=$('#pw-cur').value, n1=$('#pw-new').value, n2=$('#pw-new2').value;
+    if(!cur) return fieldErr($('#pw-cur'),'Одоогийн нууц үгээ оруулна уу');
+    if(n1.length<6) return fieldErr($('#pw-new'),'Шинэ нууц үг дор хаяж 6 тэмдэгт байна');
+    if(n1!==n2) return fieldErr($('#pw-new2'),'Шинэ нууц үг таарахгүй байна');
+    const btn = pw.querySelector('button[type=submit]'); btn.disabled = true;
+    try{ await api('/api/auth/password', {method:'POST', body:{current:cur, next:n1}}); pw.reset(); toast('Нууц үг солигдлоо. Бусад төхөөрөмжөөс гарсан.'); }
+    catch(err){ toast(err.message,'err',5000); }
+    btn.disabled = false;
+  });
+  if(!isAdmin()) return;
   bindSmsForm();
-  const f = $('#set-form'); if(!f) return;
+  const f = $('#set-form');
   f.addEventListener('submit', async e=>{
     e.preventDefault();
-    const name=$('#s-name').value.trim(), rate=parseRate($('#s-rate').value), term=parseInt($('#s-term').value,10), next=parseInt($('#s-next').value,10);
+    const name=$('#s-name').value.trim(), rate=parseRate($('#s-rate').value), term=parseInt($('#s-term').value,10), next=parseInt($('#s-next').value,10), bad=parseInt($('#s-bad').value,10);
     if(!name) return fieldErr($('#s-name'),'Ломбардын нэрийг оруулна уу');
     if(!(rate>=0)) return fieldErr($('#s-rate'),'Хүүгийн хувийг зөв оруулна уу');
     if(!(term>=1)) return fieldErr($('#s-term'),'Хугацааг хоногоор оруулна уу');
+    if(!(bad>=1)) return fieldErr($('#s-bad'),'Хоногийг оруулна уу');
     if(!(next>=1)) return fieldErr($('#s-next'),'Тасалбарын дугаар 1-ээс их байна');
     const maxNo = db.loans.reduce((m,l)=>Math.max(m,l.ticketNo||0),0);
     if(next<=maxNo) return fieldErr($('#s-next'),'№'+String(maxNo).padStart(4,'0')+' тасалбар бичигдсэн тул '+(maxNo+1)+'-ээс эхлүүлнэ үү');
-    const vals = {shopName:name, phone:$('#s-phone').value.trim(), address:$('#s-addr').value.trim(), defaultRate:rate, defaultTerm:term, terms:$('#s-terms').value.trim()};
+    const vals = {shopName:name, phone:$('#s-phone').value.trim(), address:$('#s-addr').value.trim(), defaultRate:rate, defaultTerm:term, badAfterDays:bad, terms:$('#s-terms').value.trim()};
     if(next !== +db.settings.nextTicket){
       const btn = f.querySelector('button[type=submit]'); btn.disabled = true;
       try{ const r = await api('/api/ticket', {method:'PUT', body:{next}}); vals.nextTicket = r.nextTicket; }
@@ -1212,46 +1505,608 @@ function bindSettings(){
     Object.assign(db.settings, vals);
     changed(); toast('Тохиргоог хадгаллаа');
   });
+  const ed = $('#cat-ed');
+  const bindDel = ()=>$$('.cat-del', ed).forEach(b=>{ b.onclick = ()=>{ b.closest('.cat-row').remove(); }; });
+  bindDel();
+  $('#cat-add').addEventListener('click', ()=>{ ed.insertAdjacentHTML('beforeend', catRow({id:'', name:'', metal:false}, false)); bindDel(); const n=$$('.cat-name',ed); n[n.length-1].focus(); });
+  $('#cat-form').addEventListener('submit', e=>{
+    e.preventDefault();
+    const rows = $$('.cat-row', ed).map(r=>({id:r.dataset.id || ('c'+uid()), name:$('.cat-name',r).value.trim(), metal:$('.cat-metal',r).checked}));
+    const empty = $$('.cat-row', ed).find(r=>!$('.cat-name',r).value.trim());
+    if(empty) return fieldErr($('.cat-name',empty),'Ангиллын нэрийг бичнэ үү');
+    if(!rows.length) return toast('Дор хаяж нэг ангилал байх ёстой','err');
+    const names = rows.map(r=>r.name.toLowerCase()); if(new Set(names).size!==names.length) return toast('Ижил нэртэй ангилал байна','err');
+    db.settings.categories = rows.map(r=>r.metal?r:{id:r.id, name:r.name});
+    changed(); toast('Ангиллыг хадгаллаа');
+  });
+  $('#tcat-form').addEventListener('submit', e=>{
+    e.preventDefault();
+    const lines = id=>[...new Set($(id).value.split('\n').map(x=>x.trim()).filter(Boolean))];
+    db.settings.txnCategories = {income:lines('#tc-inc'), expense:lines('#tc-exp')};
+    changed(); toast('Гүйлгээний ангиллыг хадгаллаа');
+  });
 }
 
 /* ================= Үндсэн рендер ================= */
-function route(){ const h=(location.hash||'').replace('#',''); return ['loans','customers','settings'].includes(h) ? h : 'dashboard'; }
+const ROUTES = {
+  dashboard:{t:'Самбар', v:()=>viewDashboard()},
+  loans:{t:'Зээлүүд', v:()=>viewLoans(), after:()=>renderLoanList()},
+  customers:{t:'Харилцагчид', v:()=>viewCustomers(), after:()=>renderCustList()},
+  blacklist:{t:'Хар жагсаалт', v:()=>viewBlacklist(), after:()=>renderBlList()},
+  txns:{t:'Бусад гүйлгээ', v:()=>viewTxns(), after:()=>renderTxnList()},
+  cash:{t:'Касс', v:()=>viewCash()},
+  reports:{t:'Тайлан', v:()=>viewReports()},
+  audit:{t:'Засварын түүх', v:()=>viewAudit(), after:()=>loadAudit()},
+  users:{t:'Хэрэглэгч', v:()=>viewUsers(), after:()=>loadUsers(), admin:true},
+  settings:{t:'Тохиргоо', v:()=>viewSettings(), after:()=>bindSettings()}
+};
+function route(){ const h=(location.hash||'').replace('#',''); const r=ROUTES[h]; return r && (!r.admin || isAdmin()) ? h : 'dashboard'; }
 function render(){
   const r = route();
   $$('[data-nav]').forEach(a=>{ const on=a.dataset.nav===r; a.classList.toggle('on',on); if(on) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
+  $$('[data-admin]').forEach(a=>{ a.hidden = !isAdmin(); });
   $('#brand-name').textContent = db.settings.shopName || 'Ломбард';
-  const lb = db.settings.lastBackup;
-  $('#side-info').innerHTML = 'Сүүлийн нөөц файл: <b>'+(lb?fmtDate(lb.slice(0,10)):'алга')+'</b><br><button class="side-link" data-act="logout">Гарах</button>';
+  $('#side-info').innerHTML = (me?'<div class="side-user">'+esc(me.name||me.username)+' <span>('+(isAdmin()?'админ':'ажилтан')+')</span></div>':'')+'<button class="side-link" data-act="logout">Гарах</button>';
   const v = $('#view');
   const sy = window.scrollY;
-  if(r==='loans'){ v.innerHTML = viewLoans(); renderLoanList(); }
-  else if(r==='customers'){ v.innerHTML = viewCustomers(); renderCustList(); }
-  else if(r==='settings'){ v.innerHTML = viewSettings(); bindSettings(); }
-  else v.innerHTML = viewDashboard();
+  v.innerHTML = ROUTES[r].v();
+  if(ROUTES[r].after) ROUTES[r].after();
   window.scrollTo(0, sy);
-  document.title = (db.settings.shopName||'Ломбард') + ': ' + ({dashboard:'Самбар',loans:'Зээлүүд',customers:'Харилцагчид',settings:'Тохиргоо'})[r];
+  document.title = (db.settings.shopName||'Ломбард') + ': ' + ROUTES[r].t;
 }
-document.addEventListener('input', e=>{
-  if(e.target.id==='loan-q'){ ui.loanQ=e.target.value; renderLoanList(); }
-  if(e.target.id==='cust-q'){ ui.custQ=e.target.value; renderCustList(); }
+// Шүүлтүүрийн талбарууд
+const FILTERS = {
+  'loan-q':  [()=>ui.loan, 'q', ()=>renderLoanList()],
+  'loan-cat':[()=>ui.loan, 'cat', ()=>renderLoanList()],
+  'loan-size':[()=>ui.loan, 'size', ()=>renderLoanList(), Number],
+  'cust-q':  [()=>ui, 'custQ', ()=>renderCustList()],
+  'txn-q':   [()=>ui.txn, 'q', ()=>renderTxnList()],
+  'txn-cat': [()=>ui.txn, 'cat', ()=>renderTxnList()],
+  'txn-acc': [()=>ui.txn, 'acc', ()=>renderTxnList()],
+  'txn-from':[()=>ui.txn, 'from', ()=>renderTxnList()],
+  'txn-to':  [()=>ui.txn, 'to', ()=>renderTxnList()],
+  'txn-size':[()=>ui.txn, 'size', ()=>renderTxnList(), Number],
+  'bl-q':    [()=>ui.bl, 'q', ()=>renderBlList()],
+  'bl-cat':  [()=>ui.bl, 'cat', ()=>renderBlList()],
+  'bl-status':[()=>ui.bl, 'status', ()=>renderBlList()],
+  'audit-q': [()=>ui.audit, 'q', ()=>debounceAudit()],
+  'audit-kind':[()=>ui.audit, 'kind', ()=>loadAudit()],
+  'audit-user':[()=>ui.audit, 'user', ()=>loadAudit()],
+  'audit-from':[()=>ui.audit, 'from', ()=>loadAudit()],
+  'audit-to':[()=>ui.audit, 'to', ()=>loadAudit()],
+  'rep-from':[()=>ui.rep, 'from', ()=>render()],
+  'rep-to':  [()=>ui.rep, 'to', ()=>render()],
+  'cash-day':[()=>ui, 'cashDay', ()=>render()]
+};
+let auditTimer;
+function debounceAudit(){ clearTimeout(auditTimer); auditTimer = setTimeout(loadAudit, 300); }
+function onFilter(e){
+  const f = FILTERS[e.target.id]; if(!f) return;
+  const isText = e.target.type==='search' || e.target.type==='text';
+  if(e.type==='change' && isText) return;
+  if(e.type==='input' && !isText) return;
+  const obj = f[0](); obj[f[1]] = f[3] ? f[3](e.target.value) : e.target.value;
+  if('page' in obj) obj.page = 1;
+  f[2]();
+}
+document.addEventListener('input', onFilter);
+document.addEventListener('change', onFilter);
+document.addEventListener('submit', e=>{
+  const qf = e.target.closest('[data-qs], #qs-form'); if(!qf) return;
+  e.preventDefault();
+  const inp = qf.querySelector('input'); const q = inp.value; inp.value=''; inp.blur();
+  if(modalStack.length) closeAllModals();
+  quickSearch(q);
 });
 window.addEventListener('hashchange', ()=>{ closeAllModals(); render(); window.scrollTo(0,0); });
 function closeAllModals(){ while(modalStack.length) closeModal(); }
+
+/* ================= Шуурхай хайлт (Регистр, №) ================= */
+function quickSearch(q){
+  q = String(q||'').trim(); if(!q) return;
+  const ql = q.toLowerCase(), qn = q.replace(/^№\s*/,'');
+  if(/^\d+$/.test(qn)){ const l = db.loans.find(x=>x.ticketNo===+qn); if(l){ openLoan(l.id); return; } }
+  const reg = normReg(q), hit = blacklistHit(reg);
+  const exact = db.customers.find(c=>normReg(c.regNo)===reg && reg);
+  if(exact && !hit){ openCustomer(exact.id); return; }
+  const cs = db.customers.filter(c=>custMatch(c,ql)).slice(0,15);
+  const ls = db.loans.map(l=>({l, c:custById(l.customerId)})).filter(r=>loanMatch(r,ql)).slice(0,15);
+  const bs = db.blacklist.filter(b=>b.status!=='inactive' && [b.regNo,b.name,b.note].join(' ').toLowerCase().includes(ql)).slice(0,10);
+  let h = '';
+  if(bs.length) h += bs.map(b=>'<div class="bl-warn" style="margin-bottom:10px"><b>Хар жагсаалт: '+esc(b.regNo)+(b.name?' '+esc(b.name):'')+'</b><br>'+esc(b.category)+(b.note?'. '+esc(b.note):'')+'</div>').join('');
+  if(cs.length) h += '<h3 class="mini-title">Харилцагч</h3><div class="panel" style="margin-bottom:16px">'+cs.map((c,i)=>'<button class="mrow" data-act="open-customer" data-id="'+c.id+'"'+(i===0?' style="border-top:0"':'')+'><span class="muted">'+esc(c.regNo||'')+'</span><span><b class="ell">'+esc(fullName(c))+'</b><span class="cell-sub">'+esc(c.phone||'')+'</span></span><span></span>'+(blacklistHit(c.regNo)?'<span class="badge b-bad">Хар жагсаалт</span>':'<span></span>')+'</button>').join('')+'</div>';
+  if(ls.length) h += '<h3 class="mini-title">Зээл</h3><div class="panel">'+ls.map((r,i)=>{ const x=calc(r.l); return '<button class="mrow" data-act="open-loan" data-id="'+r.l.id+'"'+(i===0?' style="border-top:0"':'')+'><span class="tno-s">'+tno(r.l)+'</span><span><span class="ell">'+esc(shortName(r.c))+', '+esc(itemLine(r.l))+'</span><span class="cell-sub">'+fmtDate(r.l.startDate)+' олгосон, '+money(r.l.principal)+'</span></span><span></span>'+badge(x.state)+'</button>'; }).join('')+'</div>';
+  if(!h) h = '<div class="empty"><p>"'+esc(q)+'" гэсэн хайлтаар юу ч олдсонгүй.</p></div>';
+  openModal({title:'Хайлт: '+q, body:h, wide:true, dismissOutside:true});
+}
+function openMenu(){
+  const items = [['dashboard','home','Самбар'],['loans','ticket','Зээлүүд'],['customers','user','Харилцагчид'],['blacklist','alert','Хар жагсаалт'],['txns','swap','Бусад гүйлгээ'],['cash','cash','Касс'],['reports','chart','Тайлан'],['audit','history','Засварын түүх']]
+    .concat(isAdmin()?[['users','team','Хэрэглэгч']]:[]).concat([['settings','sliders','Тохиргоо']]);
+  const m = openModal({title:'Цэс', dismissOutside:true, body:
+    '<form class="m-search" data-qs>'+ic('search')+'<input type="search" placeholder="Регистр, №, нэр, утасаар хайх" aria-label="Шуурхай хайх"></form>'+
+    '<div class="menu-list">'+items.map(i=>'<a href="#'+i[0]+'">'+ic(i[1])+esc(i[2])+'</a>').join('')+
+    '<button data-act="logout">'+ic('logout')+'Гарах ('+esc(me?me.name||me.username:'')+')</button></div>'});
+  m.el.querySelectorAll('.menu-list a').forEach(a=>a.addEventListener('click', ()=>closeModal(m)));
+}
+
+/* ================= Бусад гүйлгээ ================= */
+function txnCatsFor(type){
+  const tc = db.settings.txnCategories || DEFAULT_TXN_CATS;
+  const base = type==='income' ? tc.income : type==='expense' ? tc.expense : [];
+  const used = db.txns.filter(t=>t.type===type).map(t=>t.category).filter(Boolean);
+  return [...new Set(base.concat(used))];
+}
+function txnSigned(t){ return t.type==='income' ? +t.amount : t.type==='expense' ? -t.amount : 0; }
+function txnAccText(t){ return t.type==='transfer' ? (ACC[t.from]||'')+' → '+(ACC[t.to]||'') : (ACC[t.account||'cash']); }
+function filteredTxns(){
+  const u = ui.txn, q = u.q.trim().toLowerCase();
+  let rows = db.txns.slice();
+  if(u.type!=='all') rows = rows.filter(t=>t.type===u.type);
+  if(u.cat) rows = rows.filter(t=>t.category===u.cat);
+  if(u.acc) rows = rows.filter(t=>t.type==='transfer' ? (t.from===u.acc||t.to===u.acc) : (t.account||'cash')===u.acc);
+  if(u.from) rows = rows.filter(t=>t.date>=u.from);
+  if(u.to) rows = rows.filter(t=>t.date<=u.to);
+  if(q) rows = rows.filter(t=>[t.no, t.category, t.desc, userName(t.by)].join(' ').toLowerCase().includes(q));
+  const dir = u.dir==='asc' ? 1 : -1;
+  const val = t=>{ switch(u.sort){ case 'no': return +t.no||0; case 'cat': return t.category||''; case 'amount': return +t.amount||0; case 'user': return userName(t.by); default: return t.date+' '+String(t.at||0).padStart(15,'0'); } };
+  rows.sort((a,b)=>{ const va=val(a), vb=val(b); return (va<vb?-1:va>vb?1:0)*dir; });
+  return rows;
+}
+function viewTxns(){
+  const u = ui.txn;
+  const allCats = [...new Set(txnCatsFor('income').concat(txnCatsFor('expense')))];
+  return '<div class="wrap"><header class="page-head"><div><h1>Бусад гүйлгээ</h1><p class="sub">Орлого, зардал (түрээс, цалин, интернет), данс хоорондын шилжүүлэлт</p></div>'+
+    '<div class="head-btns"><button class="btn" data-act="export-txns">'+ic('download')+'Excel</button><button class="btn btn-primary" data-act="new-txn">'+ic('plus')+'Гүйлгээ бүртгэх</button></div></header>'+
+    '<div class="chips" style="margin-bottom:14px">'+[['all','Бүгд'],['income','Орлого'],['expense','Зардал'],['transfer','Шилжүүлэлт']].map(t=>'<button class="chip'+(u.type===t[0]?' on':'')+'" data-act="txn-tab" data-f="'+t[0]+'">'+t[1]+'</button>').join('')+'</div>'+
+    '<div class="filters"><label class="search">'+ic('search')+'<input type="search" id="txn-q" placeholder="Гүйлгээний утга, ангилал, ажилтан" aria-label="Гүйлгээ хайх" value="'+esc(u.q)+'"></label>'+
+      '<select id="txn-cat" aria-label="Ангилал"><option value="">Бүх ангилал</option>'+allCats.map(c=>'<option'+(c===u.cat?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select>'+
+      '<select id="txn-acc" aria-label="Данс"><option value="">Бэлэн ба данс</option><option value="cash"'+(u.acc==='cash'?' selected':'')+'>Бэлэн</option><option value="bank"'+(u.acc==='bank'?' selected':'')+'>Данс</option></select>'+
+      '<input type="date" id="txn-from" value="'+esc(u.from)+'" aria-label="Эхлэх огноо"><input type="date" id="txn-to" value="'+esc(u.to)+'" aria-label="Дуусах огноо">'+sizeSel('txn-size',u.size)+'</div>'+
+    '<div class="panel" id="txn-list"></div></div>';
+}
+const TCOLS = [['no','№'],['date','Огноо'],['type','Төрөл'],['cat','Ангилал'],['desc','Гүйлгээний утга'],['acc','Данс'],['amount','Дүн','r'],['user','Хэрэглэгч']];
+function renderTxnList(){
+  const box = $('#txn-list'); if(!box) return;
+  const u = ui.txn, rows = filteredTxns();
+  const inc = rows.filter(t=>t.type==='income').reduce((s,t)=>s+(+t.amount||0),0), exp = rows.filter(t=>t.type==='expense').reduce((s,t)=>s+(+t.amount||0),0);
+  const sum = '<div class="sumbar"><div><span>Орлого </span><b class="pos">'+money(inc)+'</b></div><div><span>Зардал </span><b class="neg">'+money(exp)+'</b></div><div><span>Цэвэр </span><b>'+money(inc-exp)+'</b></div></div>';
+  if(!rows.length){ box.innerHTML = sum+'<div class="empty"><p>'+(u.q||u.cat||u.acc||u.from||u.to?'Шүүлтүүрт тохирох гүйлгээ алга.':'Одоогоор гүйлгээ бүртгээгүй байна.')+'</p><button class="btn btn-primary sm" data-act="new-txn">'+ic('plus')+'Гүйлгээ бүртгэх</button></div>'; return; }
+  const pages = Math.max(1, Math.ceil(rows.length/u.size)); if(u.page>pages) u.page = pages;
+  const head = '<thead><tr>'+TCOLS.map(c=>['type','desc','acc'].includes(c[0]) ? '<th>'+c[1]+'</th>' : thSort(c[0], c[1], c[2], u, 'txn')).join('')+'</tr></thead>';
+  const body = rows.slice((u.page-1)*u.size, u.page*u.size).map(t=>{
+    const sv = txnSigned(t);
+    return '<tr data-act="open-txn" data-id="'+t.id+'">'+
+      '<td data-l="№" class="num">'+esc(t.no||'')+'</td>'+
+      '<td data-l="Огноо" class="num main">'+fmtDate(t.date)+'</td>'+
+      '<td data-l="Төрөл"><span class="badge b-'+t.type+'">'+TXN_T[t.type]+'</span></td>'+
+      '<td data-l="Ангилал">'+esc(t.category||'')+'</td>'+
+      '<td data-l="Утга"><div class="clip">'+esc(t.desc||'')+'</div></td>'+
+      '<td data-l="Данс">'+esc(txnAccText(t))+'</td>'+
+      '<td data-l="Дүн" class="r num '+(sv>0?'pos':sv<0?'neg':'')+'"><b>'+(sv>0?'+':sv<0?'−':'')+money(Math.abs(+t.amount||0)).replace('−','')+'</b></td>'+
+      '<td data-l="Хэрэглэгч">'+esc(userName(t.by))+'</td></tr>';
+  }).join('');
+  box.innerHTML = sum+'<div class="tbl-wrap"><table class="dt cards">'+head+'<tbody>'+body+'</tbody></table></div>'+pagerHTML('txn', rows.length, u.page, u.size);
+}
+function exportTxns(){
+  csvDownload('guilgee-'+todayISO()+'.csv', ['№','Огноо','Төрөл','Ангилал','Гүйлгээний утга','Данс','Дүн','Хэрэглэгч'],
+    filteredTxns().map(t=>[t.no, t.date, TXN_T[t.type], t.category, t.desc, txnAccText(t), txnSigned(t)||t.amount, userName(t.by)]));
+}
+function openTxnForm(opts){
+  opts = opts || {};
+  const t = opts.id ? db.txns.find(x=>x.id===opts.id) : null;
+  let type = t ? t.type : (opts.type || 'expense');
+  const body = '<form id="txn-form" class="form" novalidate>'+
+    '<div class="seg" role="group" aria-label="Гүйлгээний төрөл">'+['income','expense','transfer'].map(k=>'<button type="button" data-type="'+k+'"'+(k===type?' class="on" aria-pressed="true"':' aria-pressed="false"')+'>'+TXN_T[k]+'</button>').join('')+'</div>'+
+    '<div id="tf-fields"></div>'+
+  '</form>';
+  const m = openModal({ title: t ? 'Гүйлгээ №'+(t.no||'')+' засах' : 'Гүйлгээ бүртгэх', body,
+    foot:(t&&isAdmin()?'<button class="btn btn-ghost danger" type="button" data-act="del-txn" data-id="'+t.id+'" style="margin-right:auto">'+ic('trash')+'Устгах</button>':'')+
+      '<button class="btn" data-dismiss>Болих</button><button class="btn btn-primary" type="submit" form="txn-form">'+(t?'Хадгалах':'Бүртгэх')+'</button>' });
+  const f = m.el, box = $('#tf-fields', f);
+  const v = t || {date:todayISO(), account:'cash', from:'cash', to:'bank'};
+  function fields(){
+    const cats = txnCatsFor(type);
+    box.innerHTML = (type==='transfer'
+      ? '<div class="grid2"><div class="field"><label for="tf-from">Хаанаас</label><select id="tf-from"><option value="cash"'+(v.from!=='bank'?' selected':'')+'>Бэлэн</option><option value="bank"'+(v.from==='bank'?' selected':'')+'>Данс</option></select></div>'+
+        '<div class="field"><label for="tf-to">Хаашаа</label><select id="tf-to"><option value="bank"'+(v.to!=='cash'?' selected':'')+'>Данс</option><option value="cash"'+(v.to==='cash'?' selected':'')+'>Бэлэн</option></select></div></div>'
+      : '<div class="grid2"><div class="field"><label for="tf-cat" class="req">Ангилал</label><input type="text" id="tf-cat" list="tf-cats" value="'+esc(v.category||'')+'" placeholder="Сонгох эсвэл бичих" autocomplete="off"><datalist id="tf-cats">'+cats.map(c=>'<option value="'+esc(c)+'">').join('')+'</datalist></div>'+
+        '<div class="field"><label for="tf-acc">Данс</label><select id="tf-acc"><option value="cash"'+((v.account||'cash')==='cash'?' selected':'')+'>Бэлэн</option><option value="bank"'+(v.account==='bank'?' selected':'')+'>Данс</option></select></div></div>'+
+        '<div class="quick">'+cats.slice(0,8).map(c=>'<button type="button" data-cat="'+esc(c)+'">'+esc(c)+'</button>').join('')+'</div>')+
+      '<div class="grid2" style="margin-top:14px"><div class="field"><label for="tf-amt" class="req">Дүн, ₮</label><input type="text" inputmode="numeric" class="money" id="tf-amt" value="'+(v.amount?num(v.amount):'')+'" placeholder="0"></div>'+
+      '<div class="field"><label for="tf-date" class="req">Огноо</label><input type="date" id="tf-date" value="'+esc(v.date||todayISO())+'"></div></div>'+
+      '<div class="field" style="margin-top:14px"><label for="tf-desc">Гүйлгээний утга</label><input type="text" id="tf-desc" value="'+esc(v.desc||'')+'" placeholder="Жишээ нь: 11-р сарын түрээс"></div>';
+    bindMoney(box);
+    $$('[data-cat]', box).forEach(b=>b.addEventListener('click', ()=>{ $('#tf-cat',box).value=b.dataset.cat; }));
+  }
+  fields();
+  $$('[data-type]', f).forEach(b=>b.addEventListener('click', ()=>{
+    v.category = ($('#tf-cat',box)||{}).value || ''; v.amount = parseMoney(($('#tf-amt',box)||{}).value); v.date = ($('#tf-date',box)||{}).value; v.desc = ($('#tf-desc',box)||{}).value;
+    if(type!==b.dataset.type) v.category = '';
+    type = b.dataset.type;
+    $$('[data-type]', f).forEach(x=>{ x.classList.toggle('on', x===b); x.setAttribute('aria-pressed', x===b); });
+    fields();
+  }));
+  setTimeout(()=>{ const el = $('#tf-cat',box) || $('#tf-amt',box); el && el.focus(); }, 30);
+  $('#txn-form', f).addEventListener('submit', e=>{
+    e.preventDefault();
+    const A = parseMoney($('#tf-amt',box).value), D = $('#tf-date',box).value, desc = $('#tf-desc',box).value.trim();
+    const rec = { type, amount:A, date:D, desc };
+    if(type==='transfer'){
+      rec.from = $('#tf-from',box).value; rec.to = $('#tf-to',box).value;
+      if(rec.from===rec.to) return fieldErr($('#tf-to',box),'Өөр данс сонгоно уу');
+      rec.category = 'Шилжүүлэлт';
+    } else {
+      rec.category = $('#tf-cat',box).value.trim(); rec.account = $('#tf-acc',box).value;
+      if(!rec.category) return fieldErr($('#tf-cat',box),'Ангиллыг сонгох эсвэл бичнэ үү');
+    }
+    if(!(A>0)) return fieldErr($('#tf-amt',box),'Дүнг оруулна уу');
+    if(!isISO(D)) return fieldErr($('#tf-date',box),'Огноог оруулна уу');
+    if(t){
+      delete t.account; delete t.from; delete t.to;
+      Object.assign(t, rec);
+    } else {
+      const no = db.txns.reduce((mx,x)=>Math.max(mx,+x.no||0),0)+1;
+      db.txns.push(Object.assign({id:uid(), no, at:Date.now(), by:me?me.username:''}, rec));
+    }
+    closeModal(m); changed(); toast(t ? 'Гүйлгээг хадгаллаа' : TXN_T[type]+' '+money(A)+' бүртгэгдлээ');
+  });
+}
+
+/* ================= Касс: мөнгөн гүйлгээ ================= */
+function msOf(at){ at = +at||0; return at > 1e14 ? Math.floor(at/1000) : at; }
+// Бүх мөнгөн хөдөлгөөн: олгосон зээл, төлөлт, бусад гүйлгээ
+function flows(){
+  const out = [];
+  for(const l of db.loans){
+    const c = custById(l.customerId), x = calc(l);
+    out.push({date:l.startDate, at:l.createdAt?Date.parse(l.createdAt):0, acc:l.method||'cash', amount:-(+l.principal||0), kind:'loan_out', ref:tno(l), text:'Зээл олгов: '+shortName(c)+(itemLine(l)?', '+itemLine(l):''), by:l.by, loanId:l.id});
+    for(const e of l.events) if(e.type==='payment'){
+      const a = x.alloc[e.id] || {i:0,p:0,o:0};
+      out.push({date:e.date, at:msOf(e.at), acc:e.method||'cash', amount:+e.amount||0, kind:'loan_in', i:a.i, p:a.p, o:a.o, ref:tno(l), text:'Төлөлт: '+shortName(c)+(a.i?', хүү '+money(a.i):'')+(a.p?', үндсэн '+money(a.p):''), by:e.by, loanId:l.id});
+    }
+  }
+  for(const t of db.txns){
+    if(t.type==='transfer'){
+      out.push({date:t.date, at:msOf(t.at), acc:t.from, amount:-(+t.amount||0), kind:'tr_out', ref:'Шилжүүлэлт', text:(t.desc||'Шилжүүлэлт')+' ('+ACC[t.from]+' → '+ACC[t.to]+')', by:t.by, txnId:t.id});
+      out.push({date:t.date, at:msOf(t.at)+1, acc:t.to, amount:+t.amount||0, kind:'tr_in', ref:'Шилжүүлэлт', text:(t.desc||'Шилжүүлэлт')+' ('+ACC[t.from]+' → '+ACC[t.to]+')', by:t.by, txnId:t.id});
+    } else out.push({date:t.date, at:msOf(t.at), acc:t.account||'cash', amount:t.type==='income'?(+t.amount||0):-(+t.amount||0), kind:t.type, ref:t.category, text:t.desc||t.category, by:t.by, txnId:t.id});
+  }
+  return out;
+}
+function cashSummary(day, all){
+  const op = db.settings.opening || {};
+  const start = op.date || '';
+  const res = {};
+  for(const a of ['cash','bank']){
+    const base = start ? (+op[a]||0) : 0;
+    const before = all.filter(f=>f.acc===a && f.date<day && (!start || f.date>=start)).reduce((s,f)=>s+f.amount,0);
+    const today = all.filter(f=>f.acc===a && f.date===day);
+    const sum = k=>today.filter(f=>f.kind===k).reduce((s,f)=>s+f.amount,0);
+    const r = { open: base+before, loanIn: sum('loan_in'), income: sum('income'), trIn: sum('tr_in'), loanOut: -sum('loan_out'), expense: -sum('expense'), trOut: -sum('tr_out'),
+      interest: today.filter(f=>f.kind==='loan_in').reduce((s,f)=>s+(f.i||0)+(f.o||0),0), principal: today.filter(f=>f.kind==='loan_in').reduce((s,f)=>s+(f.p||0),0) };
+    r.in = r.loanIn + r.income + r.trIn; r.out = r.loanOut + r.expense + r.trOut; r.close = r.open + r.in - r.out;
+    res[a] = r;
+  }
+  return res;
+}
+function viewCash(){
+  const T = todayISO(); if(!isISO(ui.cashDay)) ui.cashDay = T;
+  const day = ui.cashDay, op = db.settings.opening || {}, all = flows(), s = cashSummary(day, all);
+  const card = (a, r)=>'<section class="panel cashcard"><h2>'+ACC[a]+'<b class="num">'+money(r.close)+'</b></h2>'+
+    '<div class="kv"><span>Эхний үлдэгдэл</span><b>'+money(r.open)+'</b></div>'+
+    '<div class="kv head"><span>Орлого</span><b class="pos">+'+num(r.in)+'₮</b></div>'+
+    '<div class="kv sub"><span>Зээлийн төлөлт</span><b>'+money(r.loanIn)+'</b></div>'+
+    (r.loanIn?'<div class="kv sub"><span>  үүнээс хүү</span><b>'+money(r.interest)+'</b></div><div class="kv sub"><span>  үүнээс үндсэн зээл</span><b>'+money(r.principal)+'</b></div>':'')+
+    '<div class="kv sub"><span>Бусад орлого</span><b>'+money(r.income)+'</b></div>'+
+    '<div class="kv sub"><span>Шилжүүлэлт орсон</span><b>'+money(r.trIn)+'</b></div>'+
+    '<div class="kv head"><span>Зарлага</span><b class="'+(r.out?'neg':'')+'">'+(r.out?'−':'')+num(r.out)+'₮</b></div>'+
+    '<div class="kv sub"><span>Олгосон зээл</span><b>'+money(r.loanOut)+'</b></div>'+
+    '<div class="kv sub"><span>Зардал</span><b>'+money(r.expense)+'</b></div>'+
+    '<div class="kv sub"><span>Шилжүүлэлт гарсан</span><b>'+money(r.trOut)+'</b></div>'+
+    '<div class="kv total"><span>Эцсийн үлдэгдэл</span><b>'+money(r.close)+'</b></div></section>';
+  const today = all.filter(f=>f.date===day).sort((a,b)=>(a.at||0)-(b.at||0));
+  const KIND = {loan_out:'Зээл олгосон', loan_in:'Зээлийн төлөлт', income:'Орлого', expense:'Зардал', tr_in:'Шилжүүлэлт', tr_out:'Шилжүүлэлт'};
+  let h = '<div class="wrap"><header class="page-head"><div><h1>Касс</h1><p class="sub">'+fmtLong(day)+'</p></div>'+
+    '<div class="head-btns daynav"><button class="btn" data-act="cash-day" data-d="-1" aria-label="Өмнөх өдөр">‹</button><input type="date" id="cash-day" value="'+day+'" aria-label="Өдөр сонгох"><button class="btn" data-act="cash-day" data-d="1" aria-label="Дараагийн өдөр">›</button>'+
+    (day!==T?'<button class="btn btn-ghost" data-act="cash-day" data-d="0">Өнөөдөр</button>':'')+
+    (isAdmin()?'<button class="btn" data-act="set-opening">Эхний үлдэгдэл</button>':'')+'</div></header>';
+  if(!op.date) h += '<div class="notice"><span>Кассын эхний үлдэгдэл тохируулаагүй байна. '+(isAdmin()?'Тооцоо эхлэх өдрийн бэлэн мөнгө, дансны үлдэгдлээ оруулна уу.':'Админ тохируулна.')+'</span>'+(isAdmin()?'<button class="btn sm" data-act="set-opening">Тохируулах</button>':'')+'</div>';
+  else if(day < op.date) h += '<div class="notice"><span>Энэ өдөр эхний үлдэгдлийн огнооноос ('+fmtDate(op.date)+') өмнө байна.</span></div>';
+  h += '<div class="cashgrid">'+card('cash', s.cash)+card('bank', s.bank)+'</div>';
+  h += '<div class="sec-head"><h2>Өдрийн гүйлгээ</h2><span class="sub">'+today.length+' гүйлгээ</span></div><div class="panel">';
+  if(today.length){
+    h += '<div class="tbl-wrap"><table class="dt cards"><thead><tr><th>Цаг</th><th>Төрөл</th><th>Холбоос</th><th>Тайлбар</th><th>Данс</th><th class="r">Орлого</th><th class="r">Зарлага</th><th>Ажилтан</th></tr></thead><tbody>'+
+      today.map(f=>'<tr'+(f.loanId?' data-act="open-loan" data-id="'+f.loanId+'"':f.txnId?' data-act="open-txn" data-id="'+f.txnId+'"':'')+'>'+
+        '<td data-l="Цаг" class="num">'+(f.at?fmtStamp(f.at).slice(11):'')+'</td><td data-l="Төрөл" class="main">'+KIND[f.kind]+'</td><td data-l="Холбоос">'+esc(f.ref||'')+'</td>'+
+        '<td data-l="Тайлбар"><div class="clip">'+esc(f.text||'')+'</div></td><td data-l="Данс">'+ACC[f.acc]+'</td>'+
+        '<td data-l="Орлого" class="r num pos">'+(f.amount>0?money(f.amount):'')+'</td><td data-l="Зарлага" class="r num neg">'+(f.amount<0?money(-f.amount):'')+'</td><td data-l="Ажилтан">'+esc(userName(f.by))+'</td></tr>').join('')+
+      '</tbody></table></div>';
+  } else h += '<div class="empty"><p>Энэ өдөр мөнгөн гүйлгээ алга.</p></div>';
+  h += '</div></div>';
+  return h;
+}
+function openOpening(){
+  const op = db.settings.opening || {};
+  const m = openModal({ title:'Кассын эхний үлдэгдэл', body:'<form id="op-form" class="form" novalidate>'+
+    '<p class="lead">Тооцоо эхлэх өдрийн өглөөний бэлэн мөнгө, дансны үлдэгдлийг оруулна. Тэр өдрөөс хойшхи зээл, төлөлт, гүйлгээгээр касс автоматаар бодогдоно.</p>'+
+    '<div class="field"><label for="op-date" class="req">Эхлэх өдөр</label><input type="date" id="op-date" value="'+esc(op.date||todayISO())+'"></div>'+
+    '<div class="grid2"><div class="field"><label for="op-cash">Бэлэн мөнгө, ₮</label><input type="text" inputmode="numeric" class="money" id="op-cash" value="'+(op.cash?num(op.cash):'')+'" placeholder="0"></div>'+
+    '<div class="field"><label for="op-bank">Дансны үлдэгдэл, ₮</label><input type="text" inputmode="numeric" class="money" id="op-bank" value="'+(op.bank?num(op.bank):'')+'" placeholder="0"></div></div></form>',
+    foot:'<button class="btn" data-dismiss>Болих</button><button class="btn btn-primary" type="submit" form="op-form">Хадгалах</button>' });
+  const f = m.el; bindMoney(f);
+  $('#op-form',f).addEventListener('submit', e=>{
+    e.preventDefault();
+    const d = $('#op-date',f).value; if(!isISO(d)) return fieldErr($('#op-date',f),'Огноог оруулна уу');
+    db.settings.opening = { date:d, cash:parseMoney($('#op-cash',f).value), bank:parseMoney($('#op-bank',f).value) };
+    closeModal(m); changed(); toast('Эхний үлдэгдлийг хадгаллаа');
+  });
+}
+
+/* ================= Тайлан ================= */
+function monthStart(iso){ return iso.slice(0,8)+'01'; }
+function monthEnd(iso){ const p=iso.split('-').map(Number); const x=new Date(Date.UTC(p[0], p[1], 0)); return x.toISOString().slice(0,10); }
+function repRange(){
+  const T = todayISO(), r = ui.rep;
+  const wd = (new Date(toUTC(T)).getUTCDay()+6)%7;
+  switch(r.preset){
+    case 'today': return [T, T];
+    case 'week': return [addDays(T,-wd), addDays(T,6-wd)];
+    case 'prev': { const pm = addDays(monthStart(T), -1); return [monthStart(pm), monthEnd(pm)]; }
+    case 'year': return [T.slice(0,4)+'-01-01', T.slice(0,4)+'-12-31'];
+    case 'custom': return [isISO(r.from)?r.from:monthStart(T), isISO(r.to)?r.to:T];
+    default: return [monthStart(T), monthEnd(T)];
+  }
+}
+function computeReport(from, to){
+  const inR = d => d>=from && d<=to;
+  const R = { issuedN:0, issuedSum:0, redeemedN:0, forfeitedN:0, forfeitedSum:0, extN:0, interest:0, principal:0, over:0, income:0, expense:0, incomeBy:{}, expenseBy:{}, staff:{} };
+  const st = u=>{ const k=u||'—'; return R.staff[k] = R.staff[k] || {issuedN:0, issuedSum:0, payN:0, paySum:0}; };
+  for(const l of db.loans){
+    const x = calc(l);
+    if(inR(l.startDate)){ R.issuedN++; R.issuedSum += +l.principal||0; const s=st(l.by); s.issuedN++; s.issuedSum += +l.principal||0; }
+    for(const e of l.events){
+      if(!inR(e.date)) continue;
+      if(e.type==='payment'){ const a=x.alloc[e.id]||{i:0,p:0,o:0}; R.interest+=a.i; R.principal+=a.p; R.over+=a.o; const s=st(e.by); s.payN++; s.paySum += +e.amount||0; }
+      else if(e.type==='redeem') R.redeemedN++;
+      else if(e.type==='forfeit'){ R.forfeitedN++; R.forfeitedSum += +e.remaining||0; }
+      else if(e.type==='extend') R.extN++;
+    }
+  }
+  for(const t of db.txns){
+    if(!inR(t.date)) continue;
+    if(t.type==='income'){ R.income += +t.amount||0; R.incomeBy[t.category] = (R.incomeBy[t.category]||0) + (+t.amount||0); }
+    if(t.type==='expense'){ R.expense += +t.amount||0; R.expenseBy[t.category] = (R.expenseBy[t.category]||0) + (+t.amount||0); }
+  }
+  R.profit = R.interest + R.over + R.income - R.expense;
+  return R;
+}
+function portfolio(){
+  const T = todayISO(), P = { n:{normal:0, overdue:0, bad:0}, bal:{normal:0, overdue:0, bad:0}, acc:0, est:0, cats:{} , forfeitedN:0, forfeitedEst:0};
+  for(const l of db.loans){
+    const x = calc(l,T);
+    if(l.status==='forfeited'){ P.forfeitedN++; P.forfeitedEst += estTotal(l); continue; }
+    if(l.status!=='active') continue;
+    const tab = tabOf(l,x);
+    P.n[tab]++; P.bal[tab] += x.bal; P.acc += x.acc; P.est += estTotal(l);
+    const first = ((l.items||[])[0]||{}).category || 'other';
+    const c = P.cats[first] = P.cats[first] || {n:0, bal:0};
+    c.n++; c.bal += x.bal;
+  }
+  return P;
+}
+function viewReports(){
+  const [from, to] = repRange(), R = computeReport(from, to), P = portfolio(), r = ui.rep;
+  const kv = (k,v,cls)=>'<div class="kv'+(cls?' '+cls:'')+'"><span>'+k+'</span><b>'+v+'</b></div>';
+  const PRE = [['today','Өнөөдөр'],['week','Энэ долоо хоног'],['month','Энэ сар'],['prev','Өмнөх сар'],['year','Энэ жил'],['custom','Огноо сонгох']];
+  let h = '<div class="wrap"><header class="page-head"><div><h1>Тайлан</h1><p class="sub">'+fmtDate(from)+' – '+fmtDate(to)+'</p></div>'+
+    '<div class="head-btns"><button class="btn" data-act="export-report">'+ic('download')+'Excel</button></div></header>'+
+    '<div class="presets" style="margin-bottom:18px">'+PRE.map(p=>'<button class="chip'+(r.preset===p[0]?' on':'')+'" data-act="rep-preset" data-f="'+p[0]+'">'+p[1]+'</button>').join('')+
+    (r.preset==='custom'?'<input type="date" id="rep-from" value="'+from+'" aria-label="Эхлэх огноо" style="width:auto"><input type="date" id="rep-to" value="'+to+'" aria-label="Дуусах огноо" style="width:auto">':'')+'</div>'+
+    '<div class="rgrid">'+
+      '<section class="panel"><h2>Ашиг</h2>'+kv('Хүүгийн орлого', money(R.interest))+(R.over?kv('Илүү төлөлт', money(R.over)):'')+kv('Бусад орлого', money(R.income))+kv('Зардал', (R.expense?'−':'')+num(R.expense)+'₮')+kv('Цэвэр ашиг', money(R.profit), 'total')+
+        '<p class="hint" style="margin-top:8px">Хураасан барьцааг зарсан орлогыг Бусад гүйлгээ хэсэгт "Барьцаа борлуулалт" ангиллаар бүртгэнэ.</p></section>'+
+      '<section class="panel"><h2>Зээл</h2>'+kv('Олгосон зээл', R.issuedN+' ш, '+money(R.issuedSum))+kv('Эргэн төлөгдсөн үндсэн зээл', money(R.principal))+kv('Төлж хаасан', R.redeemedN+' ш')+kv('Сунгалт', R.extN+' удаа')+kv('Хураасан', R.forfeitedN+' ш, үлдэгдэл '+money(R.forfeitedSum))+'</section>'+
+      '<section class="panel"><h2>Зардал ангиллаар</h2>'+(Object.keys(R.expenseBy).length?Object.entries(R.expenseBy).sort((a,b)=>b[1]-a[1]).map(e=>kv(esc(e[0]), money(e[1]))).join('')+kv('Нийт', money(R.expense),'total'):'<p class="sub">Энэ хугацаанд зардал бүртгээгүй.</p>')+
+        (Object.keys(R.incomeBy).length?'<h2 style="margin-top:16px">Бусад орлого</h2>'+Object.entries(R.incomeBy).map(e=>kv(esc(e[0]), money(e[1]))).join(''):'')+'</section>'+
+      '<section class="panel"><h2>Ажилтнаар</h2>'+(Object.keys(R.staff).length?'<div class="tbl-wrap"><table class="dt"><thead><tr><th>Ажилтан</th><th class="r">Олгосон</th><th class="r">Дүн</th><th class="r">Хүлээн авсан төлөлт</th></tr></thead><tbody>'+
+        Object.entries(R.staff).map(([u,s])=>'<tr><td>'+esc(u==='—'?'Тодорхойгүй':userName(u))+'</td><td class="r num">'+s.issuedN+'</td><td class="r num">'+money(s.issuedSum)+'</td><td class="r num">'+money(s.paySum)+'</td></tr>').join('')+'</tbody></table></div>':'<p class="sub">Энэ хугацаанд үйлдэл алга.</p>')+'</section>'+
+    '</div>'+
+    '<div class="rgrid">'+
+      '<section class="panel"><h2>Одоогийн зээлийн багц</h2>'+kv('Хэвийн', P.n.normal+' ш, '+money(P.bal.normal))+kv('Хугацаа хэтэрсэн', P.n.overdue+' ш, '+money(P.bal.overdue))+kv('Муу', P.n.bad+' ш, '+money(P.bal.bad))+
+        kv('Нийт үндсэн үлдэгдэл', money(P.bal.normal+P.bal.overdue+P.bal.bad),'total')+kv('Хуримтлагдсан хүү', money(P.acc))+kv('Барьцааны нийт үнэлгээ', money(P.est))+kv('Хураагдсан барьцаа', P.forfeitedN+' ш, үнэлгээ '+money(P.forfeitedEst))+'</section>'+
+      '<section class="panel"><h2>Идэвхтэй зээл ангиллаар</h2>'+(Object.keys(P.cats).length?'<div class="tbl-wrap"><table class="dt"><thead><tr><th>Ангилал</th><th class="r">Тоо</th><th class="r">Үлдэгдэл</th></tr></thead><tbody>'+
+        Object.entries(P.cats).sort((a,b)=>b[1].bal-a[1].bal).map(([id,c])=>'<tr><td><span class="cb">'+esc(catOf(id).name)+'</span></td><td class="r num">'+c.n+'</td><td class="r num">'+money(c.bal)+'</td></tr>').join('')+'</tbody></table></div>':'<p class="sub">Идэвхтэй зээл алга.</p>')+'</section>'+
+    '</div>';
+  // сүүлийн 12 сар
+  const T = todayISO(); const months = [];
+  let ms = monthStart(T);
+  for(let i=0;i<12;i++){ months.push(ms); ms = monthStart(addDays(ms,-1)); }
+  h += '<section class="panel"><div class="sec-head" style="padding:16px 16px 0"><h2>Сүүлийн 12 сар</h2></div><div class="tbl-wrap"><table class="dt cards"><thead><tr><th>Сар</th><th class="r">Олгосон зээл</th><th class="r">Хүүгийн орлого</th><th class="r">Бусад орлого</th><th class="r">Зардал</th><th class="r">Цэвэр ашиг</th></tr></thead><tbody>'+
+    months.map(m0=>{ const M = computeReport(m0, monthEnd(m0)); return '<tr><td class="main" data-l="Сар">'+m0.slice(0,7).replace('-','.')+'</td><td class="r num" data-l="Олгосон">'+M.issuedN+' ш, '+money(M.issuedSum)+'</td><td class="r num" data-l="Хүү">'+money(M.interest+M.over)+'</td><td class="r num" data-l="Бусад орлого">'+money(M.income)+'</td><td class="r num" data-l="Зардал">'+money(M.expense)+'</td><td class="r num" data-l="Ашиг"><b class="'+(M.profit<0?'neg':'')+'">'+money(M.profit)+'</b></td></tr>'; }).join('')+
+    '</tbody></table></div></section></div>';
+  return h;
+}
+function exportReport(){
+  const [from, to] = repRange(), R = computeReport(from, to), P = portfolio();
+  const rows = [['Хугацаа', from+' - '+to], [], ['Хүүгийн орлого', R.interest], ['Илүү төлөлт', R.over], ['Бусад орлого', R.income], ['Зардал', R.expense], ['Цэвэр ашиг', R.profit], [],
+    ['Олгосон зээл (тоо)', R.issuedN], ['Олгосон зээл (дүн)', R.issuedSum], ['Эргэн төлөгдсөн үндсэн зээл', R.principal], ['Төлж хаасан', R.redeemedN], ['Сунгалт', R.extN], ['Хураасан', R.forfeitedN], ['Хураах үеийн үлдэгдэл', R.forfeitedSum], [],
+    ['Зардал ангиллаар']].concat(Object.entries(R.expenseBy)).concat([[], ['Ажилтан','Олгосон тоо','Олгосон дүн','Хүлээн авсан төлөлт']]).concat(Object.entries(R.staff).map(([u,s])=>[userName(u), s.issuedN, s.issuedSum, s.paySum]))
+    .concat([[], ['Одоогийн багц','Тоо','Үлдэгдэл'], ['Хэвийн', P.n.normal, P.bal.normal], ['Хугацаа хэтэрсэн', P.n.overdue, P.bal.overdue], ['Муу', P.n.bad, P.bal.bad]]);
+  csvDownload('tailan-'+from+'-'+to+'.csv', ['Үзүүлэлт','Утга'], rows);
+}
+
+/* ================= Хар жагсаалт ================= */
+function filteredBl(){
+  const u = ui.bl, q = u.q.trim().toLowerCase();
+  let rows = db.blacklist.slice();
+  if(u.status!=='all') rows = rows.filter(b=>(b.status||'active')===u.status);
+  if(u.cat) rows = rows.filter(b=>b.category===u.cat);
+  if(q) rows = rows.filter(b=>[b.regNo, b.name, b.category, b.note, userName(b.by)].join(' ').toLowerCase().includes(q));
+  rows.sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
+  return rows;
+}
+function viewBlacklist(){
+  const u = ui.bl;
+  return '<div class="wrap"><header class="page-head"><div><h1>Хар жагсаалт</h1><p class="sub">Муу зээлдэгч, хулгай, луйврын бүртгэл. Зээл бичихэд автоматаар анхааруулна.</p></div>'+
+    '<div class="head-btns"><button class="btn" data-act="export-bl">'+ic('download')+'Excel</button><button class="btn btn-primary" data-act="new-bl">'+ic('plus')+'Нэмэх</button></div></header>'+
+    '<div class="filters"><label class="search">'+ic('search')+'<input type="search" id="bl-q" placeholder="Регистр, нэр, тайлбар" aria-label="Хар жагсаалтаас хайх" value="'+esc(u.q)+'"></label>'+
+      '<select id="bl-cat" aria-label="Ангилал"><option value="">Бүх ангилал</option>'+BL_CATS.map(c=>'<option'+(c===u.cat?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select>'+
+      '<select id="bl-status" aria-label="Төлөв"><option value="active"'+(u.status==='active'?' selected':'')+'>Идэвхтэй</option><option value="inactive"'+(u.status==='inactive'?' selected':'')+'>Идэвхгүй</option><option value="all"'+(u.status==='all'?' selected':'')+'>Бүгд</option></select></div>'+
+    '<div class="panel" id="bl-list"></div></div>';
+}
+function renderBlList(){
+  const box = $('#bl-list'); if(!box) return;
+  const u = ui.bl, rows = filteredBl();
+  if(!rows.length){ box.innerHTML = '<div class="empty"><p>'+(u.q||u.cat?'Хайлтад тохирох бичлэг алга.':'Хар жагсаалт хоосон байна.')+'</p><button class="btn btn-primary sm" data-act="new-bl">'+ic('plus')+'Нэмэх</button></div>'; return; }
+  const pages = Math.max(1, Math.ceil(rows.length/u.size)); if(u.page>pages) u.page = pages;
+  box.innerHTML = '<div class="tbl-wrap"><table class="dt cards"><thead><tr><th>Регистр</th><th>Нэр</th><th>Ангилал</th><th>Тайлбар</th><th>Хэрэглэгч</th><th>Огноо</th><th>Төлөв</th></tr></thead><tbody>'+
+    rows.slice((u.page-1)*u.size, u.page*u.size).map(b=>'<tr data-act="open-bl" data-id="'+b.id+'">'+
+      '<td class="main" data-l="Регистр">'+esc(b.regNo||'')+'</td><td data-l="Нэр">'+esc(b.name||'')+'</td><td data-l="Ангилал">'+esc(b.category||'')+'</td>'+
+      '<td data-l="Тайлбар"><div class="clip">'+esc(b.note||'')+'</div></td><td data-l="Хэрэглэгч">'+esc(userName(b.by))+'</td>'+
+      '<td data-l="Огноо" class="num">'+(b.createdAt?fmtStamp(Date.parse(b.createdAt)):'')+'</td>'+
+      '<td data-l="Төлөв">'+(b.status==='inactive'?'<span class="badge b-forfeited">Идэвхгүй</span>':'<span class="badge b-redeemed">Идэвхтэй</span>')+'</td></tr>').join('')+
+    '</tbody></table></div>'+pagerHTML('bl', rows.length, u.page, u.size);
+}
+function exportBl(){
+  csvDownload('har-jagsaalt-'+todayISO()+'.csv', ['Регистр','Нэр','Ангилал','Тайлбар','Хэрэглэгч','Огноо','Төлөв'],
+    filteredBl().map(b=>[b.regNo, b.name, b.category, b.note, userName(b.by), b.createdAt?fmtStamp(Date.parse(b.createdAt)):'', b.status==='inactive'?'Идэвхгүй':'Идэвхтэй']));
+}
+function openBlForm(opts){
+  opts = opts || {};
+  const b = opts.id ? db.blacklist.find(x=>x.id===opts.id) : null, v = b || {regNo:opts.regNo||'', name:opts.name||'', category:BL_CATS[0], status:'active'};
+  const body = '<form id="bl-form" class="form" novalidate>'+
+    '<div class="grid2"><div class="field"><label for="bf-reg" class="req">Регистрийн дугаар</label><input type="text" id="bf-reg" value="'+esc(v.regNo||'')+'" placeholder="УБ00000000" autocapitalize="characters"></div>'+
+    '<div class="field"><label for="bf-name">Нэр</label><input type="text" id="bf-name" value="'+esc(v.name||'')+'" placeholder="Овог нэр"></div></div>'+
+    '<div class="grid2"><div class="field"><label for="bf-cat">Ангилал</label><select id="bf-cat">'+BL_CATS.map(c=>'<option'+(c===v.category?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select></div>'+
+    (b?'<div class="field"><label for="bf-status">Төлөв</label><select id="bf-status"><option value="active"'+(v.status!=='inactive'?' selected':'')+'>Идэвхтэй</option><option value="inactive"'+(v.status==='inactive'?' selected':'')+'>Идэвхгүй</option></select></div>':'<div></div>')+'</div>'+
+    '<div class="field"><label for="bf-note" class="req">Тайлбар</label><textarea id="bf-note" rows="3" placeholder="Юу болсон, хэзээ, хэдэн төгрөгийн хохиролтой гэх мэт">'+esc(v.note||'')+'</textarea></div>'+
+  '</form>';
+  const m = openModal({ title: b ? 'Хар жагсаалтын бичлэг' : 'Хар жагсаалтад нэмэх', body,
+    foot:(b&&isAdmin()?'<button class="btn btn-ghost danger" type="button" data-act="del-bl" data-id="'+b.id+'" style="margin-right:auto">'+ic('trash')+'Устгах</button>':'')+
+      '<button class="btn" data-dismiss>Болих</button><button class="btn btn-primary" type="submit" form="bl-form">'+(b?'Хадгалах':'Нэмэх')+'</button>' });
+  const f = m.el;
+  setTimeout(()=>{ $(v.regNo?'#bf-note':'#bf-reg',f).focus(); }, 30);
+  $('#bl-form',f).addEventListener('submit', e=>{
+    e.preventDefault();
+    const reg = normReg($('#bf-reg',f).value), note = $('#bf-note',f).value.trim();
+    if(!reg) return fieldErr($('#bf-reg',f),'Регистрийн дугаарыг оруулна уу');
+    if(!note) return fieldErr($('#bf-note',f),'Тайлбар бичнэ үү');
+    const dup = db.blacklist.find(x=>normReg(x.regNo)===reg && x.status!=='inactive' && (!b || x.id!==b.id));
+    if(dup) return fieldErr($('#bf-reg',f),'Энэ РД хар жагсаалтад идэвхтэй бүртгэлтэй байна');
+    const rec = { regNo:reg, name:$('#bf-name',f).value.trim(), category:$('#bf-cat',f).value, note };
+    if(b){ rec.status = $('#bf-status',f).value; Object.assign(b, rec); }
+    else db.blacklist.push(Object.assign({id:uid(), status:'active', createdAt:new Date().toISOString(), by:me?me.username:''}, rec));
+    closeModal(m); changed(); toast(b ? 'Хадгаллаа' : reg+' хар жагсаалтад нэмэгдлээ');
+  });
+}
+
+/* ================= Засварын түүх ================= */
+const AUDIT_KINDS = [['','Бүх төрөл'],['loan','Зээл'],['customer','Харилцагч'],['txn','Гүйлгээ'],['blacklist','Хар жагсаалт'],['settings','Тохиргоо'],['user','Хэрэглэгч'],['system','Систем']];
+function viewAudit(){
+  const u = ui.audit;
+  return '<div class="wrap"><header class="page-head"><div><h1>Засварын түүх</h1><p class="sub">Хэн, хэзээ, юуг бүртгэж, өөрчилсөн</p></div>'+
+    '<div class="head-btns"><button class="btn" data-act="export-audit">'+ic('download')+'Excel</button></div></header>'+
+    '<div class="filters"><label class="search">'+ic('search')+'<input type="search" id="audit-q" placeholder="Тайлбараас хайх (жишээ нь: №5119, Утасны)" aria-label="Тайлбараас хайх" value="'+esc(u.q)+'"></label>'+
+      '<select id="audit-kind" aria-label="Төрөл">'+AUDIT_KINDS.map(k=>'<option value="'+k[0]+'"'+(k[0]===u.kind?' selected':'')+'>'+k[1]+'</option>').join('')+'</select>'+
+      '<select id="audit-user" aria-label="Хэрэглэгч"><option value="">Бүх хэрэглэгч</option>'+users.map(x=>'<option value="'+esc(x.username)+'"'+(x.username===u.user?' selected':'')+'>'+esc(x.name||x.username)+'</option>').join('')+'</select>'+
+      '<input type="date" id="audit-from" value="'+esc(u.from)+'" aria-label="Эхлэх огноо"><input type="date" id="audit-to" value="'+esc(u.to)+'" aria-label="Дуусах огноо"></div>'+
+    '<div class="panel" id="audit-list"><div class="empty"><div class="spin"></div></div></div></div>';
+}
+function auditQuery(limit, offset){
+  const u = ui.audit, p = new URLSearchParams({limit:String(limit), offset:String(offset)});
+  if(u.kind) p.set('kind', u.kind); if(u.user) p.set('user', u.user); if(isISO(u.from)) p.set('from', u.from); if(isISO(u.to)) p.set('to', u.to); if(u.q.trim()) p.set('q', u.q.trim());
+  return api('/api/audit?'+p.toString());
+}
+let auditSeq = 0;
+async function loadAudit(){
+  const box = $('#audit-list'); if(!box) return;
+  const u = ui.audit, my = ++auditSeq;
+  try{
+    const r = await auditQuery(u.size, (u.page-1)*u.size);
+    if(my!==auditSeq || !$('#audit-list')) return;
+    const K = Object.fromEntries(AUDIT_KINDS);
+    if(!r.rows.length){ box.innerHTML = '<div class="empty"><p>Бичлэг олдсонгүй.</p></div>'; return; }
+    box.innerHTML = '<div class="tbl-wrap"><table class="dt cards"><thead><tr><th>Тайлбар</th><th>Төрөл</th><th>Хэрэглэгч</th><th>Огноо</th></tr></thead><tbody>'+
+      r.rows.map(a=>'<tr><td class="main" style="white-space:normal">'+esc(a.text)+'</td><td data-l="Төрөл">'+esc(K[a.kind]||a.kind||'')+'</td><td data-l="Хэрэглэгч">'+esc(userName(a.username))+'</td><td data-l="Огноо" class="num">'+fmtStamp(a.at)+'</td></tr>').join('')+
+      '</tbody></table></div>'+pagerHTML('audit', r.total, u.page, u.size);
+  }catch(e){ if(my===auditSeq && $('#audit-list')) box.innerHTML = '<div class="empty"><p>Ачаалж чадсангүй: '+esc(e.message)+'</p></div>'; handleApiError(e,false); }
+}
+async function exportAudit(){
+  try{
+    const r = await auditQuery(200, 0);
+    const K = Object.fromEntries(AUDIT_KINDS);
+    csvDownload('zasvaryn-tuuh-'+todayISO()+'.csv', ['Тайлбар','Төрөл','Хэрэглэгч','Огноо'], r.rows.map(a=>[a.text, K[a.kind]||a.kind, userName(a.username), fmtStamp(a.at)]));
+  }catch(e){ handleApiError(e,false); toast('Татаж чадсангүй','err'); }
+}
+
+/* ================= Хэрэглэгч (зөвхөн админ) ================= */
+const ROLE_T = {admin:'Админ', staff:'Ажилтан'};
+function viewUsers(){
+  return '<div class="wrap narrow"><header class="page-head"><div><h1>Хэрэглэгч</h1><p class="sub">Ажилтан бүр өөрийн нэр, нууц үгээр нэвтэрнэ. Засварын түүх, гүйлгээ дээр хэн хийсэн нь харагдана.</p></div>'+
+    '<div class="head-btns"><button class="btn btn-primary" data-act="new-user">'+ic('plus')+'Хэрэглэгч нэмэх</button></div></header>'+
+    '<div class="panel" id="user-list"><div class="empty"><div class="spin"></div></div></div>'+
+    '<section class="panel pad" style="margin-top:18px"><h2>Эрхийн ялгаа</h2><p><b>Ажилтан:</b> харилцагч, зээл, төлөлт, сунгалт, хураалт, гүйлгээ, хар жагсаалт бүртгэж засна. Касс, тайлан, засварын түүхийг харна.</p>'+
+    '<p><b>Админ:</b> дээрхээс гадна зээл, харилцагч, гүйлгээ устгах, тохиргоо, ангилал, SMS, эхний үлдэгдэл, хэрэглэгч удирдах, нөөцөөс сэргээх.</p></section></div>';
+}
+let userCache = [];
+async function loadUsers(){
+  const box = $('#user-list'); if(!box) return;
+  try{
+    userCache = (await api('/api/users')).users;
+    if(!$('#user-list')) return;
+    box.innerHTML = '<div class="tbl-wrap"><table class="dt cards"><thead><tr><th>Нэр</th><th>Нэвтрэх нэр</th><th>Эрх</th><th>Төлөв</th><th>Сүүлд нэвтэрсэн</th></tr></thead><tbody>'+
+      userCache.map(u=>'<tr data-act="open-user" data-id="'+u.id+'"><td class="main">'+esc(u.name||u.username)+(me&&u.id===me.id?' <span class="muted">(та)</span>':'')+'</td><td data-l="Нэвтрэх нэр">'+esc(u.username)+'</td>'+
+        '<td data-l="Эрх"><span class="badge '+(u.role==='admin'?'b-active':'b-forfeited')+'">'+ROLE_T[u.role]+'</span></td>'+
+        '<td data-l="Төлөв">'+(u.active?'<span class="badge b-redeemed">Идэвхтэй</span>':'<span class="badge b-overdue">Хаагдсан</span>')+'</td>'+
+        '<td data-l="Сүүлд нэвтэрсэн" class="num">'+(u.lastLogin?fmtStamp(u.lastLogin):'—')+'</td></tr>').join('')+'</tbody></table></div>';
+  }catch(e){ if($('#user-list')) box.innerHTML = '<div class="empty"><p>Ачаалж чадсангүй: '+esc(e.message)+'</p></div>'; handleApiError(e,false); }
+}
+function openUserForm(u){
+  const body = '<form id="user-form" class="form" novalidate>'+
+    '<div class="field"><label for="uf-name" class="req">Нэр</label><input type="text" id="uf-name" value="'+esc(u?u.name:'')+'" placeholder="Жишээ нь: Батаа"></div>'+
+    (u ? '<div class="field"><span class="lbl">Нэвтрэх нэр</span><b>'+esc(u.username)+'</b></div>'
+       : '<div class="field"><label for="uf-user" class="req">Нэвтрэх нэр (латинаар)</label><input type="text" id="uf-user" autocapitalize="off" spellcheck="false" placeholder="Жишээ нь: bataa"><span class="hint">3-32 латин жижиг үсэг, тоо, цэг, зураас</span></div>')+
+    '<div class="field"><label for="uf-role">Эрх</label><select id="uf-role"><option value="staff"'+(!u||u.role==='staff'?' selected':'')+'>Ажилтан</option><option value="admin"'+(u&&u.role==='admin'?' selected':'')+'>Админ</option></select></div>'+
+    '<div class="field"><label for="uf-pass"'+(u?'':' class="req"')+'>'+(u?'Шинэ нууц үг (солих бол)':'Нууц үг')+'</label><input type="text" id="uf-pass" autocomplete="off" placeholder="6-аас дээш тэмдэгт"><span class="hint">Ажилтанд өгөөд, өөрөө Тохиргоо хэсгээс солихыг хэлээрэй.</span></div>'+
+    (u && !(me&&u.id===me.id) ? '<label class="check"><input type="checkbox" id="uf-active"'+(u.active?' checked':'')+'><span>Идэвхтэй (унтраавал энэ хэрэглэгч нэвтэрч чадахгүй)</span></label>' : '')+
+  '</form>';
+  const m = openModal({ title: u ? 'Хэрэглэгч засах' : 'Хэрэглэгч нэмэх', body,
+    foot:'<button class="btn" data-dismiss>Болих</button><button class="btn btn-primary" type="submit" form="user-form">'+(u?'Хадгалах':'Нэмэх')+'</button>' });
+  const f = m.el;
+  setTimeout(()=>$('#uf-name',f).focus(), 30);
+  $('#user-form',f).addEventListener('submit', async e=>{
+    e.preventDefault();
+    const name = $('#uf-name',f).value.trim(), pass = $('#uf-pass',f).value, role = $('#uf-role',f).value;
+    if(!name) return fieldErr($('#uf-name',f),'Нэрийг оруулна уу');
+    if(!u && !/^[a-z0-9._-]{3,32}$/.test($('#uf-user',f).value.trim().toLowerCase())) return fieldErr($('#uf-user',f),'Нэвтрэх нэр 3-32 латин үсэг, тоо байна');
+    if((!u || pass) && pass.length<6) return fieldErr($('#uf-pass',f),'Нууц үг дор хаяж 6 тэмдэгт байна');
+    const btn = f.querySelector('.m-foot .btn-primary'); btn.disabled = true;
+    try{
+      if(u){ const body={name, role}; if(pass) body.password=pass; const a=$('#uf-active',f); if(a) body.active=a.checked; await api('/api/users/'+u.id, {method:'PUT', body}); }
+      else await api('/api/users', {method:'POST', body:{name, username:$('#uf-user',f).value.trim().toLowerCase(), role, password:pass}});
+      closeModal(m); toast(u ? 'Хадгаллаа' : name+' нэмэгдлээ');
+      try{ const d = await api('/api/data'); users = d.users||users; }catch(err){}
+      loadUsers();
+    }catch(err){ btn.disabled = false; toast(err.message,'err',5000); }
+  });
+}
 
 /* ================= Зээлийн дэлгэрэнгүй ================= */
 function loanDetail(id){
   const l = loanById(id); if(!l) return null;
   const c = custById(l.customerId), T = todayISO(), x = calc(l,T), act = l.status==='active';
-  const it = l.item||{}, cat = catOf(it.category);
+  const items = l.items||[], est = estTotal(l);
   let owedLabel, owedVal;
   if(act){ owedLabel='Өнөөдөр хаахад төлөх'; owedVal=x.owed; }
   else if(l.status==='redeemed'){ owedLabel='Нийт төлсөн'; owedVal=x.paid; }
   else { owedLabel='Хураах үеийн өр'; owedVal=x.owed; }
-  let h = '<div class="ticket big st-'+x.state+'">'+
+  const bl = c && blacklistHit(c.regNo);
+  let h = (bl ? '<div class="bl-warn" style="margin-bottom:14px"><b>Хар жагсаалтад бүртгэлтэй харилцагч:</b> '+esc(bl.category)+(bl.note?'. '+esc(bl.note):'')+'</div>' : '')+
+    '<div class="ticket big st-'+x.state+'">'+
     '<div class="stub"><span class="tno">'+tno(l)+'</span><span class="stub-due">'+(act?'Дуусах':'Хаагдсан')+'<b>'+fmtDate(act?x.due:l.closedDate)+'</b></span></div>'+
     '<div class="tbody">'+
       '<div class="t-top"><div class="who">'+(c?'<button class="link" data-act="open-customer" data-id="'+c.id+'">'+esc(fullName(c))+'</button>':'<b>Устгагдсан харилцагч</b>')+(c&&c.phone?'<span>'+esc(c.phone)+'</span>':'')+(c&&c.regNo?'<span>РД '+esc(c.regNo)+'</span>':'')+'</div>'+badge(x.state)+'</div>'+
-      '<div class="what"><span class="cat">'+esc(cat.name)+(it.serial?', '+esc(it.serial):'')+'</span><b>'+esc(itemLine(l))+'</b></div>'+
+      '<div class="what">'+(items.length ? items.map(i=>'<div><span class="cb">'+esc(catOf(i.category).name)+'</span> <b>'+esc(itemText(i))+'</b>'+(i.serial?' <span class="muted">'+esc(i.serial)+'</span>':'')+(i.est&&items.length>1?' <span class="muted">'+money(i.est)+'</span>':'')+'</div>').join('') : '<span class="muted">Барьцаа бүртгэгдээгүй</span>')+'</div>'+
       '<div class="owed-line"><span>'+owedLabel+'</span><b>'+money(owedVal)+'</b></div>'+
     '</div></div>';
   if(act){
@@ -1262,9 +2117,9 @@ function loanDetail(id){
   h += '<div class="actions-2"><button class="btn btn-ghost sm" data-act="print" data-id="'+l.id+'">'+ic('print')+'Тасалбар хэвлэх</button>'+
     '<button class="btn btn-ghost sm" data-act="edit-loan" data-id="'+l.id+'">'+ic('edit')+'Засах</button>'+
     (act?'<button class="btn btn-ghost sm" data-act="forfeit" data-id="'+l.id+'">'+ic('lock')+'Барьцаа хураах</button>':'<button class="btn btn-ghost sm" data-act="reopen" data-id="'+l.id+'">'+ic('undo')+'Дахин нээх</button>')+
-    '<button class="btn btn-ghost sm danger" data-act="del-loan" data-id="'+l.id+'">'+ic('trash')+'Устгах</button></div>';
+    (isAdmin()?'<button class="btn btn-ghost sm danger" data-act="del-loan" data-id="'+l.id+'">'+ic('trash')+'Устгах</button>':'')+'</div>';
 
-  h += '<div class="pgs"><div><div class="pg-head"><span>Хугацааны явц</span><b class="'+(x.state==='overdue'?'red':'')+'">'+esc(dueText(x))+'</b></div>'+
+  h += '<div class="pgs"><div><div class="pg-head"><span>Хугацааны явц</span><b class="'+(late(x)?'red':'')+'">'+esc(dueText(x))+'</b></div>'+
       '<span class="track st-'+x.state+'"><i style="width:'+(x.timePct*100).toFixed(1)+'%"></i></span>'+
       '<div class="pg-scale"><span>'+fmtDate(l.startDate)+' олгосон</span><span>'+(act?(Math.max(0,x.elapsed))+' / '+x.term+' хоног':x.elapsed+' хоног')+'</span><span>'+fmtDate(x.due)+' дуусах</span></div></div>'+
     '<div><div class="pg-head"><span>Үндсэн зээлийн төлөлт</span><b>'+Math.round(x.payPct*100)+'%</b></div>'+
@@ -1273,15 +2128,15 @@ function loanDetail(id){
 
   const ext = l.events.filter(e=>e.type==='extend');
   const figs = [
-    ['Зээлийн дүн', money(l.principal)],
-    ['Барьцааны үнэлгээ', it.est?money(it.est)+(l.principal?' <small>('+Math.round(l.principal/it.est*100)+'%)</small>':''):'—'],
+    ['Зээлийн дүн', money(l.principal)+' <small>('+ACC[l.method||'cash'].toLowerCase()+')</small>'],
+    ['Барьцааны үнэлгээ', est?money(est)+(l.principal?' <small>('+Math.round(l.principal/est*100)+'%)</small>':''):'—'],
     ['Хүү', 'Сарын '+fmtRate(l.rate)+'% <small>(хоногт '+money((+l.principal||0)*(+l.rate||0)/100/30)+')</small>'],
     ['Үндсэн зээлийн үлдэгдэл', money(x.bal)],
     [act?'Хуримтлагдсан хүү':'Хаах үеийн хүү', money(x.acc)],
     ['Төлсөн хүү', money(x.intPaid)],
     ['Нийт төлсөн', money(x.paid)+(x.over?' <small>(илүү '+money(x.over)+')</small>':'')],
-    ['Анхны хугацаа', l.termDays+' хоног'],
-    ['Сунгалт', ext.length?ext.length+' удаа <small>(+'+ext.reduce((s,e)=>s+(+e.days||0),0)+' хоног)</small>':'Сунгаагүй']
+    ['Хугацаа', l.termDays+' хоног'+(ext.length?' <small>(+'+ext.reduce((s,e)=>s+(+e.days||0),0)+' хоног, '+ext.length+' сунгалт)</small>':'')],
+    ['Бичсэн ажилтан', esc(userName(l.by)||'—')]
   ];
   h += '<dl class="figs">'+figs.map(f=>'<div><dt>'+f[0]+'</dt><dd>'+f[1]+'</dd></div>').join('')+'</dl>';
   if(l.note) h += '<div class="note-box">'+esc(l.note)+'</div>';
@@ -1290,14 +2145,15 @@ function loanDetail(id){
   const smsEv = smsInfo.log.filter(r=>r.loan_id===l.id && r.status!=='test').map(r=>({id:'sms'+r.created_at, type:'sms', date:ubDate(r.created_at), at:r.created_at*1000, sms:r}));
   for(const e of sortEvents(l.events.concat(smsEv))){
     let t='', s='';
-    if(e.type==='issue'){ t='Зээл олгосон '+money(l.principal); s='Сарын '+fmtRate(l.rate)+'% хүүтэй, '+l.termDays+' хоногийн хугацаатай'; }
-    else if(e.type==='payment'){ t='Төлөлт '+money(e.amount); const a=x.alloc[e.id]; if(a){ const p=[]; if(a.i) p.push('хүүнд '+money(a.i)); if(a.p) p.push('үндсэн зээлд '+money(a.p)); if(a.o) p.push('илүү төлөлт '+money(a.o)); s=p.join(', '); } }
+    const by = e.type==='issue' ? (e.by||l.by) : e.by;
+    if(e.type==='issue'){ t='Зээл олгосон '+money(l.principal); s='Сарын '+fmtRate(l.rate)+'% хүүтэй, '+l.termDays+' хоногийн хугацаатай, '+ACC[l.method||'cash'].toLowerCase()+'ээр'; }
+    else if(e.type==='payment'){ t='Төлөлт '+money(e.amount)+' ('+ACC[e.method||'cash'].toLowerCase()+')'; const a=x.alloc[e.id]; if(a){ const p=[]; if(a.i) p.push('хүүнд '+money(a.i)); if(a.p) p.push('үндсэн зээлд '+money(a.p)); if(a.o) p.push('илүү төлөлт '+money(a.o)); s=p.join(', '); } }
     else if(e.type==='extend'){ t='Хугацаа '+(e.req||e.days)+' хоногоор сунгасан'; s='Шинэ дуусах огноо '+fmtDate(e.newDue||''); }
     else if(e.type==='redeem'){ t='Төлж хаасан, барьцааг буцаан олгосон'; if(e.remaining>0) s='Хөнгөлөлт '+money(e.remaining); }
     else if(e.type==='forfeit'){ t='Барьцааг хураасан'; if(e.remaining>0) s='Хураах үеийн өр '+money(e.remaining); }
     else if(e.type==='sms'){ const r=e.sms; t = r.status==='sent'?'SMS сануулга илгээсэн':r.status==='skipped'?'SMS илгээгээгүй':'SMS илгээж чадсангүй'; s = r.status==='sent' ? (r.phone+' дугаар руу, '+fmtStamp(r.created_at).slice(11)+' цагт') : (r.info||''); }
     const del = act && (e.type==='payment'||e.type==='extend') ? '<button class="icon-btn sm" data-act="del-event" data-id="'+l.id+'" data-ev="'+e.id+'" aria-label="Энэ бичлэгийг устгах" title="Устгах">'+ic('trash')+'</button>' : '<span></span>';
-    h += '<li class="ev-'+e.type+'"><span class="d">'+fmtDate(e.date)+'</span><span class="dot"></span><span class="what"><b>'+esc(t)+'</b>'+(s?'<span>'+esc(s)+'</span>':'')+(e.note?'<span class="note">'+esc(e.note)+'</span>':'')+'</span>'+del+'</li>';
+    h += '<li class="ev-'+e.type+'"><span class="d">'+fmtDate(e.date)+'</span><span class="dot"></span><span class="what"><b>'+esc(t)+'</b>'+(s?'<span>'+esc(s)+'</span>':'')+(e.note?'<span class="note">'+esc(e.note)+'</span>':'')+(by?'<span>Ажилтан: '+esc(userName(by))+'</span>':'')+'</span>'+del+'</li>';
   }
   if(act){
     const future = x.due > T ? calc(l, x.due).owed : null;
@@ -1316,21 +2172,19 @@ function openLoan(id){
 function openLoanForm(opts){
   opts = opts || {};
   const editing = opts.id ? loanById(opts.id) : null, s = db.settings;
-  const l = editing || { customerId:opts.customerId||'', item:{category:'gold'}, principal:0, rate:s.defaultRate, termDays:s.defaultTerm, startDate:todayISO(), note:'' };
-  const it = l.item || {};
+  const l = editing || { customerId:opts.customerId||'', items:[], principal:0, rate:s.defaultRate, termDays:s.defaultTerm, startDate:todayISO(), note:'', method:'cash' };
+  const firstCat = (cats()[0]||{}).id || 'other';
+  let items = ((l.items&&l.items.length) ? l.items : [{id:uid(), category:firstCat, name:'', serial:'', est:0}]).map(i=>Object.assign({}, i));
   const hasPays = editing && editing.events.some(e=>e.type==='payment');
   const body = '<form id="loan-form" class="form" novalidate>'+
     '<div class="fs-title">Харилцагч</div>'+
     '<div class="field"><label for="lf-cust" class="req">Харилцагч сонгох</label>'+
       '<div class="pick"><input type="search" id="lf-cq" placeholder="Нэр, РД, утсаар шүүх" aria-label="Харилцагч шүүх"><select id="lf-cust"></select></div>'+
       '<div><button type="button" class="btn btn-ghost sm" id="lf-newc" style="margin-left:-10px">'+ic('plus')+'Шинэ харилцагч бүртгэх</button></div></div>'+
+    '<div id="lf-bl"></div>'+
     '<div class="fs-title">Барьцаа хөрөнгө</div>'+
-    '<div class="grid2"><div class="field"><label for="lf-cat">Төрөл</label><select id="lf-cat">'+CATS.map(c=>'<option value="'+c.id+'"'+(it.category===c.id?' selected':'')+'>'+c.name+'</option>').join('')+'</select></div>'+
-      '<div class="field"><label for="lf-name" class="req">Нэр, тодорхойлолт</label><input type="text" id="lf-name" value="'+esc(it.name||'')+'" placeholder="Жишээ нь: Алтан бөгж, iPhone 14 Pro"></div></div>'+
-    '<div class="grid2 metal"><div class="field"><label for="lf-weight">Жин, гр</label><input type="text" inputmode="decimal" id="lf-weight" value="'+esc(it.weight||'')+'"></div>'+
-      '<div class="field"><label for="lf-purity">Сорьц</label><input type="text" id="lf-purity" value="'+esc(it.purity||'')+'" placeholder="585, 750"></div></div>'+
-    '<div class="grid2"><div class="field"><label for="lf-serial">Сериал, IMEI, улсын дугаар</label><input type="text" id="lf-serial" value="'+esc(it.serial||'')+'"></div>'+
-      '<div class="field"><label for="lf-est">Үнэлгээ, ₮</label><input type="text" inputmode="numeric" class="money" id="lf-est" value="'+(it.est?num(it.est):'')+'" placeholder="0"></div></div>'+
+    '<div class="items-ed" id="lf-items"></div>'+
+    '<div><button type="button" class="btn btn-ghost sm" id="lf-additem" style="margin-left:-10px">'+ic('plus')+'Барьцаа нэмэх</button></div>'+
     '<div class="fs-title">Зээл</div>'+
     (hasPays?'<p class="hint">Энэ зээлд төлөлт бүртгэгдсэн тул дүн, хүүг өөрчлөхөд үлдэгдэл дахин бодогдоно.</p>':'')+
     '<div class="grid2"><div class="field"><label for="lf-amt" class="req">Зээлийн дүн, ₮</label><input type="text" inputmode="numeric" class="money" id="lf-amt" value="'+(l.principal?num(l.principal):'')+'" placeholder="0"></div>'+
@@ -1338,73 +2192,119 @@ function openLoanForm(opts){
     '<div class="grid2"><div class="field"><label for="lf-term" class="req">Хугацаа, хоног</label><input type="number" id="lf-term" step="1" min="1" value="'+esc(l.termDays)+'">'+
       '<div class="quick">'+[7,14,30,60,90].map(n=>'<button type="button" data-term="'+n+'">'+n+' хоног</button>').join('')+'</div></div>'+
       '<div class="field"><label for="lf-start" class="req">Олгосон огноо</label><input type="date" id="lf-start" value="'+esc(l.startDate)+'"></div></div>'+
+    '<div class="grid2"><div class="field"><label for="lf-method">Олгосон хэлбэр</label><select id="lf-method"><option value="cash"'+(l.method!=='bank'?' selected':'')+'>Бэлэн</option><option value="bank"'+(l.method==='bank'?' selected':'')+'>Данс</option></select></div><div></div></div>'+
     '<div class="calc" id="lf-calc"></div>'+
     '<div class="field"><label for="lf-note">Тэмдэглэл</label><textarea id="lf-note" rows="2" placeholder="Барьцааны байдал, дагалдах зүйл гэх мэт">'+esc(l.note||'')+'</textarea></div>'+
   '</form>';
-  const m = openModal({ title: editing ? tno(editing)+' тасалбарыг засах' : 'Шинэ зээл бичих', body,
+  const m = openModal({ title: editing ? tno(editing)+' тасалбарыг засах' : 'Шинэ зээл бичих', body, wide:true,
     foot:'<button class="btn" data-dismiss>Болих</button><button class="btn btn-primary" type="submit" form="loan-form">'+(editing?'Өөрчлөлтийг хадгалах':'Зээл бичих')+'</button>' });
   const f = m.el;
   bindMoney(f);
-  const sel=$('#lf-cust',f), cq=$('#lf-cq',f);
+  const sel=$('#lf-cust',f), cq=$('#lf-cq',f), itemsBox=$('#lf-items',f);
   function fillCust(q, selectId){
     q = (q||'').trim().toLowerCase();
     const cur = selectId || sel.value || l.customerId;
     const list = db.customers.filter(c=>!q || custMatch(c,q) || c.id===cur).sort((a,b)=>fullName(a).localeCompare(fullName(b),'mn'));
     sel.innerHTML = '<option value="">'+(db.customers.length?'Сонгоно уу':'Эхлээд харилцагч бүртгэнэ үү')+'</option>'+
-      list.map(c=>'<option value="'+c.id+'">'+esc(fullName(c))+(c.regNo?' ('+esc(c.regNo)+')':c.phone?' ('+esc(c.phone)+')':'')+'</option>').join('');
+      list.map(c=>'<option value="'+c.id+'">'+esc(fullName(c))+(c.regNo?' ('+esc(c.regNo)+')':c.phone?' ('+esc(c.phone)+')':'')+(blacklistHit(c.regNo)?' - хар жагсаалт':'')+'</option>').join('');
     if(cur && list.some(c=>c.id===cur)) sel.value = cur;
     else if(q && list.length===1) sel.value = list[0].id;
+    blCheck();
+  }
+  function blCheck(){
+    const c = custById(sel.value), hit = c && blacklistHit(c.regNo);
+    $('#lf-bl',f).innerHTML = hit ? '<div class="bl-warn"><b>Анхаар: энэ харилцагч хар жагсаалтад бүртгэлтэй.</b> '+esc(hit.category)+(hit.note?'. '+esc(hit.note):'')+'</div>' : '';
+    return hit;
+  }
+  function readItems(){
+    $$('.irow',itemsBox).forEach((row,i)=>{
+      const it = items[i]; if(!it) return;
+      it.category = $('.icat',row).value; it.name = $('.iname',row).value; it.est = parseMoney($('.iest',row).value); it.serial = $('.iserial',row).value;
+      const w=$('.iweight',row), p=$('.ipurity',row); it.weight = w ? w.value : (it.weight||''); it.purity = p ? p.value : (it.purity||'');
+    });
+  }
+  function renderItems(){
+    itemsBox.innerHTML = items.map((it,i)=>{
+      const metal = !!catOf(it.category).metal;
+      const known = cats().some(c=>c.id===it.category);
+      return '<div class="irow">'+
+        '<select class="icat" aria-label="Барьцааны ангилал">'+cats().map(c=>'<option value="'+esc(c.id)+'"'+(c.id===it.category?' selected':'')+'>'+esc(c.name)+'</option>').join('')+(known?'':'<option value="'+esc(it.category)+'" selected>'+esc(catOf(it.category).name)+'</option>')+'</select>'+
+        '<input type="text" class="iname" placeholder="Нэр, тодорхойлолт. Жишээ нь: iPhone 14 Pro" value="'+esc(it.name||'')+'" aria-label="Барьцааны нэр">'+
+        '<input type="text" inputmode="numeric" class="money iest" placeholder="Үнэлгээ, ₮" value="'+(it.est?num(it.est):'')+'" aria-label="Үнэлгээ">'+
+        '<button type="button" class="icon-btn sm" data-rm="'+i+'" aria-label="Энэ барьцааг хасах" title="Хасах"'+(items.length<2?' disabled':'')+'>'+ic('x')+'</button>'+
+        '<div class="ext'+(metal?'':' nometal')+'"><input type="text" class="iserial" placeholder="Сериал, IMEI, улсын дугаар" value="'+esc(it.serial||'')+'" aria-label="Сериал">'+
+        (metal?'<input type="text" inputmode="decimal" class="iweight" placeholder="Жин, гр" value="'+esc(it.weight||'')+'" aria-label="Жин, грамм"><input type="text" class="ipurity" placeholder="Сорьц" value="'+esc(it.purity||'')+'" aria-label="Сорьц">':'')+
+        '</div></div>';
+    }).join('');
+    bindMoney(itemsBox);
+    $$('.icat',itemsBox).forEach(x=>x.addEventListener('change',()=>{ readItems(); renderItems(); upd(); }));
+    $$('.iest',itemsBox).forEach(x=>x.addEventListener('input',upd));
+    $$('[data-rm]',itemsBox).forEach(b=>b.addEventListener('click',()=>{ readItems(); items.splice(+b.dataset.rm,1); renderItems(); upd(); }));
   }
   fillCust('', l.customerId);
   cq.addEventListener('input', ()=>fillCust(cq.value));
+  sel.addEventListener('change', blCheck);
   $('#lf-newc',f).addEventListener('click', ()=>openCustomerForm({ onSaved:c=>{ cq.value=''; fillCust('', c.id); sel.classList.remove('bad'); } }));
-  const cat=$('#lf-cat',f);
-  function metal(){ const on=catOf(cat.value).metal; $$('.metal',f).forEach(el=>el.style.display=on?'':'none'); }
-  cat.addEventListener('change', metal); metal();
+  $('#lf-additem',f).addEventListener('click', ()=>{
+    readItems();
+    items.push({id:uid(), category:(items[items.length-1]||{}).category||firstCat, name:'', serial:'', est:0});
+    renderItems(); upd();
+    setTimeout(()=>{ const n=$$('.iname',itemsBox); n[n.length-1].focus(); }, 20);
+  });
   $$('[data-term]',f).forEach(b=>b.addEventListener('click', ()=>{ $('#lf-term',f).value=b.dataset.term; upd(); }));
   function upd(){
-    const P=parseMoney($('#lf-amt',f).value), R=parseRate($('#lf-rate',f).value)||0, N=parseInt($('#lf-term',f).value,10)||0, S=isISO($('#lf-start',f).value)?$('#lf-start',f).value:todayISO(), E=parseMoney($('#lf-est',f).value);
+    const P=parseMoney($('#lf-amt',f).value), R=parseRate($('#lf-rate',f).value)||0, N=parseInt($('#lf-term',f).value,10)||0, S=isISO($('#lf-start',f).value)?$('#lf-start',f).value:todayISO();
+    const E=$$('.iest',itemsBox).reduce((s,x)=>s+parseMoney(x.value),0);
     const daily=P*R/100/30, ti=Math.round(daily*N);
     $('#lf-calc',f).innerHTML =
       '<div><span>Дуусах огноо</span><b>'+(N?fmtDate(addDays(S,N)):'—')+'</b></div>'+
       '<div><span>Хоногийн хүү</span><b>'+money(daily)+'</b></div>'+
       '<div><span>Хугацааны хүү</span><b>'+money(ti)+'</b></div>'+
-      '<div><span>Үнэлгээний харьцаа</span><b>'+(E&&P?Math.round(P/E*100)+'%':'—')+'</b></div>'+
+      '<div><span>Нийт үнэлгээ</span><b>'+(E?money(E)+(P?' ('+Math.round(P/E*100)+'%)':''):'—')+'</b></div>'+
       '<div class="total"><span>Хугацаандаа төлөх нийт дүн</span><b>'+money(P+ti)+'</b></div>';
   }
-  ['lf-amt','lf-rate','lf-term','lf-start','lf-est'].forEach(id=>$('#'+id,f).addEventListener('input',upd));
+  renderItems();
+  ['lf-amt','lf-rate','lf-term','lf-start'].forEach(id=>$('#'+id,f).addEventListener('input',upd));
   upd();
-  setTimeout(()=>{ (sel.value ? $('#lf-name',f) : (db.customers.length? cq : $('#lf-newc',f))).focus(); }, 30);
+  setTimeout(()=>{ (sel.value ? $('.iname',itemsBox) : (db.customers.length? cq : $('#lf-newc',f))).focus(); }, 30);
 
   $('#loan-form',f).addEventListener('submit', async e=>{
     e.preventDefault();
     if(f.dataset.busy) return;
-    const cid=sel.value, name=$('#lf-name',f).value.trim(), P=parseMoney($('#lf-amt',f).value), R=parseRate($('#lf-rate',f).value), N=parseInt($('#lf-term',f).value,10), S=$('#lf-start',f).value;
+    readItems();
+    const cid=sel.value, P=parseMoney($('#lf-amt',f).value), R=parseRate($('#lf-rate',f).value), N=parseInt($('#lf-term',f).value,10), S=$('#lf-start',f).value;
     if(!cid) return fieldErr(sel,'Харилцагч сонгоно уу');
-    if(!name) return fieldErr($('#lf-name',f),'Барьцаа хөрөнгийн нэрийг бичнэ үү');
+    const clean = items.filter(i=>(i.name||'').trim() || +i.est).map(i=>{ const metal=!!catOf(i.category).metal; return {id:i.id||uid(), category:i.category, name:(i.name||'').trim(), serial:(i.serial||'').trim(), est:+i.est||0, weight:metal?String(i.weight||'').trim():'', purity:metal?String(i.purity||'').trim():''}; });
+    const noName = clean.findIndex(i=>!i.name);
+    if(!clean.length || noName>=0){ const rows=$$('.iname',itemsBox); return fieldErr(rows[Math.max(0, noName>=0 ? items.findIndex(i=>!(i.name||'').trim()) : 0)] || rows[0],'Барьцаа хөрөнгийн нэрийг бичнэ үү'); }
     if(!(P>0)) return fieldErr($('#lf-amt',f),'Зээлийн дүнг оруулна уу');
     if(!(R>=0)) return fieldErr($('#lf-rate',f),'Сарын хүүг оруулна уу');
     if(!(N>=1)) return fieldErr($('#lf-term',f),'Хугацааг хоногоор оруулна уу');
     if(!isISO(S)) return fieldErr($('#lf-start',f),'Олгосон огноог оруулна уу');
-    const item = { category:cat.value, name, serial:$('#lf-serial',f).value.trim(), est:parseMoney($('#lf-est',f).value),
-      weight: catOf(cat.value).metal ? $('#lf-weight',f).value.trim() : '', purity: catOf(cat.value).metal ? $('#lf-purity',f).value.trim() : '' };
-    const note = $('#lf-note',f).value.trim();
-    if(editing){
-      Object.assign(editing, {customerId:cid, item, principal:P, rate:R, termDays:N, startDate:S, note});
-      const iss = editing.events.find(e=>e.type==='issue'); if(iss) iss.date = S;
-      closeModal(m); changed(); toast('Өөрчлөлтийг хадгаллаа');
-    } else {
-      // Тасалбарын дугаарыг сервер олгоно, ингэснээр хоёр компьютер нэг дугаар өгөхгүй
-      const btn = f.querySelector('.m-foot .btn-primary'); f.dataset.busy = '1'; btn.disabled = true;
-      let no;
-      try{ no = (await api('/api/ticket', {method:'POST'})).ticketNo; }
-      catch(err){ delete f.dataset.busy; btn.disabled = false; handleApiError(err,false); if(err.status!==401 && err.status!==503) toast('Тасалбарын дугаар авч чадсангүй. Интернэтээ шалгаад дахин оролдоно уу.','err',5000); return; }
-      const loan = { id:uid(), ticketNo:no, customerId:cid, item, principal:P, rate:R, termDays:N, startDate:S, status:'active', closedDate:null, note,
-        createdAt:new Date().toISOString(), events:[{id:uid(), type:'issue', date:S, at:stamp()}] };
-      db.loans.push(loan); db.settings.nextTicket = no+1;
-      closeModal(m); changed(); openLoan(loan.id);
-      toast(tno(loan)+' тасалбар бичигдлээ. Тасалбараа хэвлэж болно.');
+    const note = $('#lf-note',f).value.trim(), method = $('#lf-method',f).value==='bank' ? 'bank' : 'cash';
+    if(!editing && blCheck() && !f.dataset.blOk){
+      confirmBox({ title:'Хар жагсаалтад бүртгэлтэй харилцагч', danger:true, ok:'Тийм, зээл бичих',
+        text:esc(fullName(custById(cid)))+' хар жагсаалтад бүртгэлтэй байна. Зээл олгохдоо итгэлтэй байна уу?',
+        onOk:()=>{ f.dataset.blOk='1'; $('#loan-form',f).requestSubmit(); } });
+      return;
     }
+    if(editing){
+      Object.assign(editing, {customerId:cid, items:clean, principal:P, rate:R, termDays:N, startDate:S, note, method});
+      const iss = editing.events.find(ev=>ev.type==='issue'); if(iss) iss.date = S;
+      closeModal(m); changed(); toast('Өөрчлөлтийг хадгаллаа');
+      return;
+    }
+    // Тасалбарын дугаарыг сервер олгоно, ингэснээр хоёр компьютер нэг дугаар өгөхгүй
+    const btn = f.querySelector('.m-foot .btn-primary'); f.dataset.busy = '1'; btn.disabled = true;
+    let no;
+    try{ no = (await api('/api/ticket', {method:'POST'})).ticketNo; }
+    catch(err){ delete f.dataset.busy; btn.disabled = false; handleApiError(err,false); if(err.status!==401) toast('Тасалбарын дугаар авч чадсангүй. Интернэтээ шалгаад дахин оролдоно уу.','err',5000); return; }
+    const by = me ? me.username : '';
+    const loan = { id:uid(), ticketNo:no, customerId:cid, items:clean, principal:P, rate:R, termDays:N, startDate:S, status:'active', closedDate:null, note, method, by,
+      createdAt:new Date().toISOString(), events:[{id:uid(), type:'issue', date:S, at:stamp(), by}] };
+    db.loans.push(loan); db.settings.nextTicket = no+1;
+    closeModal(m); changed(); openLoan(loan.id);
+    toast(tno(loan)+' тасалбар бичигдлээ. Тасалбараа хэвлэж болно.');
   });
 }
 
@@ -1419,7 +2319,7 @@ function openPayment(id){
       '<div class="quick" id="pf-quick"></div></div></div>'+
     '<div class="calc" id="pf-prev"></div>'+
     '<label class="check"><input type="checkbox" id="pf-close"><span>Энэ төлөлтөөр зээлийг хааж, барьцааг буцаан олгох</span></label>'+
-    '<div class="field"><label for="pf-note">Тэмдэглэл</label><input type="text" id="pf-note" placeholder="Бэлэн, данс гэх мэт"></div>'+
+    '<div class="grid2">'+'<div class="field"><label for="pf-method">Төлбөрийн хэлбэр</label><select id="pf-method"><option value="cash">Бэлэн</option><option value="bank">Данс</option></select></div>'+'<div class="field"><label for="pf-note">Тэмдэглэл</label><input type="text" id="pf-note"></div></div>'+
     '<p class="hint">Төлбөр эхлээд хуримтлагдсан хүүнд, үлдсэн нь үндсэн зээлд орно.</p>'+
   '</form>';
   const m = openModal({ title:tno(l)+': төлөлт бүртгэх', body,
@@ -1448,7 +2348,7 @@ function openPayment(id){
     if(!isISO(D)) return fieldErr(dt,'Огноог оруулна уу');
     if(D<l.startDate) return fieldErr(dt,'Огноо зээл олгосноос өмнө байж болохгүй');
     if(!(A>0)) return fieldErr(amt,'Төлсөн дүнг оруулна уу');
-    opPay(l, D, A, $('#pf-note',f).value.trim());
+    opPay(l, D, A, $('#pf-note',f).value.trim(), $('#pf-method',f).value);
     if(cl.checked) opClose(l, D, 'redeem', '');
     closeModal(m); changed();
     toast(cl.checked ? tno(l)+' зээл хаагдлаа. Барьцааг буцаан олгоно уу.' : 'Төлөлт '+money(A)+' бүртгэгдлээ');
@@ -1466,7 +2366,7 @@ function openExtend(id){
     '<div class="field"><label for="ef-date" class="req">Огноо</label><input type="date" id="ef-date" value="'+T+'"></div></div>'+
     '<div class="field"><label for="ef-amt">Сунгалтын үед төлсөн хүү, ₮</label><input type="text" inputmode="numeric" class="money" id="ef-amt" value="'+(x0.acc?num(x0.acc):'')+'" placeholder="0"><span class="hint">Хүү төлөөгүй бол хоосон үлдээнэ.</span></div>'+
     '<div class="calc" id="ef-prev"></div>'+
-    '<div class="field"><label for="ef-note">Тэмдэглэл</label><input type="text" id="ef-note"></div>'+
+    '<div class="grid2">'+'<div class="field"><label for="ef-method">Төлбөрийн хэлбэр</label><select id="ef-method"><option value="cash">Бэлэн</option><option value="bank">Данс</option></select></div>'+'<div class="field"><label for="ef-note">Тэмдэглэл</label><input type="text" id="ef-note"></div></div>'+
   '</form>';
   const m = openModal({ title:tno(l)+': хугацаа сунгах', body,
     foot:'<button class="btn" data-dismiss>Болих</button><button class="btn btn-primary" type="submit" form="ext-form">Сунгах</button>' });
@@ -1485,7 +2385,7 @@ function openExtend(id){
     if(!(n>=1)) return fieldErr(days,'Сунгах хоногийг оруулна уу');
     if(!isISO(D)) return fieldErr(dt,'Огноог оруулна уу');
     if(D<l.startDate) return fieldErr(dt,'Огноо зээл олгосноос өмнө байж болохгүй');
-    if(A>0) opPay(l, D, A, 'Сунгалтын хүү');
+    if(A>0) opPay(l, D, A, 'Сунгалтын хүү', $('#ef-method',f).value);
     opExtend(l, D, n, note);
     closeModal(m); changed();
     toast(tno(l)+' тасалбарыг '+fmtDate(dueOf(l))+' хүртэл сунгалаа');
@@ -1501,7 +2401,7 @@ function openRedeem(id){
     '<div class="grid2"><div class="field"><label for="rd-date" class="req">Огноо</label><input type="date" id="rd-date" value="'+T+'"></div>'+
     '<div class="field"><label for="rd-amt" class="req">Хүлээн авсан дүн, ₮</label><input type="text" inputmode="numeric" class="money" id="rd-amt"></div></div>'+
     '<p class="hint" id="rd-diff"></p>'+
-    '<div class="field"><label for="rd-note">Тэмдэглэл</label><input type="text" id="rd-note" placeholder="Барьцааг хэн хүлээн авсан гэх мэт"></div>'+
+    '<div class="grid2">'+'<div class="field"><label for="rd-method">Төлбөрийн хэлбэр</label><select id="rd-method"><option value="cash">Бэлэн</option><option value="bank">Данс</option></select></div>'+'<div class="field"><label for="rd-note">Тэмдэглэл</label><input type="text" id="rd-note" placeholder="Барьцааг хэн хүлээн авсан гэх мэт"></div></div>'+
   '</form>';
   const m = openModal({ title:tno(l)+': төлж хаах', body,
     foot:'<button class="btn" data-dismiss>Болих</button><button class="btn btn-primary" type="submit" form="rd-form">'+ic('check')+'Төлж хаах</button>' });
@@ -1523,7 +2423,7 @@ function openRedeem(id){
     const D=dt.value, A=parseMoney(amt.value);
     if(!isISO(D)) return fieldErr(dt,'Огноог оруулна уу');
     if(D<l.startDate) return fieldErr(dt,'Огноо зээл олгосноос өмнө байж болохгүй');
-    if(A>0) opPay(l, D, A, 'Хаалтын төлбөр');
+    if(A>0) opPay(l, D, A, 'Хаалтын төлбөр', $('#rd-method',f).value);
     opClose(l, D, 'redeem', $('#rd-note',f).value.trim());
     closeModal(m); changed(); toast(tno(l)+' зээл хаагдлаа. Барьцааг буцаан олгоно уу.');
   });
@@ -1558,7 +2458,7 @@ function openCustomerForm(opts){
   const body = '<form id="cust-form" class="form" novalidate>'+
     '<div class="grid2"><div class="field"><label for="cf-last">Овог</label><input type="text" id="cf-last" value="'+esc(v.lastName||'')+'" autofocus></div>'+
     '<div class="field"><label for="cf-first" class="req">Нэр</label><input type="text" id="cf-first" value="'+esc(v.firstName||'')+'"></div></div>'+
-    '<div class="field"><label for="cf-reg">Регистрийн дугаар</label><input type="text" id="cf-reg" value="'+esc(v.regNo||'')+'" placeholder="УБ00000000" autocapitalize="characters"></div>'+
+    '<div class="field"><label for="cf-reg">Регистрийн дугаар</label><input type="text" id="cf-reg" value="'+esc(v.regNo||'')+'" placeholder="УБ00000000" autocapitalize="characters"><div id="cf-bl"></div></div>'+
     '<div class="grid2"><div class="field"><label for="cf-phone" class="req">Утас</label><input type="tel" id="cf-phone" value="'+esc(v.phone||'')+'"><span class="hint">Хугацаа хэтэрвэл SMS сануулга энэ дугаар руу очно</span></div>'+
     '<div class="field"><label for="cf-phone2">Нэмэлт утас</label><input type="tel" id="cf-phone2" value="'+esc(v.phone2||'')+'" placeholder="Гэр бүлийн гишүүний утас"></div></div>'+
     '<div class="field"><label for="cf-addr">Хаяг</label><input type="text" id="cf-addr" value="'+esc(v.address||'')+'"></div>'+
@@ -1567,6 +2467,8 @@ function openCustomerForm(opts){
   const m = openModal({ title: c ? 'Харилцагчийн мэдээлэл засах' : 'Шинэ харилцагч', body,
     foot:'<button class="btn" data-dismiss>Болих</button><button class="btn btn-primary" type="submit" form="cust-form">'+(c?'Хадгалах':'Бүртгэх')+'</button>' });
   const f = m.el;
+  const blShow = ()=>{ const hit = blacklistHit($('#cf-reg',f).value); $('#cf-bl',f).innerHTML = hit ? '<div class="bl-warn" style="margin-top:6px"><b>Хар жагсаалтад бүртгэлтэй:</b> '+esc(hit.category)+(hit.note?'. '+esc(hit.note):'')+'</div>' : ''; };
+  $('#cf-reg',f).addEventListener('input', blShow); blShow();
   $('#cust-form',f).addEventListener('submit', e=>{
     e.preventDefault();
     const first=$('#cf-first',f).value.trim(), phone=$('#cf-phone',f).value.trim(), reg=$('#cf-reg',f).value.trim().toUpperCase().replace(/\s+/g,'');
@@ -1576,7 +2478,7 @@ function openCustomerForm(opts){
     const data = { lastName:$('#cf-last',f).value.trim(), firstName:first, regNo:reg, phone, phone2:$('#cf-phone2',f).value.trim(), address:$('#cf-addr',f).value.trim(), note:$('#cf-note',f).value.trim() };
     let saved;
     if(c){ Object.assign(c,data); saved=c; }
-    else { saved = Object.assign({id:uid(), createdAt:new Date().toISOString()}, data); db.customers.push(saved); }
+    else { saved = Object.assign({id:uid(), createdAt:new Date().toISOString(), by:me?me.username:''}, data); db.customers.push(saved); }
     closeModal(m); changed();
     toast(c ? 'Харилцагчийн мэдээллийг хадгаллаа' : fullName(saved)+' бүртгэгдлээ');
     if(opts.onSaved) opts.onSaved(saved);
@@ -1592,12 +2494,15 @@ function customerDetail(id){
     ['Регистр', esc(c.regNo||'—')], ['Утас', esc(c.phone||'—')], ['Нэмэлт утас', esc(c.phone2||'—')],
     ['Идэвхтэй зээл', act.length+' <small>/ нийт '+rows.length+'</small>'], ['Одоогийн нийт өр', money(owed)], ['Бүртгэсэн', c.createdAt?fmtDate(c.createdAt.slice(0,10)):'—']
   ];
-  let h = '<dl class="figs">'+figs.map(f=>'<div><dt>'+f[0]+'</dt><dd>'+f[1]+'</dd></div>').join('')+'</dl>';
+  const bl = blacklistHit(c.regNo);
+  let h = (bl ? '<div class="bl-warn" style="margin-bottom:14px"><b>Хар жагсаалтад бүртгэлтэй:</b> '+esc(bl.category)+(bl.note?'. '+esc(bl.note):'')+'</div>' : '')+
+    '<dl class="figs">'+figs.map(f=>'<div><dt>'+f[0]+'</dt><dd>'+f[1]+'</dd></div>').join('')+'</dl>';
   if(c.address) h += '<p style="margin:-10px 0 16px"><span class="muted">Хаяг: </span>'+esc(c.address)+'</p>';
   if(c.note) h += '<div class="note-box">'+esc(c.note)+'</div>';
   h += '<div class="actions" style="margin-top:0"><button class="btn btn-primary" data-act="new-loan" data-cust="'+c.id+'">'+ic('plus')+'Шинэ зээл бичих</button>'+
     '<button class="btn" data-act="edit-customer" data-id="'+c.id+'">'+ic('edit')+'Засах</button>'+
-    '<button class="btn btn-ghost danger" data-act="del-customer" data-id="'+c.id+'">'+ic('trash')+'Устгах</button></div>';
+    (bl?'':'<button class="btn btn-ghost" data-act="bl-add-cust" data-id="'+c.id+'">'+ic('alert')+'Хар жагсаалтад нэмэх</button>')+
+    (isAdmin()?'<button class="btn btn-ghost danger" data-act="del-customer" data-id="'+c.id+'">'+ic('trash')+'Устгах</button>':'')+'</div>';
   h += '<h3 class="mini-title">Зээлийн түүх</h3>';
   if(rows.length){
     h += '<div class="panel">'+rows.map((r,i)=>'<button class="mrow" data-act="open-loan" data-id="'+r.l.id+'"'+(i===0?' style="border-top:0"':'')+'>'+
@@ -1616,7 +2521,7 @@ function openCustomer(id){
 /* ================= Хэвлэх ================= */
 function printLoan(id){
   const l = loanById(id); if(!l) return;
-  const c = custById(l.customerId) || {}, s = db.settings, it = l.item||{};
+  const c = custById(l.customerId) || {}, s = db.settings, est = estTotal(l);
   const due = dueOf(l);
   const atDue = l.status==='active' ? calc(l, due).owed : calc(l).owed;
   const termInt = Math.round((+l.principal||0)*(+l.rate||0)/100/30*(+l.termDays||0));
@@ -1626,8 +2531,8 @@ function printLoan(id){
     '<div class="pt-grid">'+
       row('Зээлдэгч', esc(fullName(c)))+row('Регистр', esc(c.regNo||''))+
       row('Утас', esc([c.phone,c.phone2].filter(Boolean).join(', ')))+row('Олгосон огноо', fmtDate(l.startDate))+
-      row('Барьцаа', esc(catOf(it.category).name+': '+itemLine(l))+(it.serial?', '+esc(it.serial):''), true)+
-      row('Үнэлгээ', it.est?money(it.est):'')+row('Зээлийн дүн', money(l.principal))+
+      row('Барьцаа', (l.items||[]).map(i=>esc(catOf(i.category).name+': '+itemText(i))+(i.serial?', '+esc(i.serial):'')+(i.est&&(l.items||[]).length>1?' ('+money(i.est)+')':'')).join('<br>'), true)+
+      row('Үнэлгээ', est?money(est):'')+row('Зээлийн дүн', money(l.principal))+
       row('Сарын хүү', fmtRate(l.rate)+'%')+row('Хугацаа', l.termDays+' хоног')+
       row('Хугацааны хүү', money(termInt))+row('Дуусах огноо', fmtDate(due))+
       row('Дуусах өдөр төлөх нийт дүн', money(atDue), true)+
@@ -1642,9 +2547,8 @@ function printLoan(id){
 /* ================= Нөөц, экспорт ================= */
 function exportJSON(){
   const T = todayISO();
-  db.settings.lastBackup = new Date().toISOString();
   const ok = download('lombard-nuots-'+T+'.json', JSON.stringify(db,null,2), 'application/json');
-  if(ok){ save(); render(); refreshModals(); toast('Нөөц файл татагдлаа'); }
+  if(ok){ try{ localStorage.setItem(BACKUP_KEY, new Date().toISOString()); }catch(e){} render(); refreshModals(); toast('Нөөц файл татагдлаа'); }
 }
 function exportCSV(){
   const T=todayISO();
@@ -1652,8 +2556,8 @@ function exportCSV(){
   const q = v=>{ v=String(v==null?'':v); return /[",\n;]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; };
   const lines=[head.map(q).join(',')];
   db.loans.slice().sort((a,b)=>a.ticketNo-b.ticketNo).forEach(l=>{
-    const c=custById(l.customerId)||{}, x=calc(l,T), it=l.item||{};
-    lines.push([tno(l), STATE[x.state][0], fullName(c), c.regNo, c.phone, catOf(it.category).name, itemLine(l), it.serial, it.est||'', l.principal, l.rate, l.startDate, x.due, l.closedDate||'', x.bal, x.acc, x.owed, x.intPaid, x.paid].map(q).join(','));
+    const c=custById(l.customerId)||{}, x=calc(l,T);
+    lines.push([tno(l), STATE[x.state][0], fullName(c), c.regNo, c.phone, [...new Set((l.items||[]).map(i=>catOf(i.category).name))].join(', '), itemLine(l), (l.items||[]).map(i=>i.serial).filter(Boolean).join(', '), estTotal(l)||'', l.principal, l.rate, l.startDate, x.due, l.closedDate||'', x.bal, x.acc, x.owed, x.intPaid, x.paid].map(q).join(','));
   });
   if(download('lombard-zeel-'+T+'.csv', '﻿'+lines.join('\r\n'), 'text/csv;charset=utf-8')) toast('Жагсаалт татагдлаа');
 }
@@ -1682,7 +2586,7 @@ function loadDemo(){
   db.customers = cs;
   let no = 1;
   const mk = (ci, cat, name, extra, est, P, R, start, term)=>{
-    const l = { id:uid()+no, ticketNo:no++, customerId:cs[ci].id, item:Object.assign({category:cat, name, serial:'', weight:'', purity:'', est}, extra||{}),
+    const l = { id:uid()+no, ticketNo:no++, customerId:cs[ci].id, items:[Object.assign({id:uid(), category:cat, name, serial:'', weight:'', purity:'', est}, extra||{})], method:'cash', by:me?me.username:'',
       principal:P, rate:R, termDays:term, startDate:D(start), status:'active', closedDate:null, note:'', createdAt:new Date().toISOString(),
       events:[{id:uid(), type:'issue', date:D(start), at:stamp()}] };
     db.loans.push(l); return l;
@@ -1718,8 +2622,45 @@ document.addEventListener('click', e=>{
       confirmBox({title:'Харилцагчийг устгах уу?', text:esc(fullName(c))+' харилцагчийн мэдээлэл устна.', ok:'Устгах', danger:true,
         onOk:()=>{ db.customers=db.customers.filter(x=>x.id!==id); changed(); toast('Харилцагчийг устгалаа'); }});
       break; }
-    case 'filter': ui.loanF=b.dataset.f; renderLoanList(); break;
-    case 'filter-go': ui.loanF=b.dataset.f; break;
+    case 'ltab': ui.loan.tab=b.dataset.f; ui.loan.page=1; renderLoanList(); break;
+    case 'ltab-go': ui.loan.tab=b.dataset.f; ui.loan.page=1; break;
+    case 'sort': {
+      const u = {loan:ui.loan, txn:ui.txn}[b.dataset.k]; if(!u) break;
+      if(u.sort===b.dataset.s) u.dir = u.dir==='asc'?'desc':'asc'; else { u.sort=b.dataset.s; u.dir = ['name','cat','phone','user'].includes(b.dataset.s)?'asc':'desc'; }
+      ({loan:renderLoanList, txn:renderTxnList})[b.dataset.k](); break; }
+    case 'pg': {
+      const u = {loan:ui.loan, txn:ui.txn, bl:ui.bl, audit:ui.audit}[b.dataset.k]; if(!u) break;
+      u.page = Math.max(1, +b.dataset.p||1);
+      ({loan:renderLoanList, txn:renderTxnList, bl:renderBlList, audit:loadAudit})[b.dataset.k]();
+      const top = $('#view .panel'); if(top) top.scrollIntoView({block:'nearest'});
+      break; }
+    case 'menu': openMenu(); break;
+    case 'export-loans': exportLoans(); break;
+    case 'export-txns': exportTxns(); break;
+    case 'export-bl': exportBl(); break;
+    case 'export-report': exportReport(); break;
+    case 'export-audit': exportAudit(); break;
+    case 'new-txn': openTxnForm({type: ui.txn.type!=='all' ? ui.txn.type : 'expense'}); break;
+    case 'open-txn': openTxnForm({id}); break;
+    case 'txn-tab': ui.txn.type=b.dataset.f; ui.txn.page=1; render(); break;
+    case 'del-txn': {
+      const t = db.txns.find(x=>x.id===id); if(!t) break;
+      confirmBox({title:'Гүйлгээг устгах уу?', text:esc(TXN_T[t.type]+': '+(t.category||'')+' '+money(t.amount)+' ('+fmtDate(t.date)+')')+' устна.', ok:'Устгах', danger:true,
+        onOk:()=>{ db.txns = db.txns.filter(x=>x.id!==id); closeAllModals(); changed(); toast('Гүйлгээг устгалаа'); }});
+      break; }
+    case 'new-bl': openBlForm({}); break;
+    case 'open-bl': openBlForm({id}); break;
+    case 'bl-add-cust': { const c=custById(id); if(c) openBlForm({regNo:c.regNo, name:fullName(c)}); break; }
+    case 'del-bl': {
+      const x = db.blacklist.find(v=>v.id===id); if(!x) break;
+      confirmBox({title:'Хар жагсаалтаас устгах уу?', text:esc(x.regNo)+' бүртгэл бүрмөсөн устна. Түр хасах бол төлөвийг "Идэвхгүй" болгоно уу.', ok:'Устгах', danger:true,
+        onOk:()=>{ db.blacklist = db.blacklist.filter(v=>v.id!==id); closeAllModals(); changed(); toast('Устгалаа'); }});
+      break; }
+    case 'cash-day': { const d=+b.dataset.d; ui.cashDay = d ? addDays(isISO(ui.cashDay)?ui.cashDay:todayISO(), d) : todayISO(); render(); break; }
+    case 'set-opening': openOpening(); break;
+    case 'rep-preset': ui.rep.preset=b.dataset.f; if(b.dataset.f==='custom'){ const r=repRange(); ui.rep.from=r[0]; ui.rep.to=r[1]; } render(); break;
+    case 'new-user': openUserForm(null); break;
+    case 'open-user': { const u = userCache.find(x=>x.id===id); if(u) openUserForm(u); break; }
     case 'pay': openPayment(id); break;
     case 'extend': openExtend(id); break;
     case 'redeem': openRedeem(id); break;

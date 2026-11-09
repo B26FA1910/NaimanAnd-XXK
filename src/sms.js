@@ -102,7 +102,7 @@ export function smsVars(l, c, settings, today) {
     DAYS: Math.max(0, diffDays(due, today)),
     AMOUNT: fmtMoney(owedOn(l, today)),
     PHONE: settings.phone || '',
-    ITEM: (l.item && l.item.name) || '',
+    ITEM: (Array.isArray(l.items) ? l.items.map((i) => i.name).filter(Boolean).join(', ') : l.item && l.item.name) || '',
   };
 }
 
