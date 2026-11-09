@@ -381,6 +381,27 @@ body.modal-open{overflow:hidden}
 .b-income{background:var(--green-tint);color:var(--green)}
 .b-expense{background:var(--red-tint);color:var(--red)}
 .b-transfer{background:#E7EEF7;color:#2D5687}
+.cmatch{display:flex;gap:12px 14px;align-items:center;flex-wrap:wrap;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--hover)}
+.cmatch.ask{border-color:var(--brass-light);background:var(--brass-tint)}
+.cmatch.ok{border-color:#B9DCC6;background:var(--green-tint)}
+.cm-q{flex-basis:100%;font-weight:600;color:var(--brass-ink)}
+.cm-ic{width:30px;height:30px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;flex:none}
+.cm-ic svg{width:17px;height:17px}
+.cm-i{flex:1 1 220px;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:14px;color:var(--ink-2)}
+.cm-i b{font-size:15.5px;color:var(--ink)}
+.cm-i em{font-style:normal}
+.cm-b{display:flex;gap:8px}
+.cm-sug{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.cm-sug .lbl{display:block;padding:8px 14px 6px;font-size:12.5px;color:var(--muted);background:var(--hover)}
+.cm-sug button{display:flex;gap:10px;align-items:baseline;width:100%;text-align:left;background:var(--surface);border:0;border-top:1px solid var(--line-2);padding:10px 14px;font:inherit;font-size:14.5px;cursor:pointer;color:var(--ink)}
+.cm-sug button:hover{background:var(--hover)}
+.cm-sug button span{margin-left:auto;color:var(--muted);font-size:13.5px}
+.nc{border:1px dashed var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:14px}
+.nc-t{display:flex;gap:8px;align-items:center;font-weight:600;font-size:14.5px}
+.nc-t svg{width:18px;height:18px;color:var(--brass)}
+.hint.neg{color:var(--red)}
+#lf-reg{text-transform:uppercase;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+#lf-reg::placeholder{text-transform:none;letter-spacing:0}
 .bl-warn{background:var(--red-tint);border:1px solid #F3C4BD;color:#7A1A12;border-radius:10px;padding:10px 14px;font-size:14px}
 .bl-warn b{color:#7A1A12}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fff}
@@ -972,6 +993,20 @@ function itemLine(l){ return (l.items||[]).map(itemText).filter(Boolean).join(',
 function estTotal(l){ return (l.items||[]).reduce((s,i)=>s+(+i.est||0),0); }
 function catBadges(l){ const ids=[...new Set((l.items||[]).map(i=>i.category))]; return ids.length ? ids.map(id=>'<span class="cb">'+esc(catOf(id).name)+'</span>').join('') : ''; }
 function normReg(r){ return String(r||'').toUpperCase().replace(/\s+/g,''); }
+const REG_RE = /^[А-ЯЁӨҮ]{2}\d{8}$/;
+function regError(reg){
+  reg = normReg(reg);
+  if(!reg) return 'Регистрийн дугаарыг бичнэ үү';
+  if(/[A-Z]/.test(reg)) return 'Регистрийн үсгийг кириллээр бичнэ үү. Жишээ нь: УБ99112233';
+  if(!REG_RE.test(reg)) return 'Регистр 2 үсэг, 8 оронтой тоо байна. Жишээ нь: УБ99112233';
+  return '';
+}
+function phoneError(ph){
+  let d = String(ph||'').replace(/\D/g,''); if(d.length===11 && d.startsWith('976')) d = d.slice(3);
+  if(!d) return 'Утасны дугаарыг бичнэ үү';
+  return d.length===8 ? '' : 'Утасны дугаар 8 оронтой байна';
+}
+function custByReg(reg){ reg = normReg(reg); return reg ? db.customers.find(c=>normReg(c.regNo)===reg) || null : null; }
 function blacklistHit(reg){ reg = normReg(reg); if(!reg) return null; return db.blacklist.find(b=>b.status!=='inactive' && normReg(b.regNo)===reg) || null; }
 const late = x => x.state==='overdue' || x.state==='bad';
 function extDays(l){ return l.events.filter(e=>e.type==='extend').reduce((s,e)=>s+(+e.days||0),0); }
@@ -2196,9 +2231,18 @@ function openLoanForm(opts){
   const hasPays = editing && editing.events.some(e=>e.type==='payment');
   const body = '<form id="loan-form" class="form" novalidate>'+
     '<div class="fs-title">Харилцагч</div>'+
-    '<div class="field"><label for="lf-cust" class="req">Харилцагч сонгох</label>'+
-      '<div class="pick"><input type="search" id="lf-cq" placeholder="Нэр, РД, утсаар шүүх" aria-label="Харилцагч шүүх"><select id="lf-cust"></select></div>'+
-      '<div><button type="button" class="btn btn-ghost sm" id="lf-newc" style="margin-left:-10px">'+ic('plus')+'Шинэ харилцагч бүртгэх</button></div></div>'+
+    '<div class="field"><label for="lf-reg" class="req">Регистрийн дугаар</label>'+
+      '<input type="text" id="lf-reg" placeholder="УБ99112233" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="16" value="'+esc((custById(l.customerId)||{}).regNo||'')+'">'+
+      '<span class="hint" id="lf-reg-hint"></span></div>'+
+    '<div id="lf-cm" aria-live="polite"></div>'+
+    '<div id="lf-nc" class="nc" hidden>'+
+      '<div class="nc-t">'+ic('plus')+'Шинэ харилцагч. Зээл бичихэд автоматаар бүртгэгдэнэ.</div>'+
+      '<div class="grid2"><div class="field"><label for="lf-last">Овог</label><input type="text" id="lf-last"></div>'+
+      '<div class="field"><label for="lf-first" class="req">Нэр</label><input type="text" id="lf-first"></div></div>'+
+      '<div class="grid2"><div class="field"><label for="lf-phone" class="req">Утас</label><input type="tel" id="lf-phone"><span class="hint">Хугацаа хэтэрвэл SMS сануулга энэ дугаар руу очно</span></div>'+
+      '<div class="field"><label for="lf-phone2">Нэмэлт утас</label><input type="tel" id="lf-phone2" placeholder="Гэр бүлийн гишүүний утас"></div></div>'+
+      '<div class="field"><label for="lf-addr">Хаяг</label><input type="text" id="lf-addr"></div>'+
+    '</div>'+
     '<div id="lf-bl"></div>'+
     '<div class="fs-title">Барьцаа хөрөнгө</div>'+
     '<div class="items-ed" id="lf-items"></div>'+
@@ -2218,19 +2262,42 @@ function openLoanForm(opts){
     foot:'<button class="btn" data-dismiss>Болих</button><button class="btn btn-primary" type="submit" form="loan-form">'+(editing?'Өөрчлөлтийг хадгалах':'Зээл бичих')+'</button>' });
   const f = m.el;
   bindMoney(f);
-  const sel=$('#lf-cust',f), cq=$('#lf-cq',f), itemsBox=$('#lf-items',f);
-  function fillCust(q, selectId){
-    q = (q||'').trim().toLowerCase();
-    const cur = selectId || sel.value || l.customerId;
-    const list = db.customers.filter(c=>!q || custMatch(c,q) || c.id===cur).sort((a,b)=>fullName(a).localeCompare(fullName(b),'mn'));
-    sel.innerHTML = '<option value="">'+(db.customers.length?'Сонгоно уу':'Эхлээд харилцагч бүртгэнэ үү')+'</option>'+
-      list.map(c=>'<option value="'+c.id+'">'+esc(fullName(c))+(c.regNo?' ('+esc(c.regNo)+')':c.phone?' ('+esc(c.phone)+')':'')+(blacklistHit(c.regNo)?' - хар жагсаалт':'')+'</option>').join('');
-    if(cur && list.some(c=>c.id===cur)) sel.value = cur;
-    else if(q && list.length===1) sel.value = list[0].id;
+  const regIn=$('#lf-reg',f), regHint=$('#lf-reg-hint',f), cmBox=$('#lf-cm',f), ncBox=$('#lf-nc',f), itemsBox=$('#lf-items',f);
+  // Регистрээр харилцагч олно. Бүртгэлтэй бол "Энэ хүн мөн үү?" гэж асууна, бүртгэлгүй бол шинэ харилцагчийн талбарууд гарна.
+  let picked = custById(l.customerId) ? l.customerId : '';
+  const REG_HINT = 'Бүртгэлтэй харилцагч бол мэдээлэл нь автоматаар гарч ирнэ';
+  function custCard(c, ask){
+    const ls = db.loans.filter(x=>x.customerId===c.id), act = ls.filter(x=>x.status==='active');
+    const owed = act.reduce((t,x)=>t+calc(x).owed,0), lateN = act.filter(x=>['overdue','bad'].includes(calc(x).state)).length;
+    const info = '<div class="cm-i"><b>'+esc(fullName(c))+'</b><span>'+esc([c.regNo, c.phone, c.phone2].filter(Boolean).join(' · '))+'</span>'+
+      '<span>'+(ls.length ? 'Нийт '+ls.length+' зээл'+(act.length ? ', идэвхтэй '+act.length+', өр '+money(owed) : ', бүгд хаагдсан') : 'Өмнө зээл аваагүй')+
+      (lateN ? ', <em class="neg">хугацаа хэтэрсэн '+lateN+'</em>' : '')+'</span>'+(c.address?'<span>'+esc(c.address)+'</span>':'')+'</div>';
+    return ask
+      ? '<div class="cmatch ask"><div class="cm-q">Энэ хүн мөн үү?</div>'+info+'<div class="cm-b"><button type="button" class="btn btn-primary sm" data-cm="yes">Тийм, мөн</button><button type="button" class="btn sm" data-cm="no">Үгүй</button></div></div>'
+      : '<div class="cmatch ok"><span class="cm-ic">'+ic('check')+'</span>'+info+'<button type="button" class="btn btn-ghost sm" data-cm="change">Солих</button></div>';
+  }
+  function regUpd(msg){
+    const reg = normReg(regIn.value), pc = custById(picked);
+    if(pc && normReg(pc.regNo)!==reg) picked = '';
+    let hint = msg || REG_HINT, bad = !!msg, cm = '', isNew = false;
+    if(picked) cm = custCard(custById(picked), false);
+    else if(reg){
+      const hit = custByReg(reg), err = regError(reg);
+      if(hit) cm = custCard(hit, true);
+      else if(!err){ isNew = true; hint = 'Энэ регистртэй харилцагч бүртгэлгүй байна. Доорх мэдээллийг бөглөнө үү.'; bad = false; }
+      else {
+        const sug = reg.length>=2 ? db.customers.filter(c=>normReg(c.regNo).startsWith(reg)).slice(0,5) : [];
+        if(sug.length) cm = '<div class="cm-sug"><span class="lbl">Бүртгэлтэй харилцагчид</span>'+sug.map(c=>'<button type="button" data-pick="'+c.id+'"><b>'+esc(c.regNo)+'</b>'+esc(fullName(c))+'<span>'+esc(c.phone||'')+'</span></button>').join('')+'</div>';
+        if(reg.length>=10 || /[A-Z]/.test(reg)){ hint = err; bad = true; }
+      }
+    }
+    regHint.textContent = hint; regHint.classList.toggle('neg', bad);
+    cmBox.innerHTML = cm; ncBox.hidden = !isNew;
     blCheck();
   }
+  function choose(id){ picked = id; const c = custById(id); if(c && c.regNo) regIn.value = c.regNo; regIn.classList.remove('bad'); regUpd(); setTimeout(()=>{ const n=$('.iname',itemsBox); n && !n.value && n.focus(); }, 20); }
   function blCheck(){
-    const c = custById(sel.value), hit = c && blacklistHit(c.regNo);
+    const c = custById(picked), hit = blacklistHit(regIn.value) || (c && blacklistHit(c.regNo));
     $('#lf-bl',f).innerHTML = hit ? '<div class="bl-warn"><b>Анхаар: энэ харилцагч хар жагсаалтад бүртгэлтэй.</b> '+esc(hit.category)+(hit.note?'. '+esc(hit.note):'')+'</div>' : '';
     return hit;
   }
@@ -2259,10 +2326,21 @@ function openLoanForm(opts){
     $$('.iest',itemsBox).forEach(x=>x.addEventListener('input',upd));
     $$('[data-rm]',itemsBox).forEach(b=>b.addEventListener('click',()=>{ readItems(); items.splice(+b.dataset.rm,1); renderItems(); upd(); }));
   }
-  fillCust('', l.customerId);
-  cq.addEventListener('input', ()=>fillCust(cq.value));
-  sel.addEventListener('change', blCheck);
-  $('#lf-newc',f).addEventListener('click', ()=>openCustomerForm({ onSaved:c=>{ cq.value=''; fillCust('', c.id); sel.classList.remove('bad'); } }));
+  regUpd();
+  regIn.addEventListener('input', ()=>regUpd());
+  regIn.addEventListener('keydown', e=>{
+    if(e.key!=='Enter') return;
+    e.preventDefault();
+    const yes = $('[data-cm="yes"]',cmBox), one = $$('[data-pick]',cmBox);
+    if(yes) yes.click(); else if(one.length===1) one[0].click(); else if(!ncBox.hidden) $('#lf-first',f).focus();
+  });
+  cmBox.addEventListener('click', e=>{
+    const b = e.target.closest('[data-cm],[data-pick]'); if(!b) return;
+    if(b.dataset.pick) return choose(b.dataset.pick);
+    if(b.dataset.cm==='yes'){ const c = custByReg(regIn.value); if(c) choose(c.id); return; }
+    picked = ''; regIn.value = ''; regIn.focus();
+    regUpd(b.dataset.cm==='no' ? 'Нэг регистр нэг л хүнийх байдаг. Регистрийг шалгаад дахин бичнэ үү.' : '');
+  });
   $('#lf-additem',f).addEventListener('click', ()=>{
     readItems();
     items.push({id:uid(), category:(items[items.length-1]||{}).category||firstCat, name:'', serial:'', est:0});
@@ -2284,14 +2362,24 @@ function openLoanForm(opts){
   renderItems();
   ['lf-amt','lf-rate','lf-term','lf-start'].forEach(id=>$('#'+id,f).addEventListener('input',upd));
   upd();
-  setTimeout(()=>{ (sel.value ? $('.iname',itemsBox) : (db.customers.length? cq : $('#lf-newc',f))).focus(); }, 30);
+  setTimeout(()=>{ (picked ? $('.iname',itemsBox) : regIn).focus(); }, 30);
 
   $('#loan-form',f).addEventListener('submit', async e=>{
     e.preventDefault();
     if(f.dataset.busy) return;
     readItems();
-    const cid=sel.value, P=parseMoney($('#lf-amt',f).value), R=parseRate($('#lf-rate',f).value), N=parseInt($('#lf-term',f).value,10), S=$('#lf-start',f).value;
-    if(!cid) return fieldErr(sel,'Харилцагч сонгоно уу');
+    let cid=picked, newCust=null;
+    const P=parseMoney($('#lf-amt',f).value), R=parseRate($('#lf-rate',f).value), N=parseInt($('#lf-term',f).value,10), S=$('#lf-start',f).value;
+    if(!cid){
+      const reg = normReg(regIn.value);
+      if(custByReg(reg)){ const y=$('[data-cm="yes"]',cmBox); fieldErr(regIn,'Энэ хүн мөн эсэхийг "Тийм, мөн" дарж баталгаажуулна уу'); y && y.focus(); return; }
+      const rErr = regError(reg); if(rErr){ regUpd(rErr); return fieldErr(regIn, rErr); }
+      const first=$('#lf-first',f).value.trim(), phone=$('#lf-phone',f).value.trim();
+      if(!first) return fieldErr($('#lf-first',f),'Харилцагчийн нэрийг бичнэ үү');
+      const pErr = phoneError(phone); if(pErr) return fieldErr($('#lf-phone',f), pErr);
+      newCust = { id:uid(), createdAt:new Date().toISOString(), by:me?me.username:'', lastName:$('#lf-last',f).value.trim(), firstName:first, regNo:reg,
+        phone, phone2:$('#lf-phone2',f).value.trim(), address:$('#lf-addr',f).value.trim(), note:'' };
+    }
     const clean = items.filter(i=>(i.name||'').trim() || +i.est).map(i=>{ const metal=!!catOf(i.category).metal; return {id:i.id||uid(), category:i.category, name:(i.name||'').trim(), serial:(i.serial||'').trim(), est:+i.est||0, weight:metal?String(i.weight||'').trim():'', purity:metal?String(i.purity||'').trim():''}; });
     const noName = clean.findIndex(i=>!i.name);
     if(!clean.length || noName>=0){ const rows=$$('.iname',itemsBox); return fieldErr(rows[Math.max(0, noName>=0 ? items.findIndex(i=>!(i.name||'').trim()) : 0)] || rows[0],'Барьцаа хөрөнгийн нэрийг бичнэ үү'); }
@@ -2302,11 +2390,12 @@ function openLoanForm(opts){
     const note = $('#lf-note',f).value.trim(), method = $('#lf-method',f).value==='bank' ? 'bank' : 'cash';
     if(!editing && blCheck() && !f.dataset.blOk){
       confirmBox({ title:'Хар жагсаалтад бүртгэлтэй харилцагч', danger:true, ok:'Тийм, зээл бичих',
-        text:esc(fullName(custById(cid)))+' хар жагсаалтад бүртгэлтэй байна. Зээл олгохдоо итгэлтэй байна уу?',
+        text:esc(fullName(newCust||custById(cid)))+' ('+esc(normReg(regIn.value))+') хар жагсаалтад бүртгэлтэй байна. Зээл олгохдоо итгэлтэй байна уу?',
         onOk:()=>{ f.dataset.blOk='1'; $('#loan-form',f).requestSubmit(); } });
       return;
     }
     if(editing){
+      if(newCust){ db.customers.push(newCust); cid = newCust.id; }
       Object.assign(editing, {customerId:cid, items:clean, principal:P, rate:R, termDays:N, startDate:S, note, method});
       const iss = editing.events.find(ev=>ev.type==='issue'); if(iss) iss.date = S;
       closeModal(m); changed(); toast('Өөрчлөлтийг хадгаллаа');
@@ -2318,11 +2407,12 @@ function openLoanForm(opts){
     try{ no = (await api('/api/ticket', {method:'POST'})).ticketNo; }
     catch(err){ delete f.dataset.busy; btn.disabled = false; handleApiError(err,false); if(err.status!==401) toast('Тасалбарын дугаар авч чадсангүй. Интернэтээ шалгаад дахин оролдоно уу.','err',5000); return; }
     const by = me ? me.username : '';
+    if(newCust){ db.customers.push(newCust); cid = newCust.id; }
     const loan = { id:uid(), ticketNo:no, customerId:cid, items:clean, principal:P, rate:R, termDays:N, startDate:S, status:'active', closedDate:null, note, method, by,
       createdAt:new Date().toISOString(), events:[{id:uid(), type:'issue', date:S, at:stamp(), by}] };
     db.loans.push(loan); db.settings.nextTicket = no+1;
     closeModal(m); changed(); openLoan(loan.id);
-    toast(tno(loan)+' тасалбар бичигдлээ. Тасалбараа хэвлэж болно.');
+    toast((newCust ? fullName(newCust)+' шинээр бүртгэгдэж, ' : '')+tno(loan)+' тасалбар бичигдлээ. Тасалбараа хэвлэж болно.', '', newCust?5000:undefined);
   });
 }
 
@@ -2476,7 +2566,7 @@ function openCustomerForm(opts){
   const body = '<form id="cust-form" class="form" novalidate>'+
     '<div class="grid2"><div class="field"><label for="cf-last">Овог</label><input type="text" id="cf-last" value="'+esc(v.lastName||'')+'" autofocus></div>'+
     '<div class="field"><label for="cf-first" class="req">Нэр</label><input type="text" id="cf-first" value="'+esc(v.firstName||'')+'"></div></div>'+
-    '<div class="field"><label for="cf-reg">Регистрийн дугаар</label><input type="text" id="cf-reg" value="'+esc(v.regNo||'')+'" placeholder="УБ00000000" autocapitalize="characters"><div id="cf-bl"></div></div>'+
+    '<div class="field"><label for="cf-reg" class="req">Регистрийн дугаар</label><input type="text" id="cf-reg" value="'+esc(v.regNo||'')+'" placeholder="УБ00000000" autocapitalize="characters"><div id="cf-bl"></div></div>'+
     '<div class="grid2"><div class="field"><label for="cf-phone" class="req">Утас</label><input type="tel" id="cf-phone" value="'+esc(v.phone||'')+'"><span class="hint">Хугацаа хэтэрвэл SMS сануулга энэ дугаар руу очно</span></div>'+
     '<div class="field"><label for="cf-phone2">Нэмэлт утас</label><input type="tel" id="cf-phone2" value="'+esc(v.phone2||'')+'" placeholder="Гэр бүлийн гишүүний утас"></div></div>'+
     '<div class="field"><label for="cf-addr">Хаяг</label><input type="text" id="cf-addr" value="'+esc(v.address||'')+'"></div>'+
@@ -2489,10 +2579,11 @@ function openCustomerForm(opts){
   $('#cf-reg',f).addEventListener('input', blShow); blShow();
   $('#cust-form',f).addEventListener('submit', e=>{
     e.preventDefault();
-    const first=$('#cf-first',f).value.trim(), phone=$('#cf-phone',f).value.trim(), reg=$('#cf-reg',f).value.trim().toUpperCase().replace(/\s+/g,'');
+    const first=$('#cf-first',f).value.trim(), phone=$('#cf-phone',f).value.trim(), reg=normReg($('#cf-reg',f).value);
     if(!first) return fieldErr($('#cf-first',f),'Нэрийг бичнэ үү');
-    if(!phone) return fieldErr($('#cf-phone',f),'Утасны дугаарыг бичнэ үү');
-    if(reg){ const dup=db.customers.find(x=>x.regNo===reg && (!c || x.id!==c.id)); if(dup) return fieldErr($('#cf-reg',f),'Энэ РД-тэй харилцагч бүртгэлтэй байна: '+fullName(dup)); }
+    const rErr = (c && normReg(c.regNo)===reg && reg) ? '' : regError(reg); if(rErr) return fieldErr($('#cf-reg',f), rErr);
+    const pErr = phoneError(phone); if(pErr) return fieldErr($('#cf-phone',f), pErr);
+    const dup=db.customers.find(x=>normReg(x.regNo)===reg && (!c || x.id!==c.id)); if(dup) return fieldErr($('#cf-reg',f),'Энэ РД-тэй харилцагч бүртгэлтэй байна: '+fullName(dup));
     const data = { lastName:$('#cf-last',f).value.trim(), firstName:first, regNo:reg, phone, phone2:$('#cf-phone2',f).value.trim(), address:$('#cf-addr',f).value.trim(), note:$('#cf-note',f).value.trim() };
     let saved;
     if(c){ Object.assign(c,data); saved=c; }
