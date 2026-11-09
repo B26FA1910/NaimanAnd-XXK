@@ -39,8 +39,10 @@ export async function sha256Hex(s) {
 
 // APP_PASSWORD-тэй тэнцүү эсэхийг цагийн хувьд тэгш харьцуулна
 export async function equalsSecret(given, secret) {
+  // Хуулж буулгахад орсон эхний, сүүлийн хоосон зайг тооцохгүй
+  given = String(given || '').trim(); secret = String(secret || '').trim();
   if (!given || !secret) return false;
-  const [a, b] = await Promise.all([sha256Hex(String(given)), sha256Hex(String(secret))]);
+  const [a, b] = await Promise.all([sha256Hex(given), sha256Hex(secret)]);
   return sameBytes(fromHex(a), fromHex(b));
 }
 

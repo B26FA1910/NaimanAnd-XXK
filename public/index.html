@@ -313,6 +313,9 @@ body.modal-open{overflow:hidden}
 .gate-box ol{margin:0;padding-left:20px;display:grid;gap:6px;color:var(--ink-2)}
 .gate-box code{background:#F1F3F5;border-radius:4px;padding:1px 5px;font-size:13.5px}
 .gate-err{color:var(--red);font-size:14px}
+.secret-in{-webkit-text-security:disc;text-security:disc}
+.secret-in.shown{-webkit-text-security:none;text-security:none}
+.gate-box .check{font-size:14px;color:var(--ink-2)}
 .gate-box .btn{align-self:flex-start}
 .spin{width:22px;height:22px;border-radius:50%;border:2.5px solid var(--line);border-top-color:var(--brass);animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -811,7 +814,11 @@ window.addEventListener('beforeunload', e=>{ if(loaded && (syncing || computeDif
 
 /* ---------- нэвтрэх цонх ---------- */
 const LOGO = '<svg width="46" height="46" viewBox="0 0 34 34" aria-hidden="true"><path d="M5 3.5h24" stroke="#A57E22" stroke-width="2.2" stroke-linecap="round"/><path d="M17 3.5v5M10 3.5l0 14M24 3.5v14" stroke="#A57E22" stroke-width="1.4"/><circle cx="17" cy="12.5" r="5" fill="#A57E22"/><circle cx="10" cy="23.5" r="5" fill="#A57E22"/><circle cx="24" cy="23.5" r="5" fill="#A57E22"/></svg>';
-function gField(id, label, type, ac, ph){ return '<div class="field"><label for="'+id+'">'+label+'</label><input type="'+type+'" id="'+id+'" autocomplete="'+ac+'"'+(ph?' placeholder="'+esc(ph)+'"':'')+(type==='text'?' autocapitalize="off" spellcheck="false"':'')+'></div>'; }
+function gField(id, label, type, ac, ph){
+  // APP_PASSWORD талбарыг password биш text болгож, цэгээр нууна. Ингэхгүй бол iPhone Safari шинэ нууц үг зохиогоод энэ талбарт ч бөглөчихдөг.
+  const secret = type==='secret', t = secret ? 'text' : type;
+  return '<div class="field"><label for="'+id+'">'+label+'</label><input type="'+t+'" id="'+id+'" autocomplete="'+(secret?'off':ac)+'"'+(secret?' class="secret-in" data-lpignore="true" data-1p-ignore autocorrect="off"':'')+(ph?' placeholder="'+esc(ph)+'"':'')+(t==='text'?' autocapitalize="off" spellcheck="false"':'')+'></div>'; }
+const SHOW_PW = '<label class="check"><input type="checkbox" class="g-show"><span>Нууц үгийг харуулах</span></label>';
 function showGate(kind, msg){
   closeAllModals();
   const g = document.getElementById('gate'); g.hidden = false;
@@ -820,15 +827,15 @@ function showGate(kind, msg){
   const err = '<p class="gate-err" role="alert"'+(msg?'':' hidden')+'>'+esc(msg||'')+'</p>';
   if(kind==='loading') h += '<div class="spin" role="status" aria-label="Ачаалж байна"></div><p class="lead">Бүртгэлийг серверээс ачаалж байна…</p>';
   else if(kind==='login') h += '<h1>'+esc(shop||'Ломбардын бүртгэл')+'</h1><p class="lead">Өөрийн нэвтрэх нэр, нууц үгээ оруулна уу.</p>'+
-    '<form id="gate-form" class="form" data-kind="login" novalidate>'+gField('g-user','Нэвтрэх нэр','text','username')+gField('g-pass','Нууц үг','password','current-password')+err+
+    '<form id="gate-form" class="form" data-kind="login" novalidate>'+gField('g-user','Нэвтрэх нэр','text','username')+gField('g-pass','Нууц үг','password','current-password')+SHOW_PW+err+
     '<button class="btn btn-primary" type="submit">Нэвтрэх</button><button type="button" class="linkbtn" data-gate="reset">Админ нууц үгээ мартсан</button></form>';
   else if(kind==='setup') h += '<h1>Анхны админ үүсгэх</h1><p class="lead">Ломбардын эзэн өөрийн нэвтрэх эрхийг үүсгэнэ. Баталгаажуулахын тулд Cloudflare дээр тохируулсан APP_PASSWORD-ийг оруулна. Ажилтнуудыг дараа нь Хэрэглэгч хэсгээс нэмнэ.</p>'+
-    '<form id="gate-form" class="form" data-kind="setup" novalidate>'+gField('g-secret','Cloudflare дээрх APP_PASSWORD','password','off')+gField('g-name','Таны нэр','text','name','Жишээ нь: Отгонсүрэн')+
-    gField('g-user','Нэвтрэх нэр (латинаар)','text','username','Жишээ нь: otgonsuren')+gField('g-pass','Шинэ нууц үг (6-аас дээш тэмдэгт)','password','new-password')+err+
+    '<form id="gate-form" class="form" data-kind="setup" novalidate>'+gField('g-secret','Cloudflare дээрх APP_PASSWORD','secret','off')+gField('g-name','Таны нэр','text','name','Жишээ нь: Отгонсүрэн')+
+    gField('g-user','Нэвтрэх нэр (латинаар)','text','username','Жишээ нь: otgonsuren')+gField('g-pass','Шинэ нууц үг (6-аас дээш тэмдэгт)','password','new-password')+SHOW_PW+err+
     '<button class="btn btn-primary" type="submit">Админ үүсгэх</button></form>';
   else if(kind==='reset') h += '<h1>Админы нууц үг сэргээх</h1><p class="lead">Cloudflare дээрх APP_PASSWORD-оор баталгаажуулж, админ хэрэглэгчийн нууц үгийг шинээр тавина. Ажилтны нууц үгийг админ Хэрэглэгч хэсгээс солино.</p>'+
-    '<form id="gate-form" class="form" data-kind="reset" novalidate>'+gField('g-secret','Cloudflare дээрх APP_PASSWORD','password','off')+gField('g-user','Админы нэвтрэх нэр','text','username')+
-    gField('g-pass','Шинэ нууц үг','password','new-password')+err+'<button class="btn btn-primary" type="submit">Нууц үг сэргээх</button><button type="button" class="linkbtn" data-gate="login">Нэвтрэх хуудас руу буцах</button></form>';
+    '<form id="gate-form" class="form" data-kind="reset" novalidate>'+gField('g-secret','Cloudflare дээрх APP_PASSWORD','secret','off')+gField('g-user','Админы нэвтрэх нэр','text','username')+
+    gField('g-pass','Шинэ нууц үг','password','new-password')+SHOW_PW+err+'<button class="btn btn-primary" type="submit">Нууц үг сэргээх</button><button type="button" class="linkbtn" data-gate="login">Нэвтрэх хуудас руу буцах</button></form>';
   else if(kind==='nosecret') h += '<h1>APP_PASSWORD тохируулаагүй байна</h1><p class="lead">Анхны админыг үүсгэхэд Cloudflare дээрх APP_PASSWORD хэрэгтэй:</p>'+
     '<ol><li>Cloudflare → Workers &amp; Pages → энэ сайтын Worker</li><li><b>Settings</b> → <b>Variables and Secrets</b> → <b>Add</b></li><li>Type: <b>Secret</b>, нэр: <code>APP_PASSWORD</code>, утга: нууц үг</li><li><b>Deploy</b> дарна</li></ol>'+
     '<button class="btn btn-primary" id="gate-retry">Дахин шалгах</button>';
@@ -838,6 +845,11 @@ function showGate(kind, msg){
   if(form){
     setTimeout(()=>{ const f=form.querySelector('input'); f && f.focus(); }, 30);
     form.addEventListener('submit', e=>{ e.preventDefault(); gateSubmit(form.dataset.kind, form); });
+    const sh = form.querySelector('.g-show');
+    if(sh) sh.addEventListener('change', ()=>{
+      form.querySelectorAll('.secret-in').forEach(i=>i.classList.toggle('shown', sh.checked));
+      const pw = form.querySelector('#g-pass'); if(pw) pw.type = sh.checked ? 'text' : 'password';
+    });
   }
   g.querySelectorAll('[data-gate]').forEach(b=>b.addEventListener('click', ()=>showGate(b.dataset.gate)));
   const retry = document.getElementById('gate-retry');
@@ -858,7 +870,13 @@ async function gateSubmit(kind, f){
     else r = await api('/api/auth/reset', {method:'POST', body:{secret:v('g-secret'), username:v('g-user'), password:v('g-pass')}});
     setToken(r.token);
     await loadAfterLogin();
-  }catch(e){ showErr(e.message || 'Алдаа гарлаа'); }
+  }catch(e){
+    if(e.code==='bad_secret'){
+      const sec = f.querySelector('#g-secret'); if(sec){ sec.value=''; sec.focus(); }
+      return showErr('APP_PASSWORD буруу байна. Утас автоматаар нууц үг бөглөсөн байж магадгүй. Талбарыг цэвэрлэлээ, Cloudflare дээр тавьсан утгаа гараар бичнэ үү.');
+    }
+    showErr(e.message || 'Алдаа гарлаа');
+  }
 }
 async function loadAfterLogin(){
   const data = await api('/api/data');
